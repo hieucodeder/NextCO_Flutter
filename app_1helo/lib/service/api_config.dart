@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiConfig {
-  static const String baseUrllogin = 'https://demo.nextco.vn/api';
+  static const String baseUrlBasic = 'https://demo.nextco.vn/api';
   static const String baseUrl = 'https://demo.nextco.vn/api/api-co';
   static const String baseUrl1 = 'https://demo.nextco.vn/api/api-core';
 

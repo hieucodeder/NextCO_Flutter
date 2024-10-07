@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:app_1helo/char/LineChar.dart';
-import 'package:app_1helo/char/PieChart.dart';
+import 'package:app_1helo/charPage/LineCharPage.dart';
+import 'package:app_1helo/charPage/PieChartPage.dart';
 import 'package:app_1helo/service/customer_service..dart';
 import 'package:app_1helo/service/document_service.dart';
 import 'package:app_1helo/service/material_service.dart';
@@ -582,7 +582,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           //   ),
                           // ),
                           // const Materialschar(),
-                          const Linechar(),
+                          const Linecharpage(),
                         ],
                       ),
                     ),
@@ -712,10 +712,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 ],
                               ),
                               // Container(
-                              //   width: 150,
+                              //   width: 15
                               //   child: Container(child: const CustomSpinner()),
                               // )
-                              PieChartSample()
+                              const Piechartpage()
                             ],
                           ),
                         ],

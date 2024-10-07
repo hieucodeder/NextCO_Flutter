@@ -1,9 +1,6 @@
-import 'package:app_1helo/model/acount.dart';
 import 'package:app_1helo/model/bodylogin.dart';
-import 'package:app_1helo/model/user.dart';
-import 'package:app_1helo/pages/Accout.dart';
 import 'package:app_1helo/navigation/AppScreen.dart';
-import 'package:app_1helo/pages/ForgotPassword.dart';
+import 'package:app_1helo/login/ForgotPassword.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,9 +19,26 @@ class _LoginPageState extends State<LoginPage> {
 
   final AuthService _authService = AuthService();
 
+  bool _isPasswordVisible = false;
+
   Future<void> _login() async {
-    final String username = _usernameController.text;
-    final String password = _passwordController.text;
+    final String username = _usernameController.text.trim();
+    final String password = _passwordController.text.trim();
+
+    if (username.isEmpty) {
+      showValidationErrorSnackbar(context, 'Tài khoản không được để trống.');
+      return;
+    }
+
+    // if (!RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(username)) {
+    //   showValidationErrorSnackbar(context, 'Địa chỉ email không hợp lệ.');
+    //   return;
+    // }
+
+    if (password.isEmpty) {
+      showValidationErrorSnackbar(context, 'Mật khẩu không được để trống.');
+      return;
+    }
 
     final Bodylogin loginData =
         Bodylogin(username: username, password: password);
@@ -32,14 +46,11 @@ class _LoginPageState extends State<LoginPage> {
     Map<String, dynamic>? response = await _authService.login(loginData);
 
     if (response != null) {
-      // Acount account = response['account'];
-      // String token = response['token'];
       showLoginSnackbar(context);
     } else {
       setState(() {
-        _errorMessage = 'Login failed. Please try again.';
+        _errorMessage = 'Đăng nhập thất bại. Vui lòng thử lại.';
       });
-      print('Login failed');
       showLoginErrorSnackbar(context);
     }
   }
@@ -160,7 +171,7 @@ class _LoginPageState extends State<LoginPage> {
                                           color: const Color(0xFF064265)),
                                       border: const OutlineInputBorder(),
                                       prefixIcon: const Icon(
-                                        Icons.account_circle_outlined,
+                                        Icons.account_box_outlined,
                                         size: 24,
                                         color: const Color(0xFF064265),
                                       )),
@@ -200,21 +211,37 @@ class _LoginPageState extends State<LoginPage> {
                                           style: const TextStyle(
                                               color: Colors.black),
                                           controller: _passwordController,
-                                          obscureText: true,
+                                          obscureText: !_isPasswordVisible,
                                           decoration: InputDecoration(
-                                              hintText: '******',
-                                              hintStyle:
-                                                  GoogleFonts.robotoCondensed(
-                                                      fontSize: 14,
-                                                      color: const Color(
-                                                          0xFF064265)),
-                                              border:
-                                                  const OutlineInputBorder(),
-                                              prefixIcon: const Icon(
-                                                Icons.lock,
-                                                size: 24,
-                                                color: const Color(0xFF064265),
-                                              )),
+                                            hintText: '******',
+                                            hintStyle:
+                                                GoogleFonts.robotoCondensed(
+                                              fontSize: 14,
+                                              color: const Color(0xFF064265),
+                                            ),
+                                            border: const OutlineInputBorder(),
+                                            prefixIcon: const Icon(
+                                              Icons.lock_outline,
+                                              size: 24,
+                                              color: const Color(0xFF064265),
+                                            ),
+                                            suffixIcon: IconButton(
+                                              icon: Icon(
+                                                _isPasswordVisible
+                                                    ? Icons.visibility_outlined
+                                                    : Icons
+                                                        .visibility_off_outlined,
+                                                color: const Color(0xFFDFE2E2),
+                                                size: 18,
+                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  _isPasswordVisible =
+                                                      !_isPasswordVisible;
+                                                });
+                                              },
+                                            ),
+                                          ),
                                         ),
                                       ),
                                       Container(
@@ -343,4 +370,23 @@ void showLoginSnackbar(BuildContext context) {
       MaterialPageRoute(builder: (context) => const AppScreen()),
     );
   });
+}
+
+// Thông báo check thông tin tài khoản, mật khẩu
+void showValidationErrorSnackbar(BuildContext context, String message) {
+  final snackBar = SnackBar(
+    backgroundColor: Colors.white,
+    content: Text(
+      message,
+      style: GoogleFonts.robotoCondensed(color: Colors.black),
+    ),
+    duration: const Duration(seconds: 3),
+    action: SnackBarAction(
+      label: 'Đóng',
+      textColor: Colors.black,
+      onPressed: () {},
+    ),
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }

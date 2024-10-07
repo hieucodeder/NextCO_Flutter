@@ -1,8 +1,6 @@
 import 'package:app_1helo/navigation/AppScreen.dart';
-import 'package:app_1helo/pages/ForgotPassword.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:keyboard_avoider/keyboard_avoider.dart';
 
 class Forgotpassword extends StatefulWidget {
   const Forgotpassword({super.key});

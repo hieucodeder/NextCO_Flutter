@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   Future<Map<String, dynamic>?> login(Bodylogin loginData) async {
-    final url = Uri.parse('${ApiConfig.baseUrllogin}/login');
+    final url = Uri.parse('${ApiConfig.baseUrlBasic}/login');
 
     try {
       final response = await http.post(

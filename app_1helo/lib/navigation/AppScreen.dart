@@ -6,7 +6,7 @@ import 'package:app_1helo/pages/DSHoSoCO.dart';
 import 'package:app_1helo/navigation/Drawer.dart';
 import 'package:app_1helo/pages/Notification.dart';
 import 'package:app_1helo/pages/PersonalInfo.dart';
-import 'package:app_1helo/char/documentPage.dart';
+import 'package:app_1helo/charPage/documentPage.dart';
 import 'package:app_1helo/pages/home_page.dart';
 import 'package:app_1helo/pages/materialsPage.dart';
 import 'package:app_1helo/pages/productPage.dart';
