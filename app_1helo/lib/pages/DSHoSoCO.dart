@@ -1,8 +1,10 @@
 import 'package:app_1helo/model/documentss.dart';
+import 'package:app_1helo/provider/providerColor.dart';
 import 'package:app_1helo/service/document_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class Dshosoco extends StatefulWidget {
   const Dshosoco({Key? key}) : super(key: key);
@@ -58,15 +60,15 @@ class _DshosocoState extends State<Dshosoco> {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: GestureDetector(
               onTap: _selectDateRange,
               child: Container(
                 width: double.infinity,
-                height: 50,
+                height: 40,
                 margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -82,61 +84,86 @@ class _DshosocoState extends State<Dshosoco> {
                       labelText: 'Chọn Ngày Bắt Đầu và Kết Thúc',
                       labelStyle: GoogleFonts.robotoCondensed(fontSize: 14),
                       border: InputBorder.none,
-                      prefixIcon: const Icon(Icons.calendar_today),
+                      suffixIcon: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          VerticalDivider(
+                            width: 20,
+                            thickness: 1,
+                            color: Colors.black12,
+                          ),
+                          Icon(Icons.calendar_today),
+                        ],
+                      ),
+                      contentPadding: const EdgeInsets.all(5),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-          Column(
+          const SizedBox(
+            height: 10,
+          ),
+          Row(
             children: [
-              Container(
-                width: double.infinity,
-                height: 60,
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 10),
-                      constraints:
-                          const BoxConstraints.tightFor(width: 280, height: 50),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white),
-                      child: Expanded(
-                          child: TextField(
-                        decoration: InputDecoration(
-                            label: Text(
-                              'Số hồ sơ, tờ khai xuất, tình trạng',
-                              style: GoogleFonts.robotoCondensed(fontSize: 14),
-                            ),
-                            labelStyle: GoogleFonts.robotoCondensed(),
-                            prefixIcon: const Icon(Icons.search),
-                            border: const OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)))),
-                      )),
-                    ),
-                    Container(
-                      width: 80,
-                      height: 50,
-                      margin: const EdgeInsets.only(top: 10, left: 10),
-                      decoration: const BoxDecoration(
-                          color: Colors.black12,
+              Expanded(
+                  child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(width: 1, color: Colors.black26),
+                    color: Colors.white),
+                child: TextField(
+                  decoration: InputDecoration(
+                      label: Text(
+                        'Số hồ sơ, tờ khai xuất, tình trạng',
+                        style: GoogleFonts.robotoCondensed(fontSize: 14),
+                      ),
+                      labelStyle: GoogleFonts.robotoCondensed(),
+                      border: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(
                             Radius.circular(10),
-                          )),
-                      child: TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            'Thêm mới',
-                            style: GoogleFonts.robotoCondensed(),
-                          )),
-                    )
-                  ],
+                          ),
+                          borderSide: BorderSide.none),
+                      suffixIcon: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          VerticalDivider(
+                            width: 20,
+                            thickness: 1,
+                            color: Colors.black12,
+                          ),
+                          Icon(Icons.search_outlined)
+                        ],
+                      ),
+                      contentPadding: const EdgeInsets.all(5)),
                 ),
+              )),
+              const SizedBox(
+                width: 10,
               ),
+              Container(
+                  width: 90,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                      color: Colors.black12,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10),
+                      )),
+                  child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Provider.of<Providercolor>(context).selectedColor,
+                        padding: const EdgeInsets.all(10),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: Text(
+                        'Thêm mới',
+                        style: GoogleFonts.robotoCondensed(color: Colors.white),
+                      )))
             ],
           ),
           FutureBuilder<List<Data>>(

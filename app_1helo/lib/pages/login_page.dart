@@ -1,6 +1,6 @@
 import 'package:app_1helo/model/bodylogin.dart';
-import 'package:app_1helo/navigation/AppScreen.dart';
-import 'package:app_1helo/login/ForgotPassword.dart';
+import 'package:app_1helo/pages/AppScreen.dart';
+import 'package:app_1helo/pages/ForgotPassword.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

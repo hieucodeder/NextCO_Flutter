@@ -19,7 +19,7 @@ class _DrawerCustomState extends State<DrawerCustom> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-        width: double.infinity,
+        // width: double.infinity,
         backgroundColor: Provider.of<Providercolor>(context).selectedColor,
         child: SafeArea(
           minimum: const EdgeInsets.only(left: 5, top: 27, right: 20),

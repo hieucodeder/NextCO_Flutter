@@ -62,16 +62,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void startRandomNumber() {
     timer = Timer.periodic(const Duration(milliseconds: 100), (Timer t) {
-      setState(() {
-        // randomNumber = (Random().nextInt(900000) + 1).toString();
-        randomNumber = (Random().nextInt(100) + 1).toString();
-      });
+      if (mounted) {
+        setState(() {
+          randomNumber = (Random().nextInt(100) + 1).toString();
+        });
+      }
     });
   }
 
   void randomNumberFunc(int range) {
     timer = Timer.periodic(const Duration(milliseconds: 100), (Timer t) {
-      randomNumber = (Random().nextInt(100) + 1).toString();
+      if (mounted) {
+        setState(() {
+          randomNumber = (Random().nextInt(100) + 1).toString();
+        });
+      }
     });
   }
 
@@ -144,7 +149,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             const SizedBox(
               height: 10,
             ),
-            Container(
+            SizedBox(
               width: MediaQuery.of(context).size.width,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -160,7 +165,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           color: const Color(0xfff9f0ff),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0x5C6566).withOpacity(0.3),
+                              color: const Color(0x005c6566).withOpacity(0.3),
                               blurRadius: 8,
                             )
                           ]),
@@ -169,7 +174,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Container(
+                          SizedBox(
                             width: 100,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -188,18 +193,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               ],
                             ),
                           ),
-                          Container(
-                            // width: 90,
-                            // height: 90,
-                            child: Center(
-                              child: SvgPicture.asset(
-                                'resources/khachhang.svg',
-                                // color: Color(0xD3ADF7).withOpacity(0.2),
+                          Center(
+                            child: SvgPicture.asset(
+                              'resources/khachhang.svg',
+                              // color: Color(0xD3ADF7).withOpacity(0.2),
 
-                                fit: BoxFit.contain,
-                                width: 56,
-                                height: 56,
-                              ),
+                              fit: BoxFit.contain,
+                              width: 56,
+                              height: 56,
                             ),
                           ),
                         ],
@@ -220,7 +221,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           color: const Color(0xffECFCFE),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0x5C6566).withOpacity(0.3),
+                              color: const Color(0x005c6566).withOpacity(0.3),
                               blurRadius: 8,
                             )
                           ]),
@@ -230,14 +231,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Container(
+                          SizedBox(
                             width: 90,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 renderNumberResult(
-                                    totalDocuments, Color(0xff064265)),
+                                    totalDocuments, const Color(0xff064265)),
                                 Text(
                                   'Hồ sơ C/O',
                                   style: GoogleFonts.robotoCondensed(
@@ -248,16 +249,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               ],
                             ),
                           ),
-                          Container(
-                            // width: 90,
-                            // height: 90,
-                            child: Center(
-                              child: SvgPicture.asset(
-                                'resources/hoso.svg',
-                                fit: BoxFit.contain,
-                                height: 56,
-                                width: 56,
-                              ),
+                          Center(
+                            child: SvgPicture.asset(
+                              'resources/hoso.svg',
+                              fit: BoxFit.contain,
+                              height: 56,
+                              width: 56,
                             ),
                           ),
                         ],
@@ -270,7 +267,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             const SizedBox(
               height: 10,
             ),
-            Container(
+            SizedBox(
               width: MediaQuery.of(context).size.width,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -287,7 +284,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           color: const Color(0xffF6FFED),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0x5C6566).withOpacity(0.3),
+                              color: const Color(0x005c6566).withOpacity(0.3),
                               blurRadius: 8,
                             )
                           ]),
@@ -296,14 +293,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Container(
+                          SizedBox(
                             width: 90,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 renderNumberResult(
-                                    totalProduct, Color(0xff389E0D)),
+                                    totalProduct, const Color(0xff389E0D)),
                                 Text(
                                   'Sản phẩm',
                                   style: GoogleFonts.robotoCondensed(
@@ -315,16 +312,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               ],
                             ),
                           ),
-                          Container(
-                            // width: 90,
-                            // height: 90,
-                            child: Center(
-                              child: SvgPicture.asset(
-                                'resources/Product.svg',
-                                fit: BoxFit.contain,
-                                width: 56,
-                                height: 56,
-                              ),
+                          Center(
+                            child: SvgPicture.asset(
+                              'resources/Product.svg',
+                              fit: BoxFit.contain,
+                              width: 56,
+                              height: 56,
                             ),
                           ),
                         ],
@@ -343,7 +336,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           color: const Color(0xffFFF7E6),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0x5C6566).withOpacity(0.3),
+                              color: const Color(0x005c6566).withOpacity(0.3),
                               blurRadius: 8,
                             )
                           ]),
@@ -352,14 +345,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Container(
+                          SizedBox(
                             width: 90,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 renderNumberResult(
-                                    totalMaterial, Color(0xffFA8C16)),
+                                    totalMaterial, const Color(0xffFA8C16)),
                                 Text('Nguyên vật liệu',
                                     style: GoogleFonts.robotoCondensed(
                                         fontSize: 14,
@@ -368,16 +361,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               ],
                             ),
                           ),
-                          Container(
-                            // width: 90,
-                            // height: 90,
-                            child: Center(
-                              child: SvgPicture.asset(
-                                'resources/Material.svg',
-                                fit: BoxFit.contain,
-                                height: 56,
-                                width: 56,
-                              ),
+                          Center(
+                            child: SvgPicture.asset(
+                              'resources/Material.svg',
+                              fit: BoxFit.contain,
+                              height: 56,
+                              width: 56,
                             ),
                           ),
                         ],
@@ -408,13 +397,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Container(
+                    SizedBox(
                       width: 90,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          renderNumberResult(totalUser, Color(0xff13C2C2)),
+                          renderNumberResult(
+                              totalUser, const Color(0xff13C2C2)),
                           Text('Nhân viên',
                               style: GoogleFonts.robotoCondensed(
                                   fontSize: 14,
@@ -423,16 +413,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ],
                       ),
                     ),
-                    Container(
-                      // width: 90,
-                      // height: 90,
-                      child: Center(
-                        child: SvgPicture.asset(
-                          'resources/Employed.svg',
-                          fit: BoxFit.contain,
-                          height: 56,
-                          width: 5,
-                        ),
+                    Center(
+                      child: SvgPicture.asset(
+                        'resources/Employed.svg',
+                        fit: BoxFit.contain,
+                        height: 56,
+                        width: 5,
                       ),
                     ),
                   ],
@@ -446,7 +432,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                      color: const Color(0xff282A),
+                      color: const Color(0x00ff282a),
                       border: Border.all(
                           width: 1,
                           color: const Color(0xffC4C9CA),
@@ -467,7 +453,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     fontSize: 14, fontWeight: FontWeight.bold)),
                           ),
                           const Divider(color: Color(0xffC4C9CA)),
-                          Container(
+                          SizedBox(
                             width: double.infinity,
                             height: 50,
                             child: Row(
@@ -491,12 +477,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       child: Text(
                                         'CÔNG TY TNHH SE...',
                                         style: styleText,
-
-                                        // style: TextStyle(color: Colors.white),
-                                        // decoration: InputDecoration(
-                                        //   labelText: 'Tất cả khách hàng',
-                                        //   border: OutlineInputBorder(),
-                                        // ),
                                       ),
                                     ),
                                   ),
@@ -517,12 +497,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(
-                                        'Nguyễn ăn A', style: styleText,
-                                        // style: TextStyle(color: Colors.white),
-                                        // decoration: InputDecoration(
-                                        //   labelText: 'Tất cả khách hàng',
-                                        //   border: OutlineInputBorder(),
-                                        // ),
+                                        'Nguyễn ăn A',
+                                        style: styleText,
                                       ),
                                     ),
                                   ),
@@ -530,58 +506,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               ],
                             ),
                           ),
-                          // Container(
-                          //   width: MediaQuery.of(context).size.width,
-                          //   padding: const EdgeInsets.only(left: 100),
-                          //   child: Row(
-                          //     children: [
-                          //       Row(
-                          //         children: [
-                          //           const Align(
-                          //             alignment: Alignment.centerLeft,
-                          //             child: Icon(
-                          //                 Icons.check_box_outline_blank_sharp,
-                          //                 color: Colors.green),
-                          //           ),
-                          //           Text(
-                          //             'Đã hoàn thành',
-                          //             style: styleText,
-                          //           )
-                          //         ],
-                          //       ),
-                          //       Row(
-                          //         children: [
-                          //           const Align(
-                          //             alignment: Alignment.center,
-                          //             child: Icon(
-                          //                 Icons.check_box_outline_blank_sharp,
-                          //                 color: Colors.orange),
-                          //           ),
-                          //           Text(
-                          //             'Đã sửa',
-                          //             style: styleText,
-                          //           )
-                          //         ],
-                          //       ),
-                          //       Row(
-                          //         children: [
-                          //           const Align(
-                          //             alignment: Alignment.centerRight,
-                          //             child: Icon(
-                          //               Icons.check_box_outline_blank_sharp,
-                          //               color: Colors.red,
-                          //             ),
-                          //           ),
-                          //           Text(
-                          //             'Đã hủy',
-                          //             style: styleText,
-                          //           )
-                          //         ],
-                          //       ),
-                          //     ],
-                          //   ),
-                          // ),
-                          // const Materialschar(),
                           const Linecharpage(),
                         ],
                       ),
@@ -597,129 +521,112 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                          width: 1,
-                          color: const Color(0xffC4C9CA),
-                          style: BorderStyle.solid),
-                    ),
-                    width: MediaQuery.of(context).size.width,
-                    height: 450,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 36,
-                            padding: const EdgeInsets.all(8),
-                            child: Text('Tỷ lệ hồ sơ C/O theo trạng thái',
-                                style: GoogleFonts.robotoCondensed(
-                                    fontSize: 14, fontWeight: FontWeight.bold)),
-                          ),
-                          const Divider(color: Color(0xffC4C9CA)),
-                          Column(
-                            children: [
-                              Container(
-                                width: MediaQuery.of(context).size.width,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                        width: 1,
-                                        color: const Color(0xffC4C9CA),
-                                        style: BorderStyle.solid)),
-                                child: AbsorbPointer(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: TextField(
-                                      readOnly: true,
-                                      textAlign: TextAlign.center,
-                                      decoration: InputDecoration(
-                                        labelText:
-                                            'Chọn Ngày Bắt Đầu và Kết Thúc',
-                                        labelStyle: GoogleFonts.robotoCondensed(
-                                            fontSize: 14),
-                                        border: InputBorder.none,
-                                        prefixIcon:
-                                            const Icon(Icons.calendar_today),
-                                      ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                        width: 1,
+                        color: const Color(0xffC4C9CA),
+                        style: BorderStyle.solid),
+                  ),
+                  width: MediaQuery.of(context).size.width,
+                  height: 450,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 36,
+                          padding: const EdgeInsets.all(8),
+                          child: Text('Tỷ lệ hồ sơ C/O theo trạng thái',
+                              style: GoogleFonts.robotoCondensed(
+                                  fontSize: 14, fontWeight: FontWeight.bold)),
+                        ),
+                        const Divider(color: Color(0xffC4C9CA)),
+                        Column(
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                      width: 1,
+                                      color: const Color(0xffC4C9CA),
+                                      style: BorderStyle.solid)),
+                              child: AbsorbPointer(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: TextField(
+                                    readOnly: true,
+                                    textAlign: TextAlign.center,
+                                    decoration: InputDecoration(
+                                      labelText:
+                                          'Chọn Ngày Bắt Đầu và Kết Thúc',
+                                      labelStyle: GoogleFonts.robotoCondensed(
+                                          fontSize: 14),
+                                      border: InputBorder.none,
+                                      prefixIcon:
+                                          const Icon(Icons.calendar_today),
                                     ),
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: 168,
-                                    height: 36,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                            color: const Color(0xffC4C9CA),
-                                            width: 1,
-                                            style: BorderStyle.solid)),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        _showsimpleDialog(context);
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          'CÔNG TY TNHH SE...',
-                                          style: styleText,
-
-                                          // style: TextStyle(color: Colors.white),
-                                          // decoration: InputDecoration(
-                                          //   labelText: 'Tất cả khách hàng',
-                                          //   border: OutlineInputBorder(),
-                                          // ),
-                                        ),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  width: 168,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                          color: const Color(0xffC4C9CA),
+                                          width: 1,
+                                          style: BorderStyle.solid)),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _showsimpleDialog(context);
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        'CÔNG TY TNHH SE...',
+                                        style: styleText,
                                       ),
                                     ),
                                   ),
-                                  Container(
-                                    width: 168,
-                                    height: 36,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                            color: const Color(0xffC4C9CA),
-                                            width: 1,
-                                            style: BorderStyle.solid)),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        _showsimpleDialog(context);
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          'Nguyễn ăn A', style: styleText,
-                                          // style: TextStyle(color: Colors.white),
-                                          // decoration: InputDecoration(
-                                          //   labelText: 'Tất cả khách hàng',
-                                          //   border: OutlineInputBorder(),
-                                          // ),
-                                        ),
+                                ),
+                                Container(
+                                  width: 168,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                          color: const Color(0xffC4C9CA),
+                                          width: 1,
+                                          style: BorderStyle.solid)),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _showsimpleDialog(context);
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        'Nguyễn ăn A',
+                                        style: styleText,
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
-                              // Container(
-                              //   width: 15
-                              //   child: Container(child: const CustomSpinner()),
-                              // )
-                              const Piechartpage()
-                            ],
-                          ),
-                        ],
-                      ),
+                                ),
+                              ],
+                            ),
+                            const Piechartpage()
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),

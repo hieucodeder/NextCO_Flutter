@@ -26,21 +26,22 @@ class _MaterialspageState extends State<Materialspage> {
     _scrollController.addListener(_onScroll);
   }
 
-  // Fetch initial products
   Future<void> fetchInitialMaterials() async {
     setState(() => isLoading = true);
     List<Data> initialMaterial =
         await materialService.fetchMaterials(currentPage, pageSize);
+
+    if (!mounted) return;
+
     setState(() {
       materialList = initialMaterial;
       isLoading = false;
       if (initialMaterial.length < pageSize) {
-        hasMoreData = false; // No more products to load
+        hasMoreData = false;
       }
     });
   }
 
-  // Load more products when scrolled to the bottom
   Future<void> _loadMoreMaterial() async {
     if (isLoading || !hasMoreData) return;
 
@@ -48,11 +49,14 @@ class _MaterialspageState extends State<Materialspage> {
     currentPage++;
     List<Data> moreProducts =
         await materialService.fetchMaterials(currentPage, pageSize);
+
+    if (!mounted) return;
+
     setState(() {
       materialList.addAll(moreProducts);
       isLoading = false;
       if (moreProducts.length < pageSize) {
-        hasMoreData = false; // No more products to load
+        hasMoreData = false;
       }
     });
   }
@@ -75,37 +79,41 @@ class _MaterialspageState extends State<Materialspage> {
   Widget build(BuildContext context) {
     return Container(
       constraints: const BoxConstraints.expand(),
-      color: Colors.black12,
       child: Container(
         padding: const EdgeInsets.all(10),
         child: Column(
           children: [
-            // Search bar
             Container(
-              width: 300,
+              width: MediaQuery.of(context).size.width,
               height: 40,
-              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
+                border: Border.all(width: 1, color: Colors.black26),
                 color: Colors.white,
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                          hintText: 'Mã NV',
-                          hintStyle: GoogleFonts.robotoCondensed()),
-                    ),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Mã NV',
+                  hintStyle: GoogleFonts.robotoCondensed(),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none),
+                  suffixIcon: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      VerticalDivider(
+                        width: 20,
+                        thickness: 1,
+                        color: Colors.black12,
+                      ),
+                      Icon(Icons.search_outlined)
+                    ],
                   ),
-                  const Icon(Icons.search),
-                ],
+                  contentPadding: const EdgeInsets.all(5),
+                ),
               ),
             ),
             const SizedBox(height: 10),
-
-            // Product List Data Table
             Expanded(
               child: FutureBuilder<void>(
                 future: fetchInitialMaterials(),
@@ -115,7 +123,7 @@ class _MaterialspageState extends State<Materialspage> {
                   } else if (snapshot.hasError) {
                     return Center(child: Text("Error: ${snapshot.error}"));
                   } else if (materialList.isEmpty) {
-                    return const Center(child: Text("No products found"));
+                    return const Center(child: Text("No materials found"));
                   }
 
                   return Scrollbar(
@@ -161,7 +169,6 @@ class _MaterialspageState extends State<Materialspage> {
                 },
               ),
             ),
-
             if (isLoading)
               const Padding(
                 padding: EdgeInsets.all(10.0),

@@ -27,7 +27,9 @@ class _LinecharpageState extends State<Linecharpage> {
     LineCharModel1.LinecharModel? lineChartResponse =
         await _lineChartService.fetchLineChartData('employeeId', 'customerId');
 
-    if (lineChartResponse != null && lineChartResponse.data != null) {
+    if (mounted &&
+        lineChartResponse != null &&
+        lineChartResponse.data != null) {
       setState(() {
         _completeCoSpots = lineChartResponse.data!.completeCo?.map((co) {
               return FlSpot(
@@ -49,7 +51,7 @@ class _LinecharpageState extends State<Linecharpage> {
 
         _isLoading = false;
       });
-    } else {
+    } else if (mounted) {
       setState(() {
         _isLoading = false;
       });

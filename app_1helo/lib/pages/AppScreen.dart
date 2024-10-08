@@ -6,7 +6,6 @@ import 'package:app_1helo/pages/DSHoSoCO.dart';
 import 'package:app_1helo/navigation/Drawer.dart';
 import 'package:app_1helo/pages/Notification.dart';
 import 'package:app_1helo/pages/PersonalInfo.dart';
-import 'package:app_1helo/charPage/documentPage.dart';
 import 'package:app_1helo/pages/home_page.dart';
 import 'package:app_1helo/pages/materialsPage.dart';
 import 'package:app_1helo/pages/productPage.dart';
@@ -52,7 +51,7 @@ class _AppScreenState extends State<AppScreen> {
       case 5:
         _appBarTitle = "ĐỔI MẬT KHẨU";
         break;
-      case 10:
+      case 6:
         _appBarTitle = "QUẢN LÝ NGƯỜI DÙNG";
         break;
       case 7:
@@ -84,7 +83,7 @@ class _AppScreenState extends State<AppScreen> {
       case 5:
         return const Changepassword();
       case 6:
-        return Text('đây rồi');
+        return const Staffpage();
       case 7:
         return const ProductPage();
       case 8:

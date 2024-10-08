@@ -19,6 +19,7 @@ class _PiechartpageState extends State<Piechartpage> {
     Colors.red,
     Colors.orange,
   ];
+  bool _isFetchingData = false;
 
   @override
   void initState() {
@@ -27,6 +28,9 @@ class _PiechartpageState extends State<Piechartpage> {
   }
 
   Future<void> fetchData() async {
+    setState(() {
+      _isFetchingData = true;
+    });
     final pieCharService = PiecharService();
     final pieChartData = await pieCharService.fetchPieChartData(
       'employeeIdValue',
@@ -35,17 +39,30 @@ class _PiechartpageState extends State<Piechartpage> {
       '2023-01-31',
     );
 
-    if (pieChartData != null && pieChartData.success == true) {
-      setState(() {
-        dataMap = {
-          "Đang thực hiện": pieChartData.inProgress ?? 0.0,
-          "Đã hoàn thành": pieChartData.completed ?? 0.0,
-          "Đã sửa": pieChartData.revised ?? 0.0,
-        };
-      });
-    } else {
-      print('Failed to fetch pie chart data or data is unsuccessful');
+    if (mounted) {
+      if (pieChartData != null && pieChartData.success == true) {
+        setState(() {
+          dataMap = {
+            "Đang thực hiện": pieChartData.inProgress ?? 0.0,
+            "Đã hoàn thành": pieChartData.completed ?? 0.0,
+            "Đã sửa": pieChartData.revised ?? 0.0,
+          };
+        });
+      } else {
+        print('Failed to fetch pie chart data or data is unsuccessful');
+      }
     }
+
+    if (mounted) {
+      setState(() {
+        _isFetchingData = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
