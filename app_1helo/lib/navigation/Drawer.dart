@@ -428,51 +428,6 @@ class _DrawerCustomState extends State<DrawerCustom> {
                                 )
                               ],
                             ),
-
-                            // Row(
-                            //   children: [
-                            //     Expanded(
-                            //       child: ListTile(
-                            //         leading: Radio(
-                            //           value: Colors.red,
-                            //           groupValue: _selectedColor,
-                            //           onChanged: (Color? values) {
-                            //             setState(() {
-                            //               _selectedColor = values!;
-                            //             });
-                            //             Navigator.pop(context);
-                            //           },
-                            //         ),
-                            //       ),
-                            //     ),
-                            //     Expanded(
-                            //       child: ListTile(
-                            //         leading: Radio(
-                            //           value: Colors.blue,
-                            //           groupValue: _selectedColor,
-                            //           onChanged: (Color? values) {
-                            //             setState(() {
-                            //               _selectedColor = values!;
-                            //             });
-                            //           },
-                            //         ),
-                            //       ),
-                            //     ),
-                            //     Expanded(
-                            //       child: ListTile(
-                            //         leading: Radio(
-                            //           value: Colors.green,
-                            //           groupValue: _selectedColor,
-                            //           onChanged: (Color? values) {
-                            //             setState(() {
-                            //               _selectedColor = values!;
-                            //             });
-                            //           },
-                            //         ),
-                            //       ),
-                            //     ),
-                            //   ],
-                            // ),
                           ],
                         ),
                       ),

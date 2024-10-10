@@ -14,9 +14,27 @@ class Staffpage extends StatefulWidget {
 
 class _StaffpageState extends State<Staffpage> {
   final ScrollController _scrollController = ScrollController();
-
   late Future<List<Data>> users;
   UserService userService = UserService();
+  final TextEditingController _searchController = TextEditingController();
+
+  List<Data> _searchResults = [];
+  bool _isSearching = false;
+
+  Future<void> _searchUsers(String searchQuery) async {
+    if (searchQuery.isEmpty) {
+      setState(() {
+        _isSearching = false;
+      });
+      return;
+    }
+
+    List<Data> results = await userService.searchUser(searchQuery);
+    setState(() {
+      _searchResults = results;
+      _isSearching = true;
+    });
+  }
 
   @override
   void initState() {
@@ -88,6 +106,7 @@ class _StaffpageState extends State<Staffpage> {
                       border: Border.all(width: 1, color: Colors.black26),
                       color: Colors.white),
                   child: TextField(
+                    controller: _searchController,
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
@@ -99,19 +118,24 @@ class _StaffpageState extends State<Staffpage> {
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide.none),
                       hintStyle: GoogleFonts.robotoCondensed(fontSize: 14),
-                      suffixIcon: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          VerticalDivider(
-                            color: Colors.black26,
-                            width: 20,
-                            thickness: 1,
-                          ),
-                          Icon(
-                            Icons.search_outlined,
-                            size: 24,
-                          )
-                        ],
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          _searchUsers(_searchController.text);
+                        },
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            VerticalDivider(
+                              color: Colors.black26,
+                              width: 20,
+                              thickness: 1,
+                            ),
+                            Icon(
+                              Icons.search_outlined,
+                              size: 24,
+                            )
+                          ],
+                        ),
                       ),
                       contentPadding: const EdgeInsets.all(10),
                     ),
@@ -141,102 +165,118 @@ class _StaffpageState extends State<Staffpage> {
               )
             ],
           ),
-          FutureBuilder<List<Data>>(
-            future: users,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text("Error: ${snapshot.error}"));
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(child: Text("No documents found"));
-              }
+          const SizedBox(
+            height: 10,
+          ),
+          Expanded(
+            child: FutureBuilder<List<Data>>(
+              future: users,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (_isSearching && _searchResults.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "Dữ liệu tìm kiếm không có!!!",
+                      style: GoogleFonts.robotoCondensed(
+                          fontSize: 16,
+                          color: Provider.of<Providercolor>(context)
+                              .selectedColor),
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text("Không tìm thấy user"));
+                }
 
-              final userList = snapshot.data!;
+                final userList = _isSearching ? _searchResults : snapshot.data!;
 
-              return Expanded(
-                child: Scrollbar(
-                  controller: _scrollController,
-                  thumbVisibility: true,
-                  radius: const Radius.circular(10),
-                  thickness: 8,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
+                return SingleChildScrollView(
+                  child: Scrollbar(
                     controller: _scrollController,
-                    child: DataTable(
-                      columns: const [
-                        DataColumn(label: Text('STT')),
-                        DataColumn(label: Text('Tài khoản')),
-                        DataColumn(label: Text('Họ và tên')),
-                        DataColumn(label: Text('Số điện thoại')),
-                        DataColumn(label: Text('Email')),
-                        DataColumn(label: Text('Chức vụ')),
-                        DataColumn(label: Text('Chi nhánh')),
-                        DataColumn(label: Text('Phòng ban')),
-                        DataColumn(label: Text('Phân quyền')),
-                        DataColumn(label: Text('Action')),
-                      ],
-                      rows: userList.map((doc) {
-                        return DataRow(cells: [
-                          DataCell(Text(doc.rowNumber?.toString() ?? '')),
-                          DataCell(Text(
-                            doc.userName?.toString() ?? '',
-                            style: GoogleFonts.robotoCondensed(
-                                fontWeight: FontWeight.w700,
-                                color: Colors.blue),
-                          )),
-                          DataCell(Text(
-                            doc.fullName?.toString() ?? '',
-                          )),
-                          DataCell(Text(doc.phoneNumber ?? '')),
-                          DataCell(Text(
-                            doc.email ?? '',
-                            style: GoogleFonts.robotoCondensed(
-                                fontWeight: FontWeight.w700,
-                                color: Colors.blue),
-                          )),
-                          DataCell(Text(doc.positionName ?? '')),
-                          DataCell(Text(doc.branchName ?? '')),
-                          DataCell(Text(doc.departmentName ?? '')),
-                          DataCell(Text(doc.roleGroup ?? '')),
-                          DataCell(Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit_outlined,
-                                    size: 24, color: Colors.orange),
-                                onPressed: () {},
-                              ),
-                              IconButton(
+                    thumbVisibility: true,
+                    radius: const Radius.circular(10),
+                    thickness: 8,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      controller: _scrollController,
+                      child: DataTable(
+                        columns: const [
+                          DataColumn(label: Text('STT')),
+                          DataColumn(label: Text('Tài khoản')),
+                          DataColumn(label: Text('Họ và tên')),
+                          DataColumn(label: Text('Số điện thoại')),
+                          DataColumn(label: Text('Email')),
+                          DataColumn(label: Text('Chức vụ')),
+                          DataColumn(label: Text('Chi nhánh')),
+                          DataColumn(label: Text('Phòng ban')),
+                          DataColumn(label: Text('Phân quyền')),
+                          DataColumn(label: Text('Action')),
+                        ],
+                        rows: userList.map((doc) {
+                          return DataRow(cells: [
+                            DataCell(Text(doc.rowNumber?.toString() ?? '')),
+                            DataCell(Text(
+                              doc.userName?.toString() ?? '',
+                              style: GoogleFonts.robotoCondensed(
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.blue),
+                            )),
+                            DataCell(Text(
+                              doc.fullName?.toString() ?? '',
+                            )),
+                            DataCell(Text(doc.phoneNumber ?? '')),
+                            DataCell(Text(
+                              doc.email ?? '',
+                              style: GoogleFonts.robotoCondensed(
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.blue),
+                            )),
+                            DataCell(Text(doc.positionName ?? '')),
+                            DataCell(Text(doc.branchName ?? '')),
+                            DataCell(Text(doc.departmentName ?? '')),
+                            DataCell(Text(doc.roleGroup ?? '')),
+                            DataCell(Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit_outlined,
+                                      size: 24, color: Colors.orange),
                                   onPressed: () {},
-                                  icon: const Icon(
-                                    Icons.lock_open_outlined,
-                                    size: 24,
-                                    color: Colors.green,
-                                  )),
-                              IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(
-                                    Icons.delete_outline,
-                                    size: 24,
-                                    color: Colors.red,
-                                  )),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.replay,
-                                  size: 24,
-                                  color: Colors.blue,
                                 ),
-                                onPressed: () {},
-                              ),
-                            ],
-                          )),
-                        ]);
-                      }).toList(),
+                                IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.lock_open_outlined,
+                                      size: 24,
+                                      color: Colors.green,
+                                    )),
+                                IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.delete_outline,
+                                      size: 24,
+                                      color: Colors.red,
+                                    )),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.replay,
+                                    size: 24,
+                                    color: Colors.blue,
+                                  ),
+                                  onPressed: () {},
+                                ),
+                              ],
+                            )),
+                          ]);
+                        }).toList(),
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ],
       ),

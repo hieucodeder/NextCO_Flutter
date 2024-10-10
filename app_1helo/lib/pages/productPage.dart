@@ -1,7 +1,9 @@
 import 'package:app_1helo/model/productss.dart';
+import 'package:app_1helo/provider/providerColor.dart';
 import 'package:app_1helo/service/product_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({super.key});
@@ -18,6 +20,23 @@ class _ProductPageState extends State<ProductPage> {
   final int pageSize = 10;
   ProductService productService = ProductService();
   bool hasMoreData = true;
+  final TextEditingController _searchController = TextEditingController();
+  List<Data> _searchResults = [];
+  bool _isSearching = false;
+
+  Future<void> _searchProducts(String searchQuery) async {
+    if (searchQuery.isEmpty) {
+      setState(() {
+        _isSearching = false;
+      });
+      return;
+    }
+    List<Data> results = await productService.searchProducts(searchQuery);
+    setState(() {
+      _searchResults = results;
+      _isSearching = true;
+    });
+  }
 
   @override
   void initState() {
@@ -80,6 +99,7 @@ class _ProductPageState extends State<ProductPage> {
 
   @override
   Widget build(BuildContext context) {
+    List<Data> displayList = _isSearching ? _searchResults : productList;
     return Container(
       constraints: const BoxConstraints.expand(),
       padding: const EdgeInsets.all(10),
@@ -95,22 +115,31 @@ class _ProductPageState extends State<ProductPage> {
               color: Colors.white,
             ),
             child: TextField(
+              controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Mã sản phẩm',
                 hintStyle: GoogleFonts.robotoCondensed(),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none),
-                suffixIcon: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    VerticalDivider(
-                      width: 20,
-                      color: Colors.black12,
-                      thickness: 1,
-                    ),
-                    Icon(Icons.search),
-                  ],
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    _searchProducts(_searchController.text);
+                  },
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      VerticalDivider(
+                        width: 20,
+                        color: Colors.black12,
+                        thickness: 1,
+                      ),
+                      Icon(
+                        Icons.search_outlined,
+                        size: 24,
+                      ),
+                    ],
+                  ),
                 ),
                 contentPadding: const EdgeInsets.all(5),
               ),
@@ -118,10 +147,18 @@ class _ProductPageState extends State<ProductPage> {
           ),
           const SizedBox(height: 10),
           Expanded(
-            child: productList.isEmpty && isLoading
+            child: displayList.isEmpty && isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : productList.isEmpty
-                    ? const Center(child: Text("No products found"))
+                : displayList.isEmpty
+                    ? Center(
+                        child: Text(
+                          "Dữ liệu tìm kiếm không có!!!",
+                          style: GoogleFonts.robotoCondensed(
+                              fontSize: 16,
+                              color: Provider.of<Providercolor>(context)
+                                  .selectedColor),
+                        ),
+                      )
                     : Scrollbar(
                         controller: _scrollController,
                         thumbVisibility: true,
@@ -144,7 +181,7 @@ class _ProductPageState extends State<ProductPage> {
                                 DataColumn(label: Text('Đơn vị tính')),
                                 DataColumn(label: Text('Action')),
                               ],
-                              rows: productList.map((doc) {
+                              rows: displayList.map((doc) {
                                 return DataRow(cells: [
                                   DataCell(
                                       Text(doc.rowNumber?.toString() ?? '')),
@@ -154,9 +191,9 @@ class _ProductPageState extends State<ProductPage> {
                                         fontWeight: FontWeight.w700,
                                         color: Colors.blue),
                                   )),
-                                  DataCell(Text(doc.productId ?? '')),
+                                  DataCell(Text(doc.productCode ?? '')),
                                   DataCell(Text(doc.productName ?? '')),
-                                  DataCell(Text(doc.normId ?? '')),
+                                  DataCell(Text(doc.productExpenseId ?? '')),
                                   DataCell(Text(doc.productExpenseId ?? '')),
                                   DataCell(Text(doc.customerName ?? '')),
                                   DataCell(Text(doc.unit?.toString() ?? '')),

@@ -15,17 +15,38 @@ class Dshosoco extends StatefulWidget {
 
 class _DshosocoState extends State<Dshosoco> {
   final ScrollController _scrollController = ScrollController();
-
+  final TextEditingController _searchController = TextEditingController();
   late Future<List<Data>> documents;
   DocumentService documentService = DocumentService();
+  List<Data> allDocuments = [];
+  final TextEditingController _searchControllerDocuments =
+      TextEditingController();
+  List<Data> _searchResults = [];
+  bool _isSearching = false;
+
+  Future<void> _searchDocuments(String searchQuery) async {
+    if (searchQuery.isEmpty) {
+      setState(() {
+        _isSearching = false;
+      });
+      return;
+    }
+    List<Data> results = await documentService.searchDocuments(searchQuery);
+    setState(() {
+      _searchResults = results;
+      _isSearching = true;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    documents = documentService.fetchDocuments();
+    documents = documentService.fetchDocuments().then((docs) {
+      allDocuments = docs;
+      return docs;
+    });
   }
 
-//Date
   String? startDate;
   String? endDate;
   final TextEditingController _controller = TextEditingController();
@@ -48,11 +69,57 @@ class _DshosocoState extends State<Dshosoco> {
 
       if (endPicked != null) {
         setState(() {
-          startDate = DateFormat('dd/MM/yyyy').format(startPicked);
-          endDate = DateFormat('dd/MM/yyyy').format(endPicked);
+          startDate = DateFormat('yyyy-MM-dd').format(startPicked);
+          endDate = DateFormat('yyyy-MM-dd').format(endPicked);
           _controller.text = '$startDate - $endDate';
         });
+
+        await _searchDocumentsByDateRange();
       }
+    }
+  }
+
+  List<Data> _filterDocuments(String query) {
+    if (query.isEmpty) return allDocuments;
+
+    return allDocuments.where((doc) {
+      final documentIdMatch = doc.coDocumentId != null &&
+          doc.coDocumentId
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase());
+
+      final customerNameMatch = doc.customerName != null &&
+          doc.customerName!.toLowerCase().contains(query.toLowerCase());
+
+      final employeeNameMatch = doc.employeeName != null &&
+          doc.employeeName!.toLowerCase().contains(query.toLowerCase());
+
+      return documentIdMatch || customerNameMatch || employeeNameMatch;
+    }).toList();
+  }
+
+  Future<void> _searchDocumentsByDateRange() async {
+    if (startDate != null && endDate != null) {
+      try {
+        List<Data> filteredDocuments =
+            await documentService.searchDocumentsByDateRange(
+          DateTime.parse(startDate!),
+          DateTime.parse(endDate!),
+        );
+
+        setState(() {
+          allDocuments = filteredDocuments;
+        });
+
+        if (filteredDocuments.isEmpty) {
+          print('No documents found in the selected date range.');
+        }
+      } catch (error) {
+        print('Error searching documents by date range: $error');
+      }
+    } else {
+      print('Start date or end date is null');
     }
   }
 
@@ -63,202 +130,226 @@ class _DshosocoState extends State<Dshosoco> {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
-          Container(
-            child: GestureDetector(
-              onTap: _selectDateRange,
-              child: Container(
-                width: double.infinity,
-                height: 40,
-                margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.black26),
-                ),
-                child: AbsorbPointer(
-                  child: TextField(
-                    controller: _controller,
-                    readOnly: true,
-                    textAlign: TextAlign.center,
-                    decoration: InputDecoration(
-                      labelText: 'Chọn Ngày Bắt Đầu và Kết Thúc',
-                      labelStyle: GoogleFonts.robotoCondensed(fontSize: 14),
-                      border: InputBorder.none,
-                      suffixIcon: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          VerticalDivider(
-                            width: 20,
-                            thickness: 1,
-                            color: Colors.black12,
-                          ),
-                          Icon(Icons.calendar_today),
-                        ],
-                      ),
-                      contentPadding: const EdgeInsets.all(5),
+          GestureDetector(
+            onTap: _selectDateRange,
+            child: Container(
+              width: double.infinity,
+              height: 40,
+              margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.black26),
+              ),
+              child: AbsorbPointer(
+                child: TextField(
+                  controller: _controller,
+                  // readOnly: true,
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    labelText: 'Chọn Ngày Bắt Đầu và Kết Thúc',
+                    labelStyle: GoogleFonts.robotoCondensed(fontSize: 14),
+                    border: InputBorder.none,
+                    suffixIcon: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        VerticalDivider(
+                          width: 20,
+                          thickness: 1,
+                          color: Colors.black12,
+                        ),
+                        Icon(Icons.calendar_today),
+                      ],
                     ),
+                    contentPadding: const EdgeInsets.all(5),
                   ),
                 ),
               ),
             ),
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           Row(
             children: [
               Expanded(
-                  child: Container(
-                height: 40,
-                decoration: BoxDecoration(
+                child: Container(
+                  height: 40,
+                  decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(width: 1, color: Colors.black26),
-                    color: Colors.white),
-                child: TextField(
-                  decoration: InputDecoration(
+                    color: Colors.white,
+                  ),
+                  child: TextField(
+                    controller: _searchControllerDocuments,
+                    onChanged: (value) {
+                      setState(() {
+                        // Trigger a rebuild on search input change
+                      });
+                    },
+                    decoration: InputDecoration(
                       label: Text(
                         'Số hồ sơ, tờ khai xuất, tình trạng',
                         style: GoogleFonts.robotoCondensed(fontSize: 14),
                       ),
                       labelStyle: GoogleFonts.robotoCondensed(),
                       border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10),
-                          ),
-                          borderSide: BorderSide.none),
-                      suffixIcon: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          VerticalDivider(
-                            width: 20,
-                            thickness: 1,
-                            color: Colors.black12,
-                          ),
-                          Icon(Icons.search_outlined)
-                        ],
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                        borderSide: BorderSide.none,
                       ),
-                      contentPadding: const EdgeInsets.all(5)),
-                ),
-              )),
-              const SizedBox(
-                width: 10,
-              ),
-              Container(
-                  width: 90,
-                  height: 40,
-                  decoration: const BoxDecoration(
-                      color: Colors.black12,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10),
-                      )),
-                  child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Provider.of<Providercolor>(context).selectedColor,
-                        padding: const EdgeInsets.all(10),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
-                      child: Text(
-                        'Thêm mới',
-                        style: GoogleFonts.robotoCondensed(color: Colors.white),
-                      )))
-            ],
-          ),
-          FutureBuilder<List<Data>>(
-            future: documents,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text("Error: ${snapshot.error}"));
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(child: Text("No documents found"));
-              }
-
-              final documentList = snapshot.data!;
-
-              return Scrollbar(
-                controller: _scrollController,
-                thumbVisibility: true,
-                radius: const Radius.circular(10),
-                thickness: 8,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  controller: _scrollController,
-                  child: DataTable(
-                    columns: const [
-                      DataColumn(label: Text('STT')),
-                      DataColumn(label: Text('Mã định danh')),
-                      DataColumn(label: Text('Form C/O')),
-                      DataColumn(label: Text('Ngày tạo')),
-                      DataColumn(label: Text('Số tờ khai xuất - DKVC')),
-                      DataColumn(label: Text('Số Invoice')),
-                      DataColumn(label: Text('Khách hàng')),
-                      DataColumn(label: Text('Nhân viên')),
-                      DataColumn(label: Text('Trạng thái')),
-                      DataColumn(label: Text('Action')),
-                    ],
-                    rows: documentList.map((doc) {
-                      return DataRow(cells: [
-                        DataCell(Text(doc.rowNumber?.toString() ?? '')),
-                        DataCell(Text(
-                          doc.coDocumentId?.toString() ?? '',
-                          style: GoogleFonts.robotoCondensed(
-                              fontWeight: FontWeight.w700, color: Colors.blue),
-                        )),
-                        DataCell(Text(doc.coFormId ?? '')),
-                        DataCell(Text(doc.createdDate ?? '')),
-                        DataCell(Text(
-                          doc.numberTkx?.join(', ') ?? '',
-                          style: GoogleFonts.robotoCondensed(
-                              color: Colors.blue, fontWeight: FontWeight.w600),
-                        )),
-                        DataCell(Text(doc.numberTkxWithShippingTerms
-                                ?.map((e) => e.invoiceNumber ?? '')
-                                .join(', ') ??
-                            '')),
-                        DataCell(Text(doc.customerName ?? '')),
-                        DataCell(Text(doc.employeeName ?? '')),
-                        DataCell(Text(doc.statusName ?? '',
-                            style: GoogleFonts.robotoCondensed(
-                                fontWeight: FontWeight.w700,
-                                color: Colors.orange))),
-                        DataCell(Row(
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          _searchDocuments(_searchControllerDocuments.text);
+                        },
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit_outlined),
-                              onPressed: () {},
+                            VerticalDivider(
+                              width: 20,
+                              thickness: 1,
+                              color: Colors.black12,
                             ),
-                            IconButton(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.replay_outlined,
-                                  size: 24,
-                                  color: Colors.blue,
-                                )),
-                            IconButton(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.document_scanner_outlined,
-                                  size: 24,
-                                )),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.delete_outline,
-                                size: 24,
-                              ),
-                              onPressed: () {},
-                            ),
+                            Icon(Icons.search_outlined)
                           ],
-                        )),
-                      ]);
-                    }).toList(),
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.all(5),
+                    ),
                   ),
                 ),
-              );
-            },
+              ),
+              const SizedBox(width: 10),
+              Container(
+                width: 90,
+                height: 40,
+                decoration: const BoxDecoration(
+                  color: Colors.black12,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(10),
+                  ),
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Add new document action
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Provider.of<Providercolor>(context).selectedColor,
+                    padding: const EdgeInsets.all(10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    'Thêm mới',
+                    style: GoogleFonts.robotoCondensed(color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Expanded(
+            child: FutureBuilder<List<Data>>(
+              future: documents,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (_isSearching && _searchResults.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "Dữ liệu tìm kiếm không có!!!",
+                      style: GoogleFonts.robotoCondensed(
+                          fontSize: 16,
+                          color: Provider.of<Providercolor>(context)
+                              .selectedColor),
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text("No documents found"));
+                }
+
+                final documentList = _isSearching
+                    ? _searchResults
+                    : _filterDocuments(_searchController.text);
+
+                return Scrollbar(
+                  controller: _scrollController,
+                  thumbVisibility: true,
+                  radius: const Radius.circular(10),
+                  thickness: 8,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    controller: _scrollController,
+                    child: DataTable(
+                      columns: const [
+                        DataColumn(label: Text('STT')),
+                        DataColumn(label: Text('Mã định danh')),
+                        DataColumn(label: Text('Form C/O')),
+                        DataColumn(label: Text('Ngày tạo')),
+                        DataColumn(label: Text('Số tờ khai xuất - DKVC')),
+                        DataColumn(label: Text('Số Invoice')),
+                        DataColumn(label: Text('Khách hàng')),
+                        DataColumn(label: Text('Nhân viên')),
+                        DataColumn(label: Text('Trạng thái')),
+                        DataColumn(label: Text('Action')),
+                      ],
+                      rows: documentList.map((doc) {
+                        return DataRow(cells: [
+                          DataCell(Text(doc.rowNumber?.toString() ?? '')),
+                          DataCell(Text(
+                            doc.coDocumentId?.toString() ?? '',
+                            style: GoogleFonts.robotoCondensed(
+                              fontWeight: FontWeight.w700,
+                              color: Colors.blue,
+                            ),
+                          )),
+                          DataCell(Text(doc.coFormId ?? '')),
+                          DataCell(Text(doc.createdDate ?? '')),
+                          DataCell(Text(
+                            doc.numberTkx?.join(', ') ?? '',
+                            style: GoogleFonts.robotoCondensed(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          )),
+                          DataCell(Text(doc.numberTkxWithShippingTerms
+                                  ?.map((e) => e.invoiceNumber ?? '')
+                                  .join(', ') ??
+                              '')),
+                          DataCell(Text(doc.customerName ?? '')),
+                          DataCell(Text(doc.employeeName ?? '')),
+                          DataCell(Text(doc.statusName ?? '')),
+                          DataCell(
+                            Row(
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    // Add your edit action here
+                                  },
+                                  icon: const Icon(Icons.edit),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    // Add your delete action here
+                                  },
+                                  icon: const Icon(Icons.delete),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ]);
+                      }).toList(),
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),

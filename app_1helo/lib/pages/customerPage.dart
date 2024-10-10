@@ -14,7 +14,6 @@ class Clientpage extends StatefulWidget {
 
 class _ClientpageState extends State<Clientpage> {
   final ScrollController _scrollController = ScrollController();
-
   late Future<List<Data>> customers;
   CustomerService customerService = CustomerService();
 
@@ -28,6 +27,25 @@ class _ClientpageState extends State<Clientpage> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController taxCodeController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
+
+  List<Data> _searchResults = [];
+  bool _isSearching = false;
+
+  Future<void> _searchCustomers(String searchQuery) async {
+    if (searchQuery.isEmpty) {
+      setState(() {
+        _isSearching = false;
+      });
+      return;
+    }
+
+    List<Data> results = await customerService.searchCustomers(searchQuery);
+    setState(() {
+      _searchResults = results;
+      _isSearching = true;
+    });
+  }
 
   @override
   void dispose() {
@@ -35,6 +53,8 @@ class _ClientpageState extends State<Clientpage> {
     phoneController.dispose();
     taxCodeController.dispose();
     addressController.dispose();
+    _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -117,11 +137,7 @@ class _ClientpageState extends State<Clientpage> {
             ),
             ElevatedButton(
               onPressed: () {
-                // String name = nameController.text;
-                // String phone = phoneController.text;
-                // String taxCode = taxCodeController.text;
-                // String address = addressController.text;
-
+                // Thêm logic lưu khách hàng
                 Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(
@@ -143,37 +159,43 @@ class _ClientpageState extends State<Clientpage> {
   }
 
   final style = const TextStyle(fontWeight: FontWeight.bold);
+
   @override
   Widget build(BuildContext context) {
     return Container(
-        constraints: const BoxConstraints.expand(),
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 40,
-                    decoration: BoxDecoration(
+      constraints: const BoxConstraints.expand(),
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                      border: Border.all(width: 1, color: Colors.black26)),
+                  child: TextField(
+                    controller: _searchController,
+                    style: const TextStyle(color: Colors.black),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      label: Text(
+                        'Nhập',
+                        style: GoogleFonts.robotoCondensed(fontSize: 14),
+                      ),
+                      border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
-                        border: Border.all(width: 1, color: Colors.black26)),
-                    child: TextField(
-                      style: const TextStyle(color: Colors.black),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        label: Text(
-                          'Nhập',
-                          style: GoogleFonts.robotoCondensed(fontSize: 14),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none,
-                        ),
-                        suffixIcon: const Row(
+                        borderSide: BorderSide.none,
+                      ),
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          _searchCustomers(_searchController.text);
+                        },
+                        child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             VerticalDivider(
@@ -184,64 +206,73 @@ class _ClientpageState extends State<Clientpage> {
                             Icon(
                               Icons.search_outlined,
                               size: 24,
-                            )
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Container(
-                  width: 90,
-                  height: 40,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _showAddCustomerDialog();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Provider.of<Providercolor>(context).selectedColor,
-                      elevation: 5,
-                      padding: const EdgeInsets.all(10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Text(
-                      'Thêm mới',
-                      style: GoogleFonts.robotoCondensed(
-                          fontSize: 14, color: Colors.white),
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: 90,
+                height: 40,
+                child: ElevatedButton(
+                  onPressed: () {
+                    _showAddCustomerDialog();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Provider.of<Providercolor>(context).selectedColor,
+                    elevation: 5,
+                    padding: const EdgeInsets.all(10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
+                  child: Text(
+                    'Thêm mới',
+                    style: GoogleFonts.robotoCondensed(
+                        fontSize: 14, color: Colors.white),
+                  ),
                 ),
-              ],
-            ),
-            FutureBuilder<List<Data>>(
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: FutureBuilder<List<Data>>(
               future: customers,
               builder: (context, snapshot) {
+                if (_isSearching && _searchResults.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "Dữ liệu tìm kiếm không có!!!",
+                      style: GoogleFonts.robotoCondensed(
+                          fontSize: 16,
+                          color: Provider.of<Providercolor>(context)
+                              .selectedColor),
+                    ),
+                  );
+                }
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return Center(child: Text("Error: ${snapshot.error}"));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text("No documents found"));
-                }
-
-                final customerList = snapshot.data!;
-
-                return Expanded(
-                  child: SingleChildScrollView(
-                    child: Scrollbar(
+                  return const Center(child: Text("Đã xảy ra lỗi"));
+                } else if (snapshot.hasData) {
+                  List<Data> displayList =
+                      _isSearching ? _searchResults : snapshot.data!;
+                  return Scrollbar(
+                    controller: _scrollController,
+                    thumbVisibility: true,
+                    radius: const Radius.circular(10),
+                    thickness: 8,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
                       controller: _scrollController,
-                      thumbVisibility: true,
-                      radius: const Radius.circular(10),
-                      thickness: 8,
                       child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        controller: _scrollController,
+                        scrollDirection: Axis.vertical,
                         child: DataTable(
                           columns: const [
                             DataColumn(label: Text('STT')),
@@ -252,7 +283,7 @@ class _ClientpageState extends State<Clientpage> {
                             DataColumn(label: Text('Địa chỉ')),
                             DataColumn(label: Text('Action')),
                           ],
-                          rows: customerList.map((doc) {
+                          rows: displayList.map((doc) {
                             return DataRow(cells: [
                               DataCell(Text(doc.rowNumber?.toString() ?? '')),
                               DataCell(Text(
@@ -272,18 +303,23 @@ class _ClientpageState extends State<Clientpage> {
                                   size: 24,
                                   color: Colors.red,
                                 ),
-                                onPressed: () {},
+                                onPressed: () {
+                                  // Thêm logic xóa khách hàng tại đây
+                                },
                               )),
                             ]);
                           }).toList(),
                         ),
                       ),
                     ),
-                  ),
-                );
+                  );
+                }
+                return const SizedBox();
               },
             ),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 }
