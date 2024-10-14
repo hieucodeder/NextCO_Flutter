@@ -103,22 +103,24 @@ class _ProductPageState extends State<ProductPage> {
     return Container(
       constraints: const BoxConstraints.expand(),
       padding: const EdgeInsets.all(10),
-      width: MediaQuery.of(context).size.width,
+      color: Colors.grey[200],
       child: Column(
         children: [
           Container(
             width: double.infinity,
             height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: 5),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(width: 1, color: Colors.black26),
               color: Colors.white,
             ),
             child: TextField(
+              autofocus: true,
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Mã sản phẩm',
-                hintStyle: GoogleFonts.robotoCondensed(),
+                labelText: 'Mã sản phẩm',
+                labelStyle: GoogleFonts.robotoCondensed(fontSize: 16),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none),
@@ -159,54 +161,87 @@ class _ProductPageState extends State<ProductPage> {
                                   .selectedColor),
                         ),
                       )
-                    : Scrollbar(
-                        controller: _scrollController,
-                        thumbVisibility: true,
-                        radius: const Radius.circular(10),
-                        thickness: 8,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          controller: _scrollController,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
-                            child: DataTable(
-                              columns: const [
-                                DataColumn(label: Text('STT')),
-                                DataColumn(label: Text('Mã HS')),
-                                DataColumn(label: Text('Mã sản phẩm')),
-                                DataColumn(label: Text('Thông tin sản phẩm')),
-                                DataColumn(label: Text('Định mức')),
-                                DataColumn(label: Text('Thông số trong QTSX')),
-                                DataColumn(label: Text('Tổng SP chưa làm C/O')),
-                                DataColumn(label: Text('Đơn vị tính')),
-                                DataColumn(label: Text('Action')),
-                              ],
-                              rows: displayList.map((doc) {
-                                return DataRow(cells: [
-                                  DataCell(
-                                      Text(doc.rowNumber?.toString() ?? '')),
-                                  DataCell(Text(
-                                    doc.hsCode ?? '',
-                                    style: GoogleFonts.robotoCondensed(
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.blue),
-                                  )),
-                                  DataCell(Text(doc.productCode ?? '')),
-                                  DataCell(Text(doc.productName ?? '')),
-                                  DataCell(Text(doc.productExpenseId ?? '')),
-                                  DataCell(Text(doc.productExpenseId ?? '')),
-                                  DataCell(Text(doc.customerName ?? '')),
-                                  DataCell(Text(doc.unit?.toString() ?? '')),
-                                  DataCell(IconButton(
-                                    icon: const Icon(
-                                      Icons.delete_outline,
-                                      size: 24,
-                                      color: Colors.red,
-                                    ),
-                                    onPressed: () {},
-                                  )),
-                                ]);
-                              }).toList(),
+                    : Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey[100],
+                            border: Border.all(width: 1, color: Colors.black12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0x005c6566).withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              )
+                            ]),
+                        padding: const EdgeInsets.all(8),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Scrollbar(
+                            controller: _scrollController,
+                            thumbVisibility: true,
+                            radius: const Radius.circular(10),
+                            thickness: 8,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              controller: _scrollController,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: DataTable(
+                                  columns: const [
+                                    DataColumn(label: Text('STT')),
+                                    DataColumn(label: Text('Mã HS')),
+                                    DataColumn(label: Text('Mã sản phẩm')),
+                                    DataColumn(
+                                        label: Text('Thông tin sản phẩm')),
+                                    DataColumn(label: Text('Định mức')),
+                                    DataColumn(
+                                        label: Text('Thông số trong QTSX')),
+                                    DataColumn(
+                                        label: Text('Tổng SP chưa làm C/O')),
+                                    DataColumn(label: Text('Đơn vị tính')),
+                                    DataColumn(label: Text('Action')),
+                                  ],
+                                  rows: displayList.map((doc) {
+                                    return DataRow(cells: [
+                                      DataCell(Text(
+                                          doc.rowNumber?.toString() ?? '')),
+                                      DataCell(Text(
+                                        doc.hsCode ?? '',
+                                        style: GoogleFonts.robotoCondensed(
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.blue),
+                                      )),
+                                      DataCell(Text(doc.productCode ?? '')),
+                                      DataCell(Text(doc.productName ?? '')),
+                                      DataCell(
+                                          Text(doc.productExpenseId ?? '')),
+                                      DataCell(
+                                          Text(doc.productExpenseId ?? '')),
+                                      DataCell(Text(doc.customerName ?? '')),
+                                      DataCell(
+                                          Text(doc.unit?.toString() ?? '')),
+                                      DataCell(IconButton(
+                                        icon: const Icon(
+                                          Icons.delete_outline,
+                                          size: 24,
+                                          color: Colors.red,
+                                        ),
+                                        onPressed: () {},
+                                      )),
+                                    ]);
+                                  }).toList(),
+                                ),
+                              ),
                             ),
                           ),
                         ),

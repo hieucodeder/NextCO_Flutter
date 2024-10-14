@@ -25,7 +25,7 @@ class _DrawerCustomState extends State<DrawerCustom> {
           minimum: const EdgeInsets.only(left: 5, top: 27, right: 20),
           child: Column(
             children: [
-              Container(
+              SizedBox(
                 width: double.infinity,
                 // padding: const EdgeInsets.only(left: 5, top: 5, right: 5),
                 child: Row(
@@ -42,7 +42,7 @@ class _DrawerCustomState extends State<DrawerCustom> {
                         widget.onSelectPage(0);
                       },
                     ),
-                    Container(
+                    SizedBox(
                       width: 80,
                       height: 30,
                       child: Image.asset(
@@ -170,7 +170,8 @@ class _DrawerCustomState extends State<DrawerCustom> {
                                   title: Text('Thông tin sản phẩm',
                                       style: styleText),
                                   onTap: () {
-                                    print("Sub item 1 tapped");
+                                    Navigator.pop(context);
+                                    widget.onSelectPage(7);
                                   },
                                 ),
                                 ListTile(
@@ -499,7 +500,7 @@ class _DrawerCustomState extends State<DrawerCustom> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
+                    SizedBox(
                         width: 50,
                         child: Image.asset(
                           'resources/icon.png',

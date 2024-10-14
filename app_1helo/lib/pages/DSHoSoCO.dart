@@ -68,12 +68,14 @@ class _DshosocoState extends State<Dshosoco> {
       );
 
       if (endPicked != null) {
+        // Set the start and end date in the correct format
         setState(() {
           startDate = DateFormat('yyyy-MM-dd').format(startPicked);
           endDate = DateFormat('yyyy-MM-dd').format(endPicked);
           _controller.text = '$startDate - $endDate';
         });
 
+        // Trigger search after the dates are selected
         await _searchDocumentsByDateRange();
       }
     }
@@ -102,12 +104,14 @@ class _DshosocoState extends State<Dshosoco> {
   Future<void> _searchDocumentsByDateRange() async {
     if (startDate != null && endDate != null) {
       try {
+        // Call the search method in your service and pass the parsed dates
         List<Data> filteredDocuments =
             await documentService.searchDocumentsByDateRange(
-          DateTime.parse(startDate!),
-          DateTime.parse(endDate!),
+          DateTime.parse(startDate!), // Parse startDate
+          DateTime.parse(endDate!), // Parse endDate
         );
 
+        // Update the state with the fetched documents
         setState(() {
           allDocuments = filteredDocuments;
         });
@@ -128,6 +132,7 @@ class _DshosocoState extends State<Dshosoco> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 10),
+      color: Colors.grey[200],
       child: Column(
         children: [
           GestureDetector(
@@ -136,6 +141,7 @@ class _DshosocoState extends State<Dshosoco> {
               width: double.infinity,
               height: 40,
               margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+              padding: const EdgeInsets.symmetric(horizontal: 5),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
@@ -178,7 +184,9 @@ class _DshosocoState extends State<Dshosoco> {
                     border: Border.all(width: 1, color: Colors.black26),
                     color: Colors.white,
                   ),
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
                   child: TextField(
+                    autofocus: true,
                     controller: _searchControllerDocuments,
                     onChanged: (value) {
                       setState(() {
@@ -188,7 +196,7 @@ class _DshosocoState extends State<Dshosoco> {
                     decoration: InputDecoration(
                       label: Text(
                         'Số hồ sơ, tờ khai xuất, tình trạng',
-                        style: GoogleFonts.robotoCondensed(fontSize: 14),
+                        style: GoogleFonts.robotoCondensed(fontSize: 16),
                       ),
                       labelStyle: GoogleFonts.robotoCondensed(),
                       border: const OutlineInputBorder(
@@ -252,103 +260,278 @@ class _DshosocoState extends State<Dshosoco> {
             height: 10,
           ),
           Expanded(
-            child: FutureBuilder<List<Data>>(
-              future: documents,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (_isSearching && _searchResults.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "Dữ liệu tìm kiếm không có!!!",
-                      style: GoogleFonts.robotoCondensed(
-                          fontSize: 16,
-                          color: Provider.of<Providercolor>(context)
-                              .selectedColor),
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.grey[100],
+                  border: Border.all(width: 1, color: Colors.black12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    )
+                  ]),
+              padding: const EdgeInsets.all(10),
+              child: FutureBuilder<List<Data>>(
+                future: documents,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (_isSearching && _searchResults.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "Dữ liệu tìm kiếm không có!!!",
+                        style: GoogleFonts.robotoCondensed(
+                            fontSize: 16,
+                            color: Provider.of<Providercolor>(context)
+                                .selectedColor),
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("No documents found"));
+                  }
+
+                  final documentList = _isSearching
+                      ? _searchResults
+                      : _filterDocuments(_searchController.text);
+
+                  return SingleChildScrollView(
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            )
+                          ]),
+                      padding: const EdgeInsets.all(5),
+                      child: Scrollbar(
+                        controller: _scrollController,
+                        thumbVisibility: true,
+                        radius: const Radius.circular(10),
+                        thickness: 8,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          controller: _scrollController,
+                          child: DataTable(
+                            columns: [
+                              DataColumn(
+                                  label: Expanded(
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey[300],
+                                    ),
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('STT',
+                                        textAlign: TextAlign.center)),
+                              )),
+                              DataColumn(
+                                  label: Expanded(
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey[300],
+                                    ),
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Mã định danh',
+                                        textAlign: TextAlign.center)),
+                              )),
+                              DataColumn(
+                                  label: Expanded(
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey[300],
+                                    ),
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Form C/O',
+                                        textAlign: TextAlign.center)),
+                              )),
+                              DataColumn(
+                                  label: Expanded(
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey[300],
+                                    ),
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Ngày tạo',
+                                        textAlign: TextAlign.center)),
+                              )),
+                              DataColumn(
+                                  label: Expanded(
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey[300],
+                                    ),
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Số tờ khai xuất-DKVC',
+                                        textAlign: TextAlign.center)),
+                              )),
+                              DataColumn(
+                                  label: Expanded(
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey[300],
+                                    ),
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Số Invoice',
+                                        textAlign: TextAlign.center)),
+                              )),
+                              DataColumn(
+                                  label: Expanded(
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey[300],
+                                    ),
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Khách hàng',
+                                        textAlign: TextAlign.center)),
+                              )),
+                              DataColumn(
+                                  label: Expanded(
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey[300],
+                                    ),
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Nhân viên',
+                                        textAlign: TextAlign.center)),
+                              )),
+                              DataColumn(
+                                  label: Expanded(
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey[300],
+                                    ),
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Trạng thái',
+                                        textAlign: TextAlign.center)),
+                              )),
+                              DataColumn(
+                                  label: Expanded(
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey[300],
+                                    ),
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Action',
+                                        textAlign: TextAlign.center)),
+                              )),
+                            ],
+                            rows: documentList.map((doc) {
+                              return DataRow(cells: [
+                                DataCell(Container(
+                                    padding: const EdgeInsets.all(16),
+                                    child:
+                                        Text(doc.rowNumber?.toString() ?? ''))),
+                                DataCell(Container(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Text(
+                                    doc.coDocumentId?.toString() ?? '',
+                                    style: GoogleFonts.robotoCondensed(
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                )),
+                                DataCell(Container(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Text(doc.coFormId ?? ''))),
+                                DataCell(Text(doc.createdDate ?? '')),
+                                DataCell(Container(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Text(
+                                    doc.numberTkx?.join(', ') ?? '',
+                                    style: GoogleFonts.robotoCondensed(
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                )),
+                                DataCell(Text(doc.numberTkxWithShippingTerms
+                                        ?.map((e) => e.invoiceNumber ?? '')
+                                        .join(', ') ??
+                                    '')),
+                                DataCell(Text(doc.customerName ?? '')),
+                                DataCell(Container(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Text(doc.employeeName ?? ''))),
+                                DataCell(Container(
+                                    padding: const EdgeInsets.all(8),
+                                    child: Text(
+                                      doc.statusName ?? '',
+                                      style: GoogleFonts.robotoCondensed(
+                                        color: Colors.orange,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ))),
+                                DataCell(
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {
+                                          // Add your edit action here
+                                        },
+                                        icon: const Icon(
+                                          Icons.edit_outlined,
+                                          size: 22,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          // Add your delete action here
+                                        },
+                                        icon: const Icon(
+                                          Icons.replay_rounded,
+                                          size: 22,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          // Add your edit action here
+                                        },
+                                        icon: const Icon(
+                                          Icons.file_open_outlined,
+                                          size: 22,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          // Add your edit action here
+                                        },
+                                        icon: const Icon(
+                                          Icons.delete_outlined,
+                                          size: 22,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ]);
+                            }).toList(),
+                          ),
+                        ),
+                      ),
                     ),
                   );
-                } else if (snapshot.hasError) {
-                  return Center(child: Text("Error: ${snapshot.error}"));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text("No documents found"));
-                }
-
-                final documentList = _isSearching
-                    ? _searchResults
-                    : _filterDocuments(_searchController.text);
-
-                return Scrollbar(
-                  controller: _scrollController,
-                  thumbVisibility: true,
-                  radius: const Radius.circular(10),
-                  thickness: 8,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    controller: _scrollController,
-                    child: DataTable(
-                      columns: const [
-                        DataColumn(label: Text('STT')),
-                        DataColumn(label: Text('Mã định danh')),
-                        DataColumn(label: Text('Form C/O')),
-                        DataColumn(label: Text('Ngày tạo')),
-                        DataColumn(label: Text('Số tờ khai xuất - DKVC')),
-                        DataColumn(label: Text('Số Invoice')),
-                        DataColumn(label: Text('Khách hàng')),
-                        DataColumn(label: Text('Nhân viên')),
-                        DataColumn(label: Text('Trạng thái')),
-                        DataColumn(label: Text('Action')),
-                      ],
-                      rows: documentList.map((doc) {
-                        return DataRow(cells: [
-                          DataCell(Text(doc.rowNumber?.toString() ?? '')),
-                          DataCell(Text(
-                            doc.coDocumentId?.toString() ?? '',
-                            style: GoogleFonts.robotoCondensed(
-                              fontWeight: FontWeight.w700,
-                              color: Colors.blue,
-                            ),
-                          )),
-                          DataCell(Text(doc.coFormId ?? '')),
-                          DataCell(Text(doc.createdDate ?? '')),
-                          DataCell(Text(
-                            doc.numberTkx?.join(', ') ?? '',
-                            style: GoogleFonts.robotoCondensed(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          )),
-                          DataCell(Text(doc.numberTkxWithShippingTerms
-                                  ?.map((e) => e.invoiceNumber ?? '')
-                                  .join(', ') ??
-                              '')),
-                          DataCell(Text(doc.customerName ?? '')),
-                          DataCell(Text(doc.employeeName ?? '')),
-                          DataCell(Text(doc.statusName ?? '')),
-                          DataCell(
-                            Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    // Add your edit action here
-                                  },
-                                  icon: const Icon(Icons.edit),
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    // Add your delete action here
-                                  },
-                                  icon: const Icon(Icons.delete),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ]);
-                      }).toList(),
-                    ),
-                  ),
-                );
-              },
+                },
+              ),
             ),
           ),
         ],

@@ -11,21 +11,14 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Thông báo'),
-        centerTitle: true,
-        actions: [Icon(Icons.check)],
-      ),
-      body: Column(
-        children: [
-          const Text('Body'),
-          Center(
-            child: Lottie.network(
-                'https://lottie.host/19e2d0ec-02e5-411b-8185-0b4d8d9e2b14/FFKlAoxudo.json'),
-          ),
-        ],
-      ),
+    return Column(
+      children: [
+        const Text('Body'),
+        Center(
+          child: Lottie.network(
+              'https://lottie.host/19e2d0ec-02e5-411b-8185-0b4d8d9e2b14/FFKlAoxudo.json'),
+        ),
+      ],
     );
   }
 }

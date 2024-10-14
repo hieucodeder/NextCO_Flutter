@@ -165,6 +165,7 @@ class _ClientpageState extends State<Clientpage> {
     return Container(
       constraints: const BoxConstraints.expand(),
       padding: const EdgeInsets.all(10),
+      color: Colors.grey[200],
       child: Column(
         children: [
           Row(
@@ -173,20 +174,18 @@ class _ClientpageState extends State<Clientpage> {
               Expanded(
                 child: Container(
                   height: 40,
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       color: Colors.white,
                       border: Border.all(width: 1, color: Colors.black26)),
                   child: TextField(
+                    autofocus: true,
                     controller: _searchController,
                     style: const TextStyle(color: Colors.black),
                     decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      label: Text(
-                        'Nhập',
-                        style: GoogleFonts.robotoCondensed(fontSize: 14),
-                      ),
+                      labelText: 'Nhập KH,tên KH, mã số thuế...',
+                      labelStyle: GoogleFonts.robotoCondensed(fontSize: 16),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
@@ -242,80 +241,198 @@ class _ClientpageState extends State<Clientpage> {
           ),
           const SizedBox(height: 10),
           Expanded(
-            child: FutureBuilder<List<Data>>(
-              future: customers,
-              builder: (context, snapshot) {
-                if (_isSearching && _searchResults.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "Dữ liệu tìm kiếm không có!!!",
-                      style: GoogleFonts.robotoCondensed(
-                          fontSize: 16,
-                          color: Provider.of<Providercolor>(context)
-                              .selectedColor),
-                    ),
-                  );
-                }
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return const Center(child: Text("Đã xảy ra lỗi"));
-                } else if (snapshot.hasData) {
-                  List<Data> displayList =
-                      _isSearching ? _searchResults : snapshot.data!;
-                  return Scrollbar(
-                    controller: _scrollController,
-                    thumbVisibility: true,
-                    radius: const Radius.circular(10),
-                    thickness: 8,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      controller: _scrollController,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: DataTable(
-                          columns: const [
-                            DataColumn(label: Text('STT')),
-                            DataColumn(label: Text('Mã khách hàng')),
-                            DataColumn(label: Text('Tên khách hàng')),
-                            DataColumn(label: Text('Số điện thoại')),
-                            DataColumn(label: Text('Mã số thuế')),
-                            DataColumn(label: Text('Địa chỉ')),
-                            DataColumn(label: Text('Action')),
-                          ],
-                          rows: displayList.map((doc) {
-                            return DataRow(cells: [
-                              DataCell(Text(doc.rowNumber?.toString() ?? '')),
-                              DataCell(Text(
-                                doc.customerId ?? '',
-                                style: GoogleFonts.robotoCondensed(
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.blue),
-                              )),
-                              DataCell(
-                                  Text(doc.customerName?.toString() ?? '')),
-                              DataCell(Text(doc.phoneNumber ?? '')),
-                              DataCell(Text(doc.taxCode ?? '')),
-                              DataCell(Text(doc.address ?? '')),
-                              DataCell(IconButton(
-                                icon: const Icon(
-                                  Icons.delete_outline,
-                                  size: 24,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () {
-                                  // Thêm logic xóa khách hàng tại đây
-                                },
-                              )),
-                            ]);
-                          }).toList(),
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.grey[100],
+                  border: Border.all(width: 1, color: Colors.black12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    )
+                  ]),
+              padding: const EdgeInsets.all(10),
+              child: FutureBuilder<List<Data>>(
+                future: customers,
+                builder: (context, snapshot) {
+                  if (_isSearching && _searchResults.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "Dữ liệu tìm kiếm không có!!!",
+                        style: GoogleFonts.robotoCondensed(
+                            fontSize: 16,
+                            color: Provider.of<Providercolor>(context)
+                                .selectedColor),
+                      ),
+                    );
+                  }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text("Đã xảy ra lỗi"));
+                  } else if (snapshot.hasData) {
+                    List<Data> displayList =
+                        _isSearching ? _searchResults : snapshot.data!;
+                    return SingleChildScrollView(
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              )
+                            ]),
+                        padding: const EdgeInsets.all(5),
+                        child: Scrollbar(
+                          controller: _scrollController,
+                          thumbVisibility: true,
+                          radius: const Radius.circular(10),
+                          thickness: 8,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            controller: _scrollController,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                              child: DataTable(
+                                columns: [
+                                  DataColumn(
+                                      label: Expanded(
+                                    child: Container(
+                                        padding: const EdgeInsets.all(8.0),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.grey[300],
+                                        ),
+                                        child: const Text('STT',
+                                            textAlign: TextAlign.center)),
+                                  )),
+                                  DataColumn(
+                                      label: Expanded(
+                                    child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.grey[300],
+                                        ),
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: const Text('Mã khách hàng',
+                                            textAlign: TextAlign.center)),
+                                  )),
+                                  DataColumn(
+                                      label: Expanded(
+                                    child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.grey[300],
+                                        ),
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: const Text('Tên khách hàng',
+                                            textAlign: TextAlign.center)),
+                                  )),
+                                  DataColumn(
+                                      label: Expanded(
+                                    child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.grey[300],
+                                        ),
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: const Text('Số điện thoại',
+                                            textAlign: TextAlign.center)),
+                                  )),
+                                  DataColumn(
+                                      label: Expanded(
+                                    child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.grey[300],
+                                        ),
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: const Text('Mã số thuế',
+                                            textAlign: TextAlign.center)),
+                                  )),
+                                  DataColumn(
+                                      label: Expanded(
+                                    child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.grey[300],
+                                        ),
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: const Text('Địa chỉ',
+                                            textAlign: TextAlign.center)),
+                                  )),
+                                  DataColumn(
+                                      label: Expanded(
+                                    child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.grey[300],
+                                        ),
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: const Text('Action',
+                                            textAlign: TextAlign.center)),
+                                  )),
+                                ],
+                                rows: displayList.map((doc) {
+                                  return DataRow(cells: [
+                                    DataCell(Container(
+                                      padding: const EdgeInsets.all(16),
+                                      child: Text(
+                                        doc.rowNumber?.toString() ?? '',
+                                      ),
+                                    )),
+                                    DataCell(Container(
+                                      padding: const EdgeInsets.all(16),
+                                      child: Text(
+                                        doc.customerId ?? '',
+                                        style: GoogleFonts.robotoCondensed(
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.blue),
+                                      ),
+                                    )),
+                                    DataCell(Text(
+                                        doc.customerName?.toString() ?? '')),
+                                    DataCell(Container(
+                                        padding: const EdgeInsets.all(8),
+                                        child: Text(doc.phoneNumber ?? ''))),
+                                    DataCell(Container(
+                                        padding: const EdgeInsets.all(8),
+                                        child: Text(doc.taxCode ?? ''))),
+                                    DataCell(Container(
+                                        padding: const EdgeInsets.all(8),
+                                        child: Text(doc.address ?? ''))),
+                                    DataCell(IconButton(
+                                      icon: const Icon(
+                                        Icons.delete_outline,
+                                        size: 24,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed: () {},
+                                    )),
+                                  ]);
+                                }).toList(),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                }
-                return const SizedBox();
-              },
+                    );
+                  }
+                  return const SizedBox();
+                },
+              ),
             ),
           ),
         ],

@@ -36,25 +36,6 @@ class _LogologinState extends State<Logologin> {
                             color: Colors.white,
                             fontSize: 28),
                       ),
-                      // TextField(
-                      //   style: TextStyle(
-                      //     color: Colors.white,
-                      //     backgroundColor: Colors.white,
-                      //   ),
-                      //   controller: _usernameController,
-                      //   decoration: const InputDecoration(
-                      //     labelText: 'Tài khoản',
-                      //     border: OutlineInputBorder(),
-                      //   ),
-                      // ),
-                      // TextField(
-                      //   style: const TextStyle(color: Colors.white),
-                      //   controller: _usernameController,
-                      //   decoration: const InputDecoration(
-                      //     labelText: 'Mật khẩu',
-                      //     border: OutlineInputBorder(),
-                      //   ),
-                      // ),
                     ],
                   )),
             ],
