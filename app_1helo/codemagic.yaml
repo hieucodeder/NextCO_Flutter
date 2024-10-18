@@ -1,39 +1,41 @@
 workflows:
-  hello-world:
-    name: Hello World
-    instance_type: mac_pro
-    max_build_duration: 100
+  my-workflow:
+    name: My workflow name
+    labels:
+      - QA
+      - ${TENANT_NAME}
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    inputs: # more information about build inputs:https://docs.codemagic.io/knowledge-codemagic/build-inputs/
+      name: # input ID
+        description: Input description
+        default: Codemagic
     environment:
       groups:
-        - keystore_credentials
-        - app_store_credentials
+        - group_name
       vars:
-        GOOGLE_PLAY_TRACK: "beta" 
+        PUBLIC_ENV_VAR: "value here"
       flutter: stable
       xcode: latest
-      cocoapods: 1.9.1
-      node: 12.14.0
-      npm: 6.13.7
-      ndk: r21d
-      java: 1.8
-      ruby: 2.7.2
     cache:
       cache_paths:
-        - $HOME/.gradle/caches
-        - $FLUTTER_ROOT/.pub-cache
-        - $HOME/Library/Caches/CocoaPods
-        - $CM_BUILD_DIR/node_modules
+        - ~/.pub-cache
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: '*'
+          include: true
+          source: true
+      cancel_previous_builds: false
     scripts:
-      - name: Install dependencies
-        script: |
-          flutter pub get  
-          npm install   
-      - name: Build Android APK
-        script: |
-          flutter build apk --release
-      - name: Build iOS App
-        script: |
-          flutter build ios --release --no-codesign 
+      - echo "Hello, ${{ inputs.name }}"
+      - ...
     artifacts:
-      - build/**/outputs/apk/release/*.apk 
-      - build/ios/ipa/*.ipa 
+      - build/**/outputs/bundle/**/*.aab
+    publishing:
+      email:
+        recipients:
+          - name@example.com
+      scripts:
+        - echo 'Post-publish script'
