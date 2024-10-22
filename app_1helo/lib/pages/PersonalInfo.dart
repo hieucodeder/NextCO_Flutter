@@ -1,4 +1,10 @@
+import 'package:app_1helo/model/account.dart';
+import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/service/authService.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class PersonalInfo extends StatefulWidget {
   final Function(int) onSelectPage;
@@ -9,165 +15,284 @@ class PersonalInfo extends StatefulWidget {
 }
 
 class _PersonalInfoState extends State<PersonalInfo> {
-  TextEditingController nameController =
-      TextEditingController(text: 'Nguyễn Văn A');
-  TextEditingController accountController = TextEditingController(text: 'demo');
-  TextEditingController dateController =
-      TextEditingController(text: '01/11/1999');
-  TextEditingController emailController =
-      TextEditingController(text: 'demo@gmail.com');
-  TextEditingController foneController =
-      TextEditingController(text: '0999999999');
-  TextEditingController MotaController = TextEditingController(text: 'Mô tả');
-  String? gender = 'Nam';
+  final AuthService _authService = AuthService();
+
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController accountController = TextEditingController();
+  final TextEditingController dateController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController foneController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+
+  int? gender;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAccountInfo();
+  }
+
+  Future<void> _fetchAccountInfo() async {
+    Account? account = await _authService.getAccountInfo();
+
+    if (account != null) {
+      nameController.text = account.fullName ?? '';
+      accountController.text = account.userName ?? '';
+      // Định dạng ngày sinh sang DateTime
+      if (account.dateOfBirth != null && account.dateOfBirth!.isNotEmpty) {
+        DateTime parsedDate = DateTime.parse(account.dateOfBirth!);
+        String formattedDate = DateFormat('dd-MM-yyyy').format(parsedDate);
+        dateController.text = formattedDate;
+      } else {
+        dateController.text = '';
+      }
+      emailController.text = account.email ?? '';
+      foneController.text = account.phoneNumber ?? '';
+      descriptionController.text = account.firstName ?? '';
+
+      setState(() {
+        gender = account.gender;
+      });
+    } else {
+      print('Không lấy được thông tin tài khoản');
+    }
+  }
+
+  final TextStyle colorsRed = const TextStyle(
+    color: Colors.red,
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+  );
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Họ và tên',
-                border: OutlineInputBorder(),
+    return Container(
+      constraints: const BoxConstraints.expand(),
+      margin: const EdgeInsets.all(10),
+      child: Expanded(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        '*',
+                        style: colorsRed,
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      const Text('Họ và tên')
+                    ],
+                  ),
+                  TextField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      hintText: 'Họ và tên',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            TextField(
-              controller: accountController,
-              readOnly: true,
-              enabled: false,
-              decoration: const InputDecoration(
-                  labelText: 'Tài khoản',
-                  border: OutlineInputBorder(),
-                  suffix: Text(
-                    '*',
-                    style: TextStyle(color: Colors.red),
-                  )),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: dateController,
-              decoration: const InputDecoration(
-                  labelText: 'Ngày sinh',
-                  border: OutlineInputBorder(),
-                  suffix: Text(
-                    '*',
-                    style: TextStyle(color: Colors.red),
-                  )),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                  labelText: 'Giới tính',
-                  suffix: Text(
-                    '*',
-                    style: TextStyle(color: Colors.red),
-                  )),
-              value: gender,
-              onChanged: (value) {
-                setState(() {
-                  gender = value;
-                });
-              },
-              items: const [
-                DropdownMenuItem(
-                  value: 'Nam',
-                  child: Text('Nam'),
-                ),
-                DropdownMenuItem(
-                  value: 'Nữ',
-                  child: Text('Nữ'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                  suffix: Text(
-                    '*',
-                    style: TextStyle(color: Colors.red),
-                  )),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: foneController,
-              decoration: const InputDecoration(
-                  labelText: 'Số điện thoại',
-                  border: OutlineInputBorder(),
-                  suffix: Text(
-                    '*',
-                    style: TextStyle(color: Colors.red),
-                  )),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: MotaController,
-              decoration: const InputDecoration(
-                  labelText: 'Mô tả',
-                  border: OutlineInputBorder(),
-                  suffix: Text(
-                    '*',
-                    style: TextStyle(color: Colors.red),
-                  )),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 100,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                      foregroundColor: Colors.blue,
-                      padding: const EdgeInsets.all(10),
-                      elevation: 30,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(40),
+              const SizedBox(height: 10),
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        '*',
+                        style: colorsRed,
                       ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      const Text('Tài khoản')
+                    ],
+                  ),
+                  TextField(
+                    controller: accountController,
+                    readOnly: true,
+                    enabled: false,
+                    decoration: const InputDecoration(
+                      hintText: 'Tài khoản',
+                      border: OutlineInputBorder(),
                     ),
-                    onPressed: () {
-                      widget.onSelectPage(2);
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        '*',
+                        style: colorsRed,
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      const Text('Ngày sinh')
+                    ],
+                  ),
+                  TextField(
+                    controller: dateController,
+                    decoration: const InputDecoration(
+                      hintText: 'Ngày sinh',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        '*',
+                        style: colorsRed,
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      const Text('Giới tính')
+                    ],
+                  ),
+                  DropdownButtonFormField<int>(
+                    decoration: const InputDecoration(
+                      hintText: 'Giới tính',
+                      border: OutlineInputBorder(),
+                    ),
+                    value: gender,
+                    onChanged: (value) {
+                      setState(() {
+                        gender = value;
+                      });
                     },
-                    child: const Text('Quay lại'),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Container(
-                  width: 100,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 33, 159, 243),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.all(10),
-                      elevation: 30,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(40),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 0, // Nam
+                        child: Text('Nữ'),
                       ),
-                      // side: const BorderSide(
-                      //     width: 2, color: Color.fromARGB(255, 255, 59, 85))
-                    ),
-                    onPressed: () {},
-                    child: const Text('Lưu'),
+                      DropdownMenuItem(
+                        value: 1, // Nữ
+                        child: Text('Nam'),
+                      ),
+                    ],
                   ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        '*',
+                        style: colorsRed,
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      const Text('Email')
+                    ],
+                  ),
+                  TextField(
+                    controller: emailController,
+                    decoration: const InputDecoration(
+                      hintText: 'Email',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        '*',
+                        style: colorsRed,
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      const Text('Số điện thoại')
+                    ],
+                  ),
+                  TextField(
+                    controller: foneController,
+                    decoration: const InputDecoration(
+                      hintText: 'Số điện thoại',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              const Text('Mô tả'),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(
+                  hintText: 'Mô tả',
+                  border: OutlineInputBorder(),
                 ),
-              ],
-            )
-          ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                          width: 2,
+                          color: Provider.of<Providercolor>(context)
+                              .selectedColor),
+                    ),
+                    child: TextButton(
+                      onPressed: () {
+                        widget.onSelectPage(2);
+                      },
+                      child: Text(
+                        'Quay lại',
+                        style: GoogleFonts.robotoCondensed(
+                            color: Provider.of<Providercolor>(context)
+                                .selectedColor),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Provider.of<Providercolor>(context).selectedColor,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide.none),
+                    ),
+                    child: Text(
+                      'Lưu',
+                      style: GoogleFonts.robotoCondensed(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

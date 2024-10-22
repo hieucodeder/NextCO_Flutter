@@ -1,4 +1,4 @@
-import 'package:app_1helo/pages/Accout.dart';
+import 'package:app_1helo/pages/Accout.Pagedart';
 import 'package:app_1helo/navigation/BottomNavigation.dart';
 import 'package:app_1helo/pages/Changepassword.dart';
 import 'package:app_1helo/pages/customerPage.dart';
@@ -83,7 +83,9 @@ class _AppScreenState extends State<AppScreen> {
       case 4:
         return PersonalInfo(onSelectPage: _changeCurrentIndex);
       case 5:
-        return const Changepassword();
+        return Changepassword(
+          onSelectPage: _changeCurrentIndex,
+        );
       case 6:
         return const Staffpage();
       case 7:

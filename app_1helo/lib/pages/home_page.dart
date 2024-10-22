@@ -195,11 +195,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 renderNumberResult(
-                                    totalItems, // Giá trị số cần hiển thị
-                                    const Color(0xff9254DE), // Màu sắc hiển thị
-                                    isLoading, // Trạng thái đang tải (loading)
-                                    randomNumber // Số ngẫu nhiên hoặc chuỗi khi đang tải
-                                    ),
+                                    totalItems,
+                                    const Color(0xff9254DE),
+                                    isLoading,
+                                    randomNumber),
                                 Text(
                                   'Khách hàng',
                                   style: GoogleFonts.robotoCondensed(
@@ -763,7 +762,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
     );
-    
   }
 
   void _showsimpleDialog(BuildContext context) {

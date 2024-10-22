@@ -89,38 +89,111 @@ class _ClientpageState extends State<Clientpage> {
           content: SingleChildScrollView(
             child: Column(
               children: <Widget>[
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Tên khách hàng',
-                    border: OutlineInputBorder(),
-                  ),
+                Column(
+                  children: [
+                    const Row(
+                      children: [
+                        Text(
+                          '*',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text('Tên khách hàng'),
+                      ],
+                    ),
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        hintText: 'Tên khách hàng',
+                        hintStyle:
+                            TextStyle(color: Colors.black12, fontSize: 14),
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 10),
-                TextField(
-                  controller: phoneController,
-                  keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: 'Số điện thoại',
-                    border: OutlineInputBorder(),
-                  ),
+                Column(
+                  children: [
+                    const Row(
+                      children: [
+                        Text(
+                          '*',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text('Số điện thoại'),
+                      ],
+                    ),
+                    TextField(
+                      controller: phoneController,
+                      keyboardType: TextInputType.phone,
+                      decoration: const InputDecoration(
+                        hintText: 'Số điện thoại',
+                        hintStyle:
+                            TextStyle(color: Colors.black12, fontSize: 14),
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 10),
-                TextField(
-                  controller: taxCodeController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Mã thuế',
-                    border: OutlineInputBorder(),
-                  ),
+                Column(
+                  children: [
+                    const Row(
+                      children: [
+                        Text(
+                          '*',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text('Mã số thuế'),
+                      ],
+                    ),
+                    TextField(
+                      controller: taxCodeController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        hintText: 'Mã thuế',
+                        hintStyle:
+                            TextStyle(color: Colors.black12, fontSize: 14),
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 10),
-                TextField(
-                  controller: addressController,
-                  decoration: const InputDecoration(
-                    labelText: 'Địa chỉ',
-                    border: OutlineInputBorder(),
-                  ),
+                Column(
+                  children: [
+                    const Row(
+                      children: [
+                        Text(
+                          '*',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text('Địa chỉ'),
+                      ],
+                    ),
+                    TextField(
+                      maxLines: 3,
+                      controller: addressController,
+                      decoration: const InputDecoration(
+                        hintText: 'Địa chỉ',
+                        hintStyle:
+                            TextStyle(color: Colors.black12, fontSize: 14),
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -403,13 +476,23 @@ class _ClientpageState extends State<Clientpage> {
                                           doc.rowNumber?.toString() ?? '',
                                         ),
                                       )),
-                                      DataCell(Container(
-                                        padding: const EdgeInsets.all(16),
-                                        child: Text(
-                                          doc.customerId ?? '',
-                                          style: GoogleFonts.robotoCondensed(
-                                              fontWeight: FontWeight.w700,
-                                              color: Colors.blue),
+                                      DataCell(InkWell(
+                                        onTap: () {
+                                          showCustomerDetailsDialog(
+                                              context,
+                                              doc.customerName ?? '',
+                                              doc.phoneNumber ?? '',
+                                              doc.taxCode ?? '',
+                                              doc.address ?? '');
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(16),
+                                          child: Text(
+                                            doc.customerId ?? '',
+                                            style: GoogleFonts.robotoCondensed(
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.blue),
+                                          ),
                                         ),
                                       )),
                                       DataCell(Text(
@@ -429,7 +512,10 @@ class _ClientpageState extends State<Clientpage> {
                                           size: 24,
                                           color: Colors.red,
                                         ),
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          showDeleteCustomerDialog(
+                                              context, doc.customerName ?? '');
+                                        },
                                       )),
                                     ]);
                                   }).toList(),
@@ -505,4 +591,260 @@ class _ClientpageState extends State<Clientpage> {
           ],
         ));
   }
+}
+
+void showCustomerDetailsDialog(BuildContext context, String customerName,
+    String phone, String taxId, String address) {
+  TextEditingController customerNameController =
+      TextEditingController(text: customerName);
+  TextEditingController phoneController = TextEditingController(text: phone);
+  TextEditingController taxIdController = TextEditingController(text: taxId);
+  TextEditingController addressController =
+      TextEditingController(text: address);
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Center(
+          child: Text(
+            'Chi tiết khách hàng',
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Column(
+              children: [
+                const Row(
+                  children: [
+                    Text(
+                      '*',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text('Tên khách hàng'),
+                  ],
+                ),
+                TextField(
+                  controller: customerNameController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                const Row(
+                  children: [
+                    Text(
+                      '*',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text('Số điện thoại'),
+                  ],
+                ),
+                TextField(
+                  controller: phoneController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                const Row(
+                  children: [
+                    Text(
+                      '*',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text('Mã số thuế'),
+                  ],
+                ),
+                TextField(
+                  controller: taxIdController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                const Row(
+                  children: [
+                    Text(
+                      '*',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text('Địa chỉ'),
+                  ],
+                ),
+                TextField(
+                  controller: addressController,
+                  readOnly: true,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                        width: 2,
+                        color:
+                            Provider.of<Providercolor>(context).selectedColor),
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'Hủy',
+                      style: GoogleFonts.robotoCondensed(
+                          color: Provider.of<Providercolor>(context)
+                              .selectedColor),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Provider.of<Providercolor>(context).selectedColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        side: BorderSide.none),
+                  ),
+                  child: Text(
+                    'Lưu',
+                    style: GoogleFonts.robotoCondensed(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+void showDeleteCustomerDialog(BuildContext context, String customerName) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Center(
+          child: Text(
+            'Xóa khách hàng',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        // backgroundColor: Provider.of<Providercolor>(context).selectedColor,
+        content: RichText(
+          text: TextSpan(
+            children: [
+              const TextSpan(
+                text: 'Bạn có muốn xóa khách hàng ',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                ),
+              ),
+              TextSpan(
+                text: customerName,
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const TextSpan(
+                text: ' ?',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          Container(
+            height: 40,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                  width: 2,
+                  color: Provider.of<Providercolor>(context).selectedColor),
+            ),
+            child: TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'KHông',
+                style: GoogleFonts.robotoCondensed(
+                    color: Provider.of<Providercolor>(context).selectedColor),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Thêm logic lưu khách hàng
+              Navigator.of(context).pop();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  Provider.of<Providercolor>(context).selectedColor,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: BorderSide.none),
+            ),
+            child: Text(
+              'Có',
+              style: GoogleFonts.robotoCondensed(color: Colors.white),
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }

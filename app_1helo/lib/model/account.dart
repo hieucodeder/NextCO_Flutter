@@ -1,4 +1,4 @@
-class Acount {
+class Account {
   String? userId;
   String? roleGroup;
   String? firstName;
@@ -18,7 +18,7 @@ class Acount {
   List<Employees>? employees;
   String? token;
 
-  Acount(
+  Account(
       {this.userId,
       this.roleGroup,
       this.firstName,
@@ -38,7 +38,7 @@ class Acount {
       this.employees,
       this.token});
 
-  Acount.fromJson(Map<String, dynamic> json) {
+  Account.fromJson(Map<String, dynamic> json) {
     userId = json['user_id'];
     roleGroup = json['role_group'];
     firstName = json['first_name'];

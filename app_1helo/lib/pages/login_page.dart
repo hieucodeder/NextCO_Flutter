@@ -71,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
         title: const Text(''),
         backgroundColor: Colors.transparent,
       ),
-      body: Container(
+      body: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Stack(alignment: Alignment.center, children: [
@@ -126,10 +126,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  Container(
+                  SizedBox(
                     width: (MediaQuery.of(context).size.width),
                     height: 178,
-                    child: Container(
+                    child: SizedBox(
                       width: (MediaQuery.of(context).size.width),
                       height: 62,
                       child: Column(
@@ -158,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           Column(
                             children: [
-                              Container(
+                              SizedBox(
                                 width: MediaQuery.of(context).size.width,
                                 height: 40,
                                 child: TextField(
@@ -203,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   Column(
                                     children: [
-                                      Container(
+                                      SizedBox(
                                         width:
                                             MediaQuery.of(context).size.width,
                                         height: 40,
@@ -288,7 +288,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Container(
+                  SizedBox(
                     width: MediaQuery.of(context).size.width,
                     height: 40,
                     child: ElevatedButton(

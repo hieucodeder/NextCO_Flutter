@@ -223,11 +223,21 @@ class _ProductPageState extends State<ProductPage> {
                                     return DataRow(cells: [
                                       DataCell(Text(
                                           doc.rowNumber?.toString() ?? '')),
-                                      DataCell(Text(
-                                        doc.hsCode ?? '',
-                                        style: GoogleFonts.robotoCondensed(
-                                            fontWeight: FontWeight.w700,
-                                            color: Colors.blue),
+                                      DataCell(InkWell(
+                                        onTap: () {
+                                          showProductDetailsDialog(
+                                              context,
+                                              doc.productName ?? '',
+                                              doc.hsCode ?? '',
+                                              doc.productCode ?? '',
+                                              doc.unit ?? '');
+                                        },
+                                        child: Text(
+                                          doc.hsCode ?? '',
+                                          style: GoogleFonts.robotoCondensed(
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.blue),
+                                        ),
                                       )),
                                       DataCell(Text(doc.productCode ?? '')),
                                       DataCell(Text(doc.productName ?? '')),
@@ -244,7 +254,10 @@ class _ProductPageState extends State<ProductPage> {
                                           size: 24,
                                           color: Colors.red,
                                         ),
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          showDeleteProductDialog(
+                                              context, doc.productName ?? '');
+                                        },
                                       )),
                                     ]);
                                   }).toList(),
@@ -321,4 +334,260 @@ class _ProductPageState extends State<ProductPage> {
       ),
     );
   }
+}
+
+void showProductDetailsDialog(BuildContext context, String productsName,
+    String CodeHS, String CodeProducts, String unit) {
+  TextEditingController productsnameController =
+      TextEditingController(text: productsName);
+  TextEditingController CodeHSController = TextEditingController(text: CodeHS);
+  TextEditingController productsController =
+      TextEditingController(text: CodeProducts);
+  TextEditingController unitController = TextEditingController(text: unit);
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Center(
+          child: Text(
+            'Chi tiết sản phẩm',
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Column(
+              children: [
+                const Row(
+                  children: [
+                    Text(
+                      '*',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text('Tên sản phẩm'),
+                  ],
+                ),
+                TextField(
+                  controller: productsnameController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                const Row(
+                  children: [
+                    Text(
+                      '*',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text('Mã HS'),
+                  ],
+                ),
+                TextField(
+                  controller: CodeHSController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                const Row(
+                  children: [
+                    Text(
+                      '*',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text('Mã sản phẩm'),
+                  ],
+                ),
+                TextField(
+                  controller: productsController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                const Row(
+                  children: [
+                    Text(
+                      '*',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text('Đơn vị tính'),
+                  ],
+                ),
+                TextField(
+                  controller: unitController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                        width: 2,
+                        color:
+                            Provider.of<Providercolor>(context).selectedColor),
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'Hủy',
+                      style: GoogleFonts.robotoCondensed(
+                          color: Provider.of<Providercolor>(context)
+                              .selectedColor),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Thêm logic lưu khách hàng
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Provider.of<Providercolor>(context).selectedColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        side: BorderSide.none),
+                  ),
+                  child: Text(
+                    'Lưu',
+                    style: GoogleFonts.robotoCondensed(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+void showDeleteProductDialog(BuildContext context, String customerName) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Center(
+          child: Text(
+            'Xóa sản phẩm',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        // backgroundColor: Provider.of<Providercolor>(context).selectedColor,
+        content: RichText(
+          text: TextSpan(
+            children: [
+              const TextSpan(
+                text: 'Bạn có muốn xóa sản phẩm ',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                ),
+              ),
+              TextSpan(
+                text: customerName,
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const TextSpan(
+                text: ' ?',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          Container(
+            height: 40,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                  width: 2,
+                  color: Provider.of<Providercolor>(context).selectedColor),
+            ),
+            child: TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'KHông',
+                style: GoogleFonts.robotoCondensed(
+                    color: Provider.of<Providercolor>(context).selectedColor),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Thêm logic lưu khách hàng
+              Navigator.of(context).pop();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  Provider.of<Providercolor>(context).selectedColor,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: BorderSide.none),
+            ),
+            child: Text(
+              'Có',
+              style: GoogleFonts.robotoCondensed(color: Colors.white),
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }

@@ -462,7 +462,14 @@ class _DshosocoState extends State<Dshosoco> {
                                 DataCell(Container(
                                     padding: const EdgeInsets.all(16),
                                     child: Text(doc.coFormId ?? ''))),
-                                DataCell(Text(doc.createdDate ?? '')),
+                                DataCell(
+                                  Text(
+                                    doc.createdDate != null
+                                        ? DateFormat('dd-MM-yyyy').format(
+                                            DateTime.parse(doc.createdDate!))
+                                        : 'N/A',
+                                  ),
+                                ),
                                 DataCell(Container(
                                   padding: const EdgeInsets.all(16),
                                   child: Text(
@@ -601,7 +608,6 @@ class _DshosocoState extends State<Dshosoco> {
               ],
             ),
           ),
-          
         ],
       ),
     );

@@ -15,11 +15,7 @@ class _NotificationPageState extends State<NotificationPage> {
       constraints: const BoxConstraints.expand(),
       child: Column(
         children: [
-          const Text('Body'),
-          Center(
-            child: Lottie.network(
-                'https://lottie.host/19e2d0ec-02e5-411b-8185-0b4d8d9e2b14/FFKlAoxudo.json'),
-          ),
+          Text('Body'),
         ],
       ),
     );
