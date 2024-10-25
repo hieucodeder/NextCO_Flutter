@@ -1,17 +1,17 @@
 class LinecharModel {
   bool? success;
-  DataModel? data;
+  Data? data;
 
   LinecharModel({this.success, this.data});
 
   LinecharModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
-    data = json['data'] != null ? DataModel.fromJson(json['data']) : null;
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['success'] = this.success;
+    data['success'] = success;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -19,30 +19,30 @@ class LinecharModel {
   }
 }
 
-class DataModel {
-  List<Co>? completeCo;
-  List<Co>? processingCo;
-  List<Co>? canceledCo;
+class Data {
+  List<CompleteCo>? completeCo;
+  List<ProcessingCo>? processingCo;
+  List<CanceledCo>? canceledCo;
 
-  DataModel({this.completeCo, this.processingCo, this.canceledCo});
+  Data({this.completeCo, this.processingCo, this.canceledCo});
 
-  DataModel.fromJson(Map<String, dynamic> json) {
+  Data.fromJson(Map<String, dynamic> json) {
     if (json['complete_co'] != null) {
-      completeCo = <Co>[];
+      completeCo = <CompleteCo>[];
       json['complete_co'].forEach((v) {
-        completeCo!.add(Co.fromJson(v));
+        completeCo!.add(CompleteCo.fromJson(v));
       });
     }
     if (json['processing_co'] != null) {
-      processingCo = <Co>[];
+      processingCo = <ProcessingCo>[];
       json['processing_co'].forEach((v) {
-        processingCo!.add(Co.fromJson(v));
+        processingCo!.add(ProcessingCo.fromJson(v));
       });
     }
     if (json['canceled_co'] != null) {
-      canceledCo = <Co>[];
+      canceledCo = <CanceledCo>[];
       json['canceled_co'].forEach((v) {
-        canceledCo!.add(Co.fromJson(v));
+        canceledCo!.add(CanceledCo.fromJson(v));
       });
     }
   }
@@ -62,21 +62,89 @@ class DataModel {
   }
 }
 
-class Co {
-  int? id;
-  String? name;
+class CompleteCo {
+  String? quantity;
+  String? createdDate;
+  String? modifiedDate;
+  int? modificationCount;
 
-  Co({this.id, this.name});
+  CompleteCo(
+      {this.quantity,
+      this.createdDate,
+      this.modifiedDate,
+      this.modificationCount});
 
-  Co.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
+  CompleteCo.fromJson(Map<String, dynamic> json) {
+    quantity = json['quantity'];
+    createdDate = json['created_date'];
+    modifiedDate = json['modified_date'];
+    modificationCount = json['modification_count'] ?? 0;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['name'] = name;
+    data['quantity'] = quantity;
+    data['created_date'] = createdDate;
+    data['modified_date'] = modifiedDate;
+    data['modification_count'] = modificationCount;
+    return data;
+  }
+}
+
+class ProcessingCo {
+  String? quantity;
+  String? createdDate;
+  String? modifiedDate;
+  int? modificationCount;
+
+  ProcessingCo(
+      {this.quantity,
+      this.createdDate,
+      this.modifiedDate,
+      this.modificationCount});
+
+  ProcessingCo.fromJson(Map<String, dynamic> json) {
+    quantity = json['quantity'];
+    createdDate = json['created_date'];
+    modifiedDate = json['modified_date'];
+    modificationCount = json['modification_count'] ?? 0;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['quantity'] = quantity;
+    data['created_date'] = createdDate;
+    data['modified_date'] = modifiedDate;
+    data['modification_count'] = modificationCount;
+    return data;
+  }
+}
+
+class CanceledCo {
+  String? quantity;
+  String? createdDate;
+  String? modifiedDate;
+  int? modificationCount;
+
+  CanceledCo(
+      {this.quantity,
+      this.createdDate,
+      this.modifiedDate,
+      this.modificationCount});
+
+  CanceledCo.fromJson(Map<String, dynamic> json) {
+    quantity = json['quantity'];
+    createdDate = json['created_date'];
+    modifiedDate = json['modified_date'];
+    modificationCount = json['modification_count'] ?? 0;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['quantity'] = quantity;
+    data['created_date'] = createdDate;
+    data['modified_date'] = modifiedDate;
+    data['modification_count'] = modificationCount;
     return data;
   }
 }

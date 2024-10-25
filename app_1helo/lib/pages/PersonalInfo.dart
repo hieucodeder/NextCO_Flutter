@@ -41,7 +41,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
       // Định dạng ngày sinh sang DateTime
       if (account.dateOfBirth != null && account.dateOfBirth!.isNotEmpty) {
         DateTime parsedDate = DateTime.parse(account.dateOfBirth!);
-        String formattedDate = DateFormat('dd-MM-yyyy').format(parsedDate);
+        String formattedDate = DateFormat('dd/MM/yyyy').format(parsedDate);
         dateController.text = formattedDate;
       } else {
         dateController.text = '';

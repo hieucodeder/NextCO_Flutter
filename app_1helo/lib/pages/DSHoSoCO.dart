@@ -155,7 +155,7 @@ class _DshosocoState extends State<Dshosoco> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.black26),
+                border: Border.all(color: Colors.black38),
               ),
               child: AbsorbPointer(
                 child: TextField(
@@ -164,7 +164,8 @@ class _DshosocoState extends State<Dshosoco> {
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
                     labelText: 'Chọn Ngày Bắt Đầu và Kết Thúc',
-                    labelStyle: GoogleFonts.robotoCondensed(fontSize: 14),
+                    labelStyle: GoogleFonts.robotoCondensed(
+                        fontSize: 14, color: Colors.black38),
                     border: InputBorder.none,
                     suffixIcon: const Row(
                       mainAxisSize: MainAxisSize.min,
@@ -172,7 +173,7 @@ class _DshosocoState extends State<Dshosoco> {
                         VerticalDivider(
                           width: 20,
                           thickness: 1,
-                          color: Colors.black12,
+                          color: Colors.black38,
                         ),
                         Icon(Icons.calendar_today),
                       ],
@@ -191,12 +192,12 @@ class _DshosocoState extends State<Dshosoco> {
                   height: 40,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(width: 1, color: Colors.black26),
+                    border: Border.all(width: 1, color: Colors.black38),
                     color: Colors.white,
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 5),
                   child: TextField(
-                    autofocus: true,
+                    // autofocus: true,
                     controller: _searchControllerDocuments,
                     onChanged: (value) {
                       setState(() {
@@ -204,11 +205,9 @@ class _DshosocoState extends State<Dshosoco> {
                       });
                     },
                     decoration: InputDecoration(
-                      label: Text(
-                        'Số hồ sơ, tờ khai xuất, tình trạng',
-                        style: GoogleFonts.robotoCondensed(fontSize: 16),
-                      ),
-                      labelStyle: GoogleFonts.robotoCondensed(),
+                      hintText: 'Số hồ sơ, tờ khai xuất, tình trạng',
+                      hintStyle: GoogleFonts.robotoCondensed(
+                          fontSize: 14, color: Colors.black38),
                       border: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(
                           Radius.circular(10),
@@ -225,7 +224,7 @@ class _DshosocoState extends State<Dshosoco> {
                             VerticalDivider(
                               width: 20,
                               thickness: 1,
-                              color: Colors.black12,
+                              color: Colors.black38,
                             ),
                             Icon(Icons.search_outlined)
                           ],
@@ -465,7 +464,7 @@ class _DshosocoState extends State<Dshosoco> {
                                 DataCell(
                                   Text(
                                     doc.createdDate != null
-                                        ? DateFormat('dd-MM-yyyy').format(
+                                        ? DateFormat('dd/MM/yyyy').format(
                                             DateTime.parse(doc.createdDate!))
                                         : 'N/A',
                                   ),

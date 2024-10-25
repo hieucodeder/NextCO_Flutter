@@ -120,15 +120,16 @@ class _ProductPageState extends State<ProductPage> {
             padding: const EdgeInsets.symmetric(horizontal: 5),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(width: 1, color: Colors.black26),
+              border: Border.all(width: 1, color: Colors.black38),
               color: Colors.white,
             ),
             child: TextField(
-              autofocus: true,
+              // autofocus: true,
               controller: _searchController,
               decoration: InputDecoration(
-                labelText: 'Mã sản phẩm',
-                labelStyle: GoogleFonts.robotoCondensed(fontSize: 16),
+                hintText: 'Mã sản phẩm',
+                hintStyle: GoogleFonts.robotoCondensed(
+                    fontSize: 14, color: Colors.black38),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none),
@@ -141,12 +142,13 @@ class _ProductPageState extends State<ProductPage> {
                     children: [
                       VerticalDivider(
                         width: 20,
-                        color: Colors.black12,
+                        color: Colors.black38,
                         thickness: 1,
                       ),
                       Icon(
                         Icons.search_outlined,
                         size: 24,
+                        color: Colors.black38,
                       ),
                     ],
                   ),

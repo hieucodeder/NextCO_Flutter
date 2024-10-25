@@ -1,27 +1,20 @@
 class PieCharModel {
-  String? message;
-  bool? success;
-  double? inProgress;
-  double? completed;
-  double? revised;
+  final int statusId;
+  final int quantity;
 
-  PieCharModel({this.message, this.success, this.inProgress, this.completed, this.revised});
+  PieCharModel({required this.statusId, required this.quantity});
 
-  PieCharModel.fromJson(Map<String, dynamic> json) {
-    message = json['message'];
-    success = json['success'];
-    inProgress = json['inProgress']?.toDouble(); // Ensure this is a double
-    completed = json['completed']?.toDouble(); // Ensure this is a double
-    revised = json['revised']?.toDouble(); // Ensure this is a double
+  factory PieCharModel.fromJson(Map<String, dynamic> json) {
+    return PieCharModel(
+      statusId: json['status_id'] ?? 0, 
+      quantity: json['quantity'] ?? 0, 
+    );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'message': message,
-      'success': success,
-      'inProgress': inProgress,
-      'completed': completed,
-      'revised': revised,
+      'status_id': statusId,
+      'quantity': quantity,
     };
   }
 }

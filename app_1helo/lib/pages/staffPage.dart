@@ -23,12 +23,18 @@ class _StaffpageState extends State<Staffpage> {
   }
 
   final ScrollController _scrollController = ScrollController();
-  late Future<List<Data>> users;
+  late Future<List<DataUser>> users;
   UserService userService = UserService();
   final TextEditingController _searchController = TextEditingController();
 
-  List<Data> _searchResults = [];
-  bool _isSearching = false;
+  List<DataUser> _searchResults = [];
+  List<DataUser> _filteredUsersRoom = [];
+  List<DataUser> _filteredUsersBranch = [];
+  List<DataUser> _staffList = [];
+  DataUser? selectedUsers;
+  TextEditingController _searchControllerBranch = TextEditingController();
+  TextEditingController _searchControllerRoom = TextEditingController();
+  bool _isSearching = false, isDropDownVisible = false;
 
   Future<void> _searchUsers(String searchQuery) async {
     if (searchQuery.isEmpty) {
@@ -38,7 +44,7 @@ class _StaffpageState extends State<Staffpage> {
       return;
     }
 
-    List<Data> results = await userService.searchUser(searchQuery);
+    List<DataUser> results = await userService.searchUser(searchQuery);
     setState(() {
       _searchResults = results;
       _isSearching = true;
@@ -49,6 +55,124 @@ class _StaffpageState extends State<Staffpage> {
   void initState() {
     super.initState();
     users = userService.fetchUsers();
+    _fetchStaffsData();
+  }
+
+  Future<void> _fetchStaffsData() async {
+    try {
+      List<DataUser> staff = await userService.fetchUsers();
+      if (mounted) {
+        setState(() {
+          _staffList = staff;
+          _filteredUsersRoom = staff;
+          _filteredUsersBranch = staff;
+        });
+      }
+    } catch (e) {
+      print("Error fetching customer data: $e");
+    }
+  }
+
+  void toggleDropDownVisibility() {
+    setState(() {
+      isDropDownVisible = !isDropDownVisible;
+    });
+  }
+
+  Widget buildDropdown({
+    required List<String> items,
+    required String? selectedItem,
+    required String hint,
+    required Function(String?) onChanged,
+    double width = 150,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+        border: Border.all(
+          width: 1,
+          color: Colors.black38,
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      width: width,
+      height: 40,
+      child: DropdownButton<String>(
+        hint: Text(
+          hint,
+          style: const TextStyle(fontSize: 14, color: Colors.black),
+        ),
+        value: selectedItem,
+        isExpanded: true,
+        icon: const Icon(Icons.arrow_drop_down),
+        underline: Container(),
+        onChanged: onChanged,
+        items: items.map<DropdownMenuItem<String>>((item) {
+          return DropdownMenuItem<String>(
+            value: item,
+            child: Text(
+              item,
+              style: const TextStyle(fontSize: 14, color: Colors.black),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  List<String> getUniqueNames(
+      List<dynamic> items, String Function(dynamic) nameSelector) {
+    Set<String> seenNames = {};
+    return items
+        .map(nameSelector)
+        .where((name) => seenNames.add(name ?? ''))
+        .toList();
+  }
+
+  Widget renderUserDropdownBranch() {
+    List<String> branchNames =
+        getUniqueNames(_filteredUsersBranch, (user) => user.branchName ?? '');
+
+    return buildDropdown(
+      items: branchNames,
+      selectedItem: _filteredUsersBranch
+              .any((user) => user.branchName == selectedUsers?.branchName)
+          ? selectedUsers?.branchName
+          : null,
+      hint: 'Tất cả chi nhánh',
+      width: 170,
+      onChanged: (String? newValue) {
+        setState(() {
+          selectedUsers = _filteredUsersBranch.firstWhere(
+            (user) => user.branchName == newValue,
+            orElse: () => _filteredUsersBranch[0],
+          );
+          _searchControllerBranch.text = selectedUsers?.branchName ?? '';
+        });
+      },
+    );
+  }
+
+  Widget renderDropdownUser() {
+    List<String> departmentNames =
+        getUniqueNames(_filteredUsersRoom, (user) => user.departmentName ?? '');
+
+    return buildDropdown(
+      items: departmentNames,
+      selectedItem: selectedUsers?.departmentName,
+      hint: 'Tất cả phòng ban',
+      width: 160,
+      onChanged: (String? newValue) {
+        setState(() {
+          selectedUsers = _filteredUsersRoom.firstWhere(
+            (user) => user.departmentName == newValue,
+            orElse: () => _filteredUsersRoom[0],
+          );
+          _searchControllerRoom.text = selectedUsers?.departmentName ?? '';
+        });
+      },
+    );
   }
 
   @override
@@ -62,64 +186,12 @@ class _StaffpageState extends State<Staffpage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Container(
-                  width: 90,
-                  height: 40,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.white,
-                      border: Border.all(width: 1, color: Colors.black26)),
-                  padding: const EdgeInsets.all(7),
-                  child: TextField(
-                    decoration: InputDecoration(
-                        hintText: 'Tất cả chi nhánh',
-                        hintStyle: GoogleFonts.robotoCondensed(fontSize: 14),
-                        border: InputBorder.none,
-                        suffixIcon: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            VerticalDivider(
-                              width: 20,
-                              thickness: 1,
-                            ),
-                            Icon(Icons.arrow_drop_down_rounded)
-                          ],
-                        )),
-                  ),
-                ),
+              Expanded(child: renderUserDropdownBranch()),
+              const SizedBox(
+                width: 10,
               ),
               Expanded(
-                child: Container(
-                  width: 90,
-                  height: 40,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(width: 1, color: Colors.black26),
-                      color: Colors.white),
-                  padding: const EdgeInsets.all(5),
-                  margin: const EdgeInsets.symmetric(horizontal: 5),
-                  child: TextField(
-                    decoration: InputDecoration(
-                        hintText: 'Tất cả phòng ban',
-                        hintStyle: GoogleFonts.robotoCondensed(
-                          fontSize: 14,
-                        ),
-                        border: InputBorder.none,
-                        suffixIcon: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            VerticalDivider(
-                              width: 20,
-                              thickness: 1,
-                            ),
-                            Icon(
-                              Icons.arrow_drop_down,
-                            )
-                          ],
-                        )),
-                  ),
-                ),
+                child: renderDropdownUser(),
               ),
             ],
           ),
@@ -134,22 +206,20 @@ class _StaffpageState extends State<Staffpage> {
                   padding: const EdgeInsets.symmetric(horizontal: 5),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(width: 1, color: Colors.black26),
+                      border: Border.all(width: 1, color: Colors.black38),
                       color: Colors.white),
                   child: TextField(
-                    autofocus: true,
+                    // autofocus: true,
                     controller: _searchController,
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
-                      label: Text(
-                        'Tên tài khoản...',
-                        style: GoogleFonts.robotoCondensed(fontSize: 16),
-                      ),
+                      hintText: 'Tên tài khoản ...',
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide.none),
-                      hintStyle: GoogleFonts.robotoCondensed(fontSize: 14),
+                      hintStyle: GoogleFonts.robotoCondensed(
+                          fontSize: 14, color: Colors.black38),
                       suffixIcon: GestureDetector(
                         onTap: () {
                           _searchUsers(_searchController.text);
@@ -158,13 +228,14 @@ class _StaffpageState extends State<Staffpage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             VerticalDivider(
-                              color: Colors.black26,
+                              color: Colors.black38,
                               width: 20,
                               thickness: 1,
                             ),
                             Icon(
                               Icons.search_outlined,
                               size: 24,
+                              color: Colors.black38,
                             )
                           ],
                         ),
@@ -213,7 +284,7 @@ class _StaffpageState extends State<Staffpage> {
                     )
                   ]),
               padding: const EdgeInsets.all(10),
-              child: FutureBuilder<List<Data>>(
+              child: FutureBuilder<List<DataUser>>(
                 future: users,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -282,7 +353,7 @@ class _StaffpageState extends State<Staffpage> {
                                       color: Colors.blue),
                                 )),
                                 DataCell(Text(
-                                  doc.fullName?.toString() ?? '',
+                                  doc.positionName?.toString() ?? '',
                                 )),
                                 DataCell(Text(doc.phoneNumber ?? '')),
                                 DataCell(Text(

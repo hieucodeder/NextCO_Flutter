@@ -2,7 +2,7 @@ class User {
   int? totalItems;
   int? page;
   int? pageSize;
-  List<Data>? data;
+  List<DataUser>? data;
   int? pageCount;
 
   User({this.totalItems, this.page, this.pageSize, this.data, this.pageCount});
@@ -12,9 +12,9 @@ class User {
     page = json['page'];
     pageSize = json['pageSize'];
     if (json['data'] != null) {
-      data = <Data>[];
+      data = <DataUser>[];
       json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
+        data!.add(new DataUser.fromJson(v));
       });
     }
     pageCount = json['pageCount'];
@@ -33,7 +33,7 @@ class User {
   }
 }
 
-class Data {
+class DataUser {
   int? rowNumber;
   String? userId;
   String? firstName;
@@ -55,7 +55,7 @@ class Data {
   String? roleGroup;
   String? recordCount;
 
-  Data(
+  DataUser(
       {this.rowNumber,
       this.userId,
       this.firstName,
@@ -77,7 +77,7 @@ class Data {
       this.roleGroup,
       this.recordCount});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  DataUser.fromJson(Map<String, dynamic> json) {
     rowNumber = json['RowNumber'];
     userId = json['user_id'];
     firstName = json['first_name'];

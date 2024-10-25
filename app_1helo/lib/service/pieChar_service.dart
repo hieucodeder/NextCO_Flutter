@@ -12,10 +12,10 @@ class PiecharService {
     final url = Uri.parse(apiUrl);
 
     final Map<String, dynamic> requestBody = {
-      "fr_created_date": fromDate,
-      "to_created_date": toDate,
-      "customer_id": customerId.isNotEmpty ? customerId : null,
-      "employee_id": employeeId.isNotEmpty ? employeeId : null
+      "fr_created_date": null,
+      "to_created_date": null,
+      "customer_id": null,
+      "employee_id": "a80f412c-73cc-40be-bc12-83c201cb2c4d"
     };
 
     try {
@@ -34,13 +34,11 @@ class PiecharService {
         final Map<String, dynamic> jsonData = jsonDecode(response.body);
         return PieCharModel.fromJson(jsonData);
       } else {
-        // Handle other response codes
         print(
             'Error: Response not successful, Status code: ${response.statusCode}. Response Body: ${response.body}');
         return null;
       }
     } catch (error) {
-      // Handle and log any errors
       print('Error fetching pie chart data: $error');
       return null;
     }

@@ -261,15 +261,22 @@ class _ClientpageState extends State<Clientpage> {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
-                        border: Border.all(width: 1, color: Colors.black26)),
+                        border: Border.all(width: 1, color: Colors.black38)),
                     child: TextField(
-                      autofocus: true,
+                      // autofocus: true,
                       controller: _searchController,
                       style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
-                        labelText: 'Nhập KH,tên KH, mã số thuế...',
-                        labelStyle: GoogleFonts.robotoCondensed(fontSize: 16),
-                        border: OutlineInputBorder(
+                        hintText: 'Nhập KH, tên KH, mã số thuế ...',
+                        hintStyle: GoogleFonts.robotoCondensed(
+                            fontSize: 14, color: Colors.black38),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide.none,
                         ),
@@ -283,11 +290,12 @@ class _ClientpageState extends State<Clientpage> {
                               VerticalDivider(
                                 width: 20,
                                 thickness: 1,
-                                color: Colors.black26,
+                                color: Colors.black38,
                               ),
                               Icon(
                                 Icons.search_outlined,
                                 size: 24,
+                                color: Colors.black38,
                               ),
                             ],
                           ),

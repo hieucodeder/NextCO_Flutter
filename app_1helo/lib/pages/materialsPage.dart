@@ -127,11 +127,12 @@ class _MaterialspageState extends State<Materialspage> {
               color: Colors.white,
             ),
             child: TextField(
-              autofocus: true,
+              // autofocus: true,
               controller: _searchController,
               decoration: InputDecoration(
-                labelText: 'Mã NVL, Tên NVL...',
-                labelStyle: GoogleFonts.robotoCondensed(fontSize: 16),
+                hintText: 'Mã NVL, Tên NVL...',
+                hintStyle: GoogleFonts.robotoCondensed(
+                    fontSize: 14, color: Colors.black38),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none),
@@ -145,9 +146,13 @@ class _MaterialspageState extends State<Materialspage> {
                       VerticalDivider(
                         width: 20,
                         thickness: 1,
-                        color: Colors.black12,
+                        color: Colors.black38,
                       ),
-                      Icon(Icons.search_outlined)
+                      Icon(
+                        Icons.search_outlined,
+                        size: 24,
+                        color: Colors.black38,
+                      )
                     ],
                   ),
                 ),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:app_1helo/model/body.dart';
+import 'package:app_1helo/model/lineCharModel.dart';
 import 'package:app_1helo/model/user.dart';
 import 'package:http/http.dart' as http;
 import 'api_config.dart';
@@ -45,7 +46,7 @@ class UserService {
     }
   }
 
-  Future<List<Data>> fetchUsers() async {
+  Future<List<DataUser>> fetchUsers() async {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
@@ -80,7 +81,7 @@ class UserService {
     }
   }
 
-  Future<List<Data>> searchUser(String searchContent) async {
+  Future<List<DataUser>> searchUser(String searchContent) async {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
@@ -115,4 +116,5 @@ class UserService {
       return [];
     }
   }
+
 }
