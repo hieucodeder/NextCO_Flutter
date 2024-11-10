@@ -273,22 +273,22 @@ class _PersonalInfoState extends State<PersonalInfo> {
                   const SizedBox(
                     width: 10,
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Provider.of<Providercolor>(context).selectedColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side: BorderSide.none),
-                    ),
-                    child: Text(
-                      'Lưu',
-                      style: GoogleFonts.robotoCondensed(color: Colors.white),
-                    ),
-                  ),
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     Navigator.of(context).pop();
+                  //   },
+                  //   style: ElevatedButton.styleFrom(
+                  //     backgroundColor:
+                  //         Provider.of<Providercolor>(context).selectedColor,
+                  //     shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(10),
+                  //         side: BorderSide.none),
+                  //   ),
+                  //   child: Text(
+                  //     'Lưu',
+                  //     style: GoogleFonts.robotoCondensed(color: Colors.white),
+                  //   ),
+                  // ),
                 ],
               ),
             ],

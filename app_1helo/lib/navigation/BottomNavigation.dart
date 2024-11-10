@@ -66,7 +66,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
                   iconSize: 25,
                   padding: EdgeInsets.zero,
                   icon: Icon(
-                    Icons.notifications_outlined,
+                    Icons.dashboard_outlined,
                     color: _currentIndex == 1 ? Colors.orange : Colors.white,
                   ),
                   onPressed: () {
@@ -74,7 +74,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
                   },
                 ),
               ),
-              Text('Thông báo',
+              Text('Chức năng',
                   style: GoogleFonts.robotoCondensed(
                       fontSize: 12,
                       color: _currentIndex == 1 ? Colors.orange : Colors.white))

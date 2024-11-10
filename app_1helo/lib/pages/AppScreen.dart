@@ -1,14 +1,19 @@
-import 'package:app_1helo/pages/Accout.Pagedart';
+import 'package:app_1helo/charPage/columnCharPage.dart';
 import 'package:app_1helo/navigation/BottomNavigation.dart';
+import 'package:app_1helo/pages/AccoutPage.dart';
 import 'package:app_1helo/pages/Changepassword.dart';
+import 'package:app_1helo/pages/ChatBox.dart';
+import 'package:app_1helo/pages/PayPage.dart';
 import 'package:app_1helo/pages/customerPage.dart';
 import 'package:app_1helo/pages/DSHoSoCO.dart';
 import 'package:app_1helo/navigation/Drawer.dart';
-import 'package:app_1helo/pages/Notification.dart';
+import 'package:app_1helo/pages/funtionsPage.dart';
 import 'package:app_1helo/pages/PersonalInfo.dart';
 import 'package:app_1helo/pages/home_page.dart';
+import 'package:app_1helo/pages/materialResportPage.dart';
 import 'package:app_1helo/pages/materialsPage.dart';
 import 'package:app_1helo/pages/productPage.dart';
+import 'package:app_1helo/pages/productReportPage.dart';
 import 'package:app_1helo/pages/staffPage.dart';
 import 'package:app_1helo/provider/providerColor.dart';
 import 'package:flutter/material.dart';
@@ -36,13 +41,13 @@ class _AppScreenState extends State<AppScreen> {
   void _updateAppBarTitle(int index) {
     switch (index) {
       case 0:
-        _appBarTitle = "BÁO CÁO HOẠT ĐỘNG TẠO HỒ SƠ C/O";
+        _appBarTitle = "BÁO CÁO HOẠT ĐỘNG NEXT C/O";
         break;
       case 1:
-        _appBarTitle = "THÔNG BÁO";
+        _appBarTitle = "CHỨC NĂNG NEXT C/O";
         break;
       case 2:
-        _appBarTitle = "TÀI KHOẢN";
+        _appBarTitle = "CÁ NHÂN";
         break;
       case 3:
         _appBarTitle = "DANH SÁCH HỒ SƠ C/O";
@@ -65,6 +70,16 @@ class _AppScreenState extends State<AppScreen> {
       case 9:
         _appBarTitle = "DANH SÁCH KHÁCH HÀNG";
         break;
+      case 10:
+        _appBarTitle = "THÔNG TIN SỬ DỤNG PHẦN MỀM";
+        break;
+      case 11:
+        _appBarTitle = "THÔNG TIN THANH TOÁN";
+      case 12:
+        _appBarTitle = "BÁO CÁO TỒN SẢN PHẨM ";
+      case 13:
+        _appBarTitle = "BÁO CÁO TỒN NGUYÊN VẬT LIỆU ";
+        break;
       default:
         _appBarTitle = "BÁO CÁO HOẠT ĐỘNG TẠO HỒ SƠ C/O";
     }
@@ -75,7 +90,9 @@ class _AppScreenState extends State<AppScreen> {
       case 0:
         return HomePage(onSelectPage: _changeCurrentIndex);
       case 1:
-        return const NotificationPage();
+        return NotificationPage(
+          onSelectPage: _changeCurrentIndex,
+        );
       case 2:
         return AcountPage(onSelectPage: _changeCurrentIndex);
       case 3:
@@ -94,6 +111,14 @@ class _AppScreenState extends State<AppScreen> {
         return const Materialspage();
       case 9:
         return const Clientpage();
+      case 10:
+        return Columncharpage(onSelectPage: _changeCurrentIndex);
+      case 11:
+        return Paypage(onSelectPage: _changeCurrentIndex);
+      case 12:
+        return const Productreportpage();
+      case 13:
+        return Materialresportpage(onSelectPage: _changeCurrentIndex);
       default:
         return HomePage(onSelectPage: _changeCurrentIndex);
     }
@@ -167,6 +192,7 @@ class _AppScreenState extends State<AppScreen> {
                 width: 40,
                 height: 40,
                 child: FloatingActionButton(
+                  heroTag: 'uniqueTagForButton3',
                   onPressed: () {
                     print('Button 3 Pressed');
                   },
@@ -189,8 +215,12 @@ class _AppScreenState extends State<AppScreen> {
                 width: 40,
                 height: 40,
                 child: FloatingActionButton(
+                  heroTag: 'uniqueTagForButton2',
                   onPressed: () {
-                    print('Button 2 Pressed');
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const Chatbox()));
                   },
                   backgroundColor:
                       Provider.of<Providercolor>(context).selectedColor,
@@ -211,6 +241,7 @@ class _AppScreenState extends State<AppScreen> {
                 width: 40,
                 height: 40,
                 child: FloatingActionButton(
+                  heroTag: 'uniqueTagForButton1',
                   onPressed: () {
                     print('Button 1 Pressed');
                   },

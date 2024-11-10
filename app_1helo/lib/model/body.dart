@@ -2,8 +2,8 @@ class Body {
   String? searchContent;
   int? pageIndex;
   int? pageSize;
-  Null frCreatedDate;
-  Null toCreatedDate;
+  DateTime? frCreatedDate;
+  DateTime? toCreatedDate;
   String? employeeId;
   Null customerId;
   String? userId;
@@ -29,16 +29,17 @@ class Body {
     userId = json['user_id'];
   }
 
+  // Convert data to JSON, with dates in ISO 8601 format
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['search_content'] = this.searchContent;
-    data['pageIndex'] = this.pageIndex;
-    data['pageSize'] = this.pageSize;
-    data['fr_created_date'] = this.frCreatedDate;
-    data['to_created_date'] = this.toCreatedDate;
-    data['employee_id'] = this.employeeId;
-    data['customer_id'] = this.customerId;
-    data['user_id'] = this.userId;
+    final Map<String, dynamic> data = {};
+    data['search_content'] = searchContent;
+    data['pageIndex'] = pageIndex;
+    data['pageSize'] = pageSize;
+    data['fr_created_date'] = frCreatedDate?.toIso8601String();
+    data['to_created_date'] = toCreatedDate?.toIso8601String();
+    data['employee_id'] = employeeId;
+    data['customer_id'] = customerId;
+    data['user_id'] = userId;
     return data;
   }
 }

@@ -1,4 +1,5 @@
 import 'package:app_1helo/pages/AppScreen.dart';
+import 'package:app_1helo/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -10,31 +11,10 @@ class Forgotpassword extends StatefulWidget {
 }
 
 class _ForgotpasswordState extends State<Forgotpassword> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  void _login() {
-    String username = _usernameController.text;
-    String password = _passwordController.text;
-
-    if (username.isNotEmpty && password.isNotEmpty) {
-      print('Logging in with username: $username and password: $password');
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const AppScreen()),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter username and password')),
-      );
-    }
-  }
-
   void _forgotPassword() {
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const Forgotpassword()),
+      MaterialPageRoute(builder: (context) => const LoginPage()),
     );
   }
 
@@ -49,36 +29,60 @@ class _ForgotpasswordState extends State<Forgotpassword> {
         ),
       ),
       resizeToAvoidBottomInset: false,
-      body: Stack(children: [
-        Positioned.fill(
-          child: Image.asset(
-            'resources/bgr1_login.png',
-            fit: BoxFit.cover,
+      body: Stack(fit: StackFit.expand, children: [
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: SizedBox(
+            width: double.infinity,
+            height: 650,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  height: 650,
+                  child: Image.asset(
+                    'resources/bgr1.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  right: -270,
+                  top: 10,
+                  height: 650,
+                  child: Image.asset(
+                    'resources/bgr2.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        Positioned.fill(
-          child: Image.asset(
-            'resources/bgr2_login.png',
-            fit: BoxFit.cover,
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 50),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: Image.asset(
+              'resources/logonextco.png',
+              width: 150,
+              height: 70,
+            ),
           ),
         ),
         Expanded(
           child: Container(
-            width: MediaQuery.of(context).size.width,
-            margin: const EdgeInsets.only(top: 90),
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                const SizedBox(height: 5),
-                Center(
-                  child: Image.asset(
-                    'resources/logo_login.png',
-                    width: 61,
-                    height: 38,
-                  ),
+                const SizedBox(
+                  height: 200,
                 ),
-                const SizedBox(height: 100),
                 Text(
                   'QUÊN MẬT KHẨU',
                   style: GoogleFonts.robotoCondensed(
@@ -101,7 +105,7 @@ class _ForgotpasswordState extends State<Forgotpassword> {
                 const SizedBox(height: 50),
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
-                  height: 400,
+                  height: 350,
                   child: Column(
                     children: [
                       SizedBox(
@@ -135,9 +139,14 @@ class _ForgotpasswordState extends State<Forgotpassword> {
                                 SizedBox(
                                   width: MediaQuery.of(context).size.width,
                                   height: 40,
-                                  child: TextField(
+                                  child: TextFormField(
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Vui lòng nhập tài khoản';
+                                      }
+                                      return null;
+                                    },
                                     style: const TextStyle(color: Colors.black),
-                                    controller: _usernameController,
                                     decoration: InputDecoration(
                                         hintText: 'Tài khoản',
                                         hintStyle: GoogleFonts.robotoCondensed(
@@ -187,10 +196,15 @@ class _ForgotpasswordState extends State<Forgotpassword> {
                             ),
                             SizedBox(
                               width: MediaQuery.of(context).size.width,
-                              height: 40,
-                              child: TextField(
+                              height: 42,
+                              child: TextFormField(
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Vui lòng nhập tài khoản';
+                                  }
+                                  return null;
+                                },
                                 style: const TextStyle(color: Colors.black),
-                                controller: _passwordController,
                                 obscureText: true,
                                 decoration: InputDecoration(
                                     hintText: 'Email',
@@ -258,25 +272,28 @@ class _ForgotpasswordState extends State<Forgotpassword> {
                               color: Color.fromARGB(255, 9, 105, 160),
                             ),
                           ),
-                          onPressed: _login,
-                          child: Row(
-                            children: [
-                              const Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Icon(Icons
-                                      .keyboard_double_arrow_right_outlined)),
-                              const Spacer(),
-                              Align(
-                                alignment: Alignment.center,
-                                child: Text(
-                                  'Gửi',
-                                  style: GoogleFonts.robotoCondensed(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700),
+                          onPressed: () {},
+                          child: SizedBox(
+                            height: 30,
+                            child: Row(
+                              children: [
+                                const Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Icon(Icons
+                                        .keyboard_double_arrow_right_outlined)),
+                                const Spacer(),
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'Gửi',
+                                    style: GoogleFonts.robotoCondensed(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700),
+                                  ),
                                 ),
-                              ),
-                              const Spacer(),
-                            ],
+                                const Spacer(),
+                              ],
+                            ),
                           ),
                         ),
                       )

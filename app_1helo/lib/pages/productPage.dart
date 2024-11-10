@@ -13,13 +13,8 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-  int itemsPerPage = 20;
+  int itemsPerPage = 10;
   final List<int> itemsPerPageOptions = [10, 20, 30, 50];
-  void _changePage(int pageNumber) {
-    setState(() {
-      currentPage = pageNumber;
-    });
-  }
 
   final ScrollController _scrollController = ScrollController();
   List<Data> productList = [];
@@ -103,6 +98,45 @@ class _ProductPageState extends State<ProductPage> {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Widget buildDropdown({
+    required List<String> items,
+    required String? selectedItem,
+    required String hint,
+    required Function(String?) onChanged,
+    double width = 150,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+        border: Border.all(width: 1, color: Colors.black38),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      width: width,
+      height: 40,
+      child: DropdownButton<String>(
+        hint: Text(
+          hint,
+          style: const TextStyle(fontSize: 14, color: Colors.black),
+        ),
+        value: selectedItem,
+        isExpanded: true,
+        icon: const Icon(Icons.arrow_drop_down),
+        underline: Container(),
+        onChanged: onChanged,
+        items: items.map<DropdownMenuItem<String>>((item) {
+          return DropdownMenuItem<String>(
+            value: item,
+            child: Text(
+              item,
+              style: const TextStyle(fontSize: 14, color: Colors.black),
+            ),
+          );
+        }).toList(),
+      ),
+    );
   }
 
   @override
@@ -219,7 +253,7 @@ class _ProductPageState extends State<ProductPage> {
                                     DataColumn(
                                         label: Text('Tổng SP chưa làm C/O')),
                                     DataColumn(label: Text('Đơn vị tính')),
-                                    DataColumn(label: Text('Action')),
+                                    // DataColumn(label: Text('Action')),
                                   ],
                                   rows: displayList.map((doc) {
                                     return DataRow(cells: [
@@ -250,17 +284,6 @@ class _ProductPageState extends State<ProductPage> {
                                       DataCell(Text(doc.customerName ?? '')),
                                       DataCell(
                                           Text(doc.unit?.toString() ?? '')),
-                                      DataCell(IconButton(
-                                        icon: const Icon(
-                                          Icons.delete_outline,
-                                          size: 24,
-                                          color: Colors.red,
-                                        ),
-                                        onPressed: () {
-                                          showDeleteProductDialog(
-                                              context, doc.productName ?? '');
-                                        },
-                                      )),
                                     ]);
                                   }).toList(),
                                 ),
@@ -281,9 +304,7 @@ class _ProductPageState extends State<ProductPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  onPressed: currentPage > 1
-                      ? () => _changePage(currentPage - 1)
-                      : null,
+                  onPressed: currentPage > 1 ? () => (currentPage - 1) : null,
                   icon: const Icon(
                     Icons.chevron_left,
                     color: Colors.black12,
@@ -302,7 +323,7 @@ class _ProductPageState extends State<ProductPage> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => _changePage(currentPage + 1),
+                  onPressed: () => (currentPage + 1),
                   icon: const Icon(
                     Icons.chevron_right,
                     color: Colors.black12,
@@ -472,7 +493,7 @@ void showProductDetailsDialog(BuildContext context, String productsName,
                       Navigator.of(context).pop();
                     },
                     child: Text(
-                      'Hủy',
+                      'Đóng',
                       style: GoogleFonts.robotoCondensed(
                           color: Provider.of<Providercolor>(context)
                               .selectedColor),
@@ -482,23 +503,23 @@ void showProductDetailsDialog(BuildContext context, String productsName,
                 const SizedBox(
                   width: 5,
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Thêm logic lưu khách hàng
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Provider.of<Providercolor>(context).selectedColor,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        side: BorderSide.none),
-                  ),
-                  child: Text(
-                    'Lưu',
-                    style: GoogleFonts.robotoCondensed(color: Colors.white),
-                  ),
-                ),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     // Thêm logic lưu khách hàng
+                //     Navigator.of(context).pop();
+                //   },
+                //   style: ElevatedButton.styleFrom(
+                //     backgroundColor:
+                //         Provider.of<Providercolor>(context).selectedColor,
+                //     shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(10),
+                //         side: BorderSide.none),
+                //   ),
+                //   child: Text(
+                //     'Lưu',
+                //     style: GoogleFonts.robotoCondensed(color: Colors.white),
+                //   ),
+                // ),
               ],
             ),
           ],

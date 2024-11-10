@@ -34,61 +34,73 @@ class _SlapPageState extends State<SlapPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: Container(
-          constraints: const BoxConstraints.expand(),
-          margin: const EdgeInsets.only(top: 200),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              AnimatedOpacity(
-                opacity: _opacity,
-                duration: const Duration(seconds: 3),
-                child: SvgPicture.asset('resources/Layer_1.svg'),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              AnimatedOpacity(
-                opacity: _opacity,
-                duration: const Duration(seconds: 3),
-                child: Text(
-                  'Phần mềm quản lý chứng nhận xuất xứ hàng hóa',
-                  style: GoogleFonts.robotoCondensed(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xff064265)),
-                ),
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          AnimatedOpacity(
+            opacity: _opacity,
+            duration: const Duration(seconds: 3),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: SizedBox(
+                width: double.infinity,
                 height: 300,
-                margin: const EdgeInsets.only(top: 160),
                 child: Stack(
+                  fit: StackFit.expand,
                   children: [
-                    Positioned(
+                    Positioned.fill(
                       child: Image.asset(
                         'resources/bgr1.png',
                         fit: BoxFit.cover,
-                        width: MediaQuery.of(context).size.width,
-                        height: 400,
                       ),
                     ),
-                    Positioned(
+                    Positioned.fill(
                       child: Image.asset(
                         'resources/bgr2.png',
                         fit: BoxFit.cover,
-                        width: MediaQuery.of(context).size.width,
-                        height: 400,
                       ),
                     ),
                   ],
                 ),
-              )
-            ],
+              ),
+            ),
           ),
-        ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            margin: EdgeInsets.symmetric(vertical: 160),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                AnimatedOpacity(
+                  opacity: _opacity,
+                  duration: const Duration(seconds: 3),
+                  child: Image.asset(
+                    'resources/logonextco.png',
+                    fit: BoxFit.contain,
+                    width: 180,
+                    height: 80,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                AnimatedOpacity(
+                  opacity: _opacity,
+                  duration: const Duration(seconds: 3),
+                  child: Text(
+                    'Phần mềm quản lý chứng nhận xuất xứ hàng hóa',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.robotoCondensed(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xff064265),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 50),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

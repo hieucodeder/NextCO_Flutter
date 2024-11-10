@@ -7,43 +7,6 @@ import 'api_config.dart';
 class DocumentService {
   final String apiUrl = '${ApiConfig.baseUrl}/co-documents/search';
 
-  Future<int?> fetchTotalItemsDocuments() async {
-    final url = Uri.parse(apiUrl);
-
-    Body requestBody = Body(
-      searchContent: "",
-      pageIndex: 1,
-      pageSize: 10,
-      frCreatedDate: null,
-      toCreatedDate: null,
-      employeeId: "a80f412c-73cc-40be-bc12-83c201cb2c4d",
-      customerId: null,
-      userId: "a80f412c-73cc-40be-bc12-83c201cb2c4d",
-    );
-    try {
-      final headers = await ApiConfig.getHeaders();
-
-      final response = await http.post(
-        url,
-        headers: headers,
-        body: jsonEncode(requestBody.toJson()),
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonData = jsonDecode(response.body);
-        final Documentss documentData = Documentss.fromJson(jsonData);
-        return documentData.totalItems;
-      } else {
-        print(
-            'Error: Response not successful, Status code: ${response.statusCode}');
-        return null;
-      }
-    } catch (error) {
-      print('Error fetching total items: $error');
-      return null;
-    }
-  }
-
   Future<List<Data>> fetchDocuments() async {
     try {
       final url = Uri.parse(apiUrl);
@@ -80,7 +43,7 @@ class DocumentService {
   }
 
   Future<List<Data>> searchDocumentsByDateRange(
-      DateTime startDate, DateTime endDate) async {
+      DateTime? startDate, DateTime? endDate) async {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
@@ -89,8 +52,8 @@ class DocumentService {
         searchContent: "",
         pageIndex: 1,
         pageSize: 10,
-        frCreatedDate: null,
-        toCreatedDate: null,
+        frCreatedDate: startDate,
+        toCreatedDate: endDate,
         employeeId: "a80f412c-73cc-40be-bc12-83c201cb2c4d",
         customerId: null,
         userId: "a80f412c-73cc-40be-bc12-83c201cb2c4d",
@@ -99,11 +62,7 @@ class DocumentService {
       final response = await http.post(
         url,
         headers: headers,
-        body: jsonEncode({
-          ...requestBody.toJson(),
-          'frCreatedDate': startDate.toIso8601String(),
-          'toCreatedDate': endDate.toIso8601String(),
-        }),
+        body: jsonEncode(requestBody.toJson()),
       );
 
       if (response.statusCode == 200) {

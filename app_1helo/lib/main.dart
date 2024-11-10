@@ -1,4 +1,5 @@
 import 'package:app_1helo/pages/slap_page.dart';
+import 'package:app_1helo/provider/bottomNavProvider.dart';
 import 'package:app_1helo/provider/providerColor.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +9,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => Providercolor()),
+        ChangeNotifierProvider(create: (_) => Bottomnavprovider()),
       ],
       child: MyApp(),
     ),

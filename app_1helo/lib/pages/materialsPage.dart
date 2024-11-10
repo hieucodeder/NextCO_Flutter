@@ -14,15 +14,11 @@ class Materialspage extends StatefulWidget {
 
 class _MaterialspageState extends State<Materialspage> {
   int currentPage1 = 1;
-  int itemsPerPage = 20;
+  int itemsPerPage = 10;
   final List<int> itemsPerPageOptions = [10, 20, 30, 50];
-  void _changePage(int pageNumber) {
-    setState(() {
-      currentPage = pageNumber;
-    });
-  }
 
   final ScrollController _scrollController = ScrollController();
+
   List<Data> materialList = [];
   bool isLoading = false;
   int currentPage = 1;
@@ -262,9 +258,7 @@ class _MaterialspageState extends State<Materialspage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  onPressed: currentPage > 1
-                      ? () => _changePage(currentPage - 1)
-                      : null,
+                  onPressed: currentPage > 1 ? () => (currentPage - 1) : null,
                   icon: const Icon(
                     Icons.chevron_left,
                     color: Colors.black12,
@@ -283,7 +277,7 @@ class _MaterialspageState extends State<Materialspage> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => _changePage(currentPage + 1),
+                  onPressed: () => (currentPage + 1),
                   icon: const Icon(
                     Icons.chevron_right,
                     color: Colors.black12,

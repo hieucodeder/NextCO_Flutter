@@ -1,6 +1,8 @@
 import 'package:app_1helo/pages/login_page.dart';
+import 'package:app_1helo/provider/providerColor.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class AcountPage extends StatefulWidget {
   final Function(int) onSelectPage;
@@ -80,10 +82,10 @@ class _AcountPageState extends State<AcountPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 24),
+                // margin: const EdgeInssets.symmetric(horizontal: 24),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Colors.blue),
+                    color: Provider.of<Providercolor>(context).selectedColor),
                 child: const Center(
                   child: Text(
                     'Thông báo!',
@@ -95,12 +97,34 @@ class _AcountPageState extends State<AcountPage> {
                 )),
             content: const Text('Bạn có muốn đăng xuất tài khoản không?'),
             actions: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Hủy')),
+              Container(
+                height: 40,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white,
+                    border: Border.all(
+                        width: 1,
+                        color:
+                            Provider.of<Providercolor>(context).selectedColor)),
+                child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'Hủy',
+                      style: TextStyle(
+                          color: Provider.of<Providercolor>(context)
+                              .selectedColor),
+                    )),
+              ),
               ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Provider.of<Providercolor>(context).selectedColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        side: BorderSide.none),
+                  ),
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                         context,
@@ -108,7 +132,10 @@ class _AcountPageState extends State<AcountPage> {
                             builder: (context) => const LoginPage()),
                         (Route<dynamic> route) => false);
                   },
-                  child: const Text('Xác nhận'))
+                  child: const Text(
+                    'Xác nhận',
+                    style: TextStyle(color: Colors.white),
+                  ))
             ],
           );
         });

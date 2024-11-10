@@ -25,7 +25,7 @@ class _DshosocoState extends State<Dshosoco> {
   bool _isSearching = false;
 
   int currentPage = 1;
-  int itemsPerPage = 20;
+  int itemsPerPage = 10;
   final List<int> itemsPerPageOptions = [10, 20, 30, 50];
 
   Future<void> _searchDocuments(String searchQuery) async {
@@ -78,62 +78,31 @@ class _DshosocoState extends State<Dshosoco> {
       );
 
       if (endPicked != null) {
-        // Set the start and end date in the correct format
         setState(() {
           startDate = DateFormat('yyyy-MM-dd').format(startPicked);
           endDate = DateFormat('yyyy-MM-dd').format(endPicked);
           _controller.text = '$startDate - $endDate';
         });
 
-        // Trigger search after the dates are selected
-        await _searchDocumentsByDateRange();
+        await _updateDocumentsByDateRange();
       }
     }
   }
 
-  List<Data> _filterDocuments(String query) {
-    if (query.isEmpty) return allDocuments;
+  Future<void> _updateDocumentsByDateRange() async {
+    try {
+      final DateTime parsedStartDate =
+          DateFormat('yyyy-MM-dd').parse(startDate!);
+      final DateTime parsedEndDate = DateFormat('yyyy-MM-dd').parse(endDate!);
 
-    return allDocuments.where((doc) {
-      final documentIdMatch = doc.coDocumentId != null &&
-          doc.coDocumentId
-              .toString()
-              .toLowerCase()
-              .contains(query.toLowerCase());
-
-      final customerNameMatch = doc.customerName != null &&
-          doc.customerName!.toLowerCase().contains(query.toLowerCase());
-
-      final employeeNameMatch = doc.employeeName != null &&
-          doc.employeeName!.toLowerCase().contains(query.toLowerCase());
-
-      return documentIdMatch || customerNameMatch || employeeNameMatch;
-    }).toList();
-  }
-
-  Future<void> _searchDocumentsByDateRange() async {
-    if (startDate != null && endDate != null) {
-      try {
-        // Call the search method in your service and pass the parsed dates
-        List<Data> filteredDocuments =
-            await documentService.searchDocumentsByDateRange(
-          DateTime.parse(startDate!), // Parse startDate
-          DateTime.parse(endDate!), // Parse endDate
+      setState(() {
+        documents = documentService.searchDocumentsByDateRange(
+          parsedStartDate,
+          parsedEndDate,
         );
-
-        // Update the state with the fetched documents
-        setState(() {
-          allDocuments = filteredDocuments;
-        });
-
-        if (filteredDocuments.isEmpty) {
-          print('No documents found in the selected date range.');
-        }
-      } catch (error) {
-        print('Error searching documents by date range: $error');
-      }
-    } else {
-      print('Start date or end date is null');
+      });
+    } catch (error) {
+      print('Error searching documents by date range: ${error.toString()}');
     }
   }
 
@@ -160,12 +129,15 @@ class _DshosocoState extends State<Dshosoco> {
               child: AbsorbPointer(
                 child: TextField(
                   controller: _controller,
-                  // readOnly: true,
+                  readOnly: true,
+                  onTap: () => _selectDateRange(),
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
-                    labelText: 'Chọn Ngày Bắt Đầu và Kết Thúc',
-                    labelStyle: GoogleFonts.robotoCondensed(
-                        fontSize: 14, color: Colors.black38),
+                    hintText: 'Chọn Ngày Bắt Đầu và Kết Thúc',
+                    hintStyle: GoogleFonts.robotoCondensed(
+                      fontSize: 14,
+                      color: Colors.black38,
+                    ),
                     border: InputBorder.none,
                     suffixIcon: const Row(
                       mainAxisSize: MainAxisSize.min,
@@ -197,7 +169,6 @@ class _DshosocoState extends State<Dshosoco> {
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 5),
                   child: TextField(
-                    // autofocus: true,
                     controller: _searchControllerDocuments,
                     onChanged: (value) {
                       setState(() {
@@ -235,34 +206,6 @@ class _DshosocoState extends State<Dshosoco> {
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
-              Container(
-                width: 90,
-                height: 40,
-                decoration: const BoxDecoration(
-                  color: Colors.black12,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(10),
-                  ),
-                ),
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Add new document action
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Provider.of<Providercolor>(context).selectedColor,
-                    padding: const EdgeInsets.all(10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text(
-                    'Thêm mới',
-                    style: GoogleFonts.robotoCondensed(color: Colors.white),
-                  ),
-                ),
-              ),
             ],
           ),
           const SizedBox(
@@ -271,16 +214,17 @@ class _DshosocoState extends State<Dshosoco> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.grey[100],
-                  border: Border.all(width: 1, color: Colors.black12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    )
-                  ]),
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.grey[100],
+                border: Border.all(width: 1, color: Colors.black12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
               padding: const EdgeInsets.all(10),
               child: FutureBuilder<List<Data>>(
                 future: documents,
@@ -288,38 +232,41 @@ class _DshosocoState extends State<Dshosoco> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
+                  if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  }
                   if (_isSearching && _searchResults.isEmpty) {
                     return Center(
                       child: Text(
                         "Dữ liệu tìm kiếm không có!!!",
                         style: GoogleFonts.robotoCondensed(
-                            fontSize: 16,
-                            color: Provider.of<Providercolor>(context)
-                                .selectedColor),
+                          fontSize: 16,
+                          color:
+                              Provider.of<Providercolor>(context).selectedColor,
+                        ),
                       ),
                     );
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text("Error: ${snapshot.error}"));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text("No documents found"));
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("Không có dữ liệu nào!"));
                   }
 
-                  final documentList = _isSearching
-                      ? _searchResults
-                      : _filterDocuments(_searchController.text);
+                  final documentList =
+                      _isSearching ? _searchResults : snapshot.data!;
 
                   return SingleChildScrollView(
                     child: Container(
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            )
-                          ]),
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
                       padding: const EdgeInsets.all(5),
                       child: Scrollbar(
                         controller: _scrollController,
@@ -330,217 +277,10 @@ class _DshosocoState extends State<Dshosoco> {
                           scrollDirection: Axis.horizontal,
                           controller: _scrollController,
                           child: DataTable(
-                            columns: [
-                              DataColumn(
-                                  label: Expanded(
-                                child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.grey[300],
-                                    ),
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: const Text('STT',
-                                        textAlign: TextAlign.center)),
-                              )),
-                              DataColumn(
-                                  label: Expanded(
-                                child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.grey[300],
-                                    ),
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: const Text('Mã định danh',
-                                        textAlign: TextAlign.center)),
-                              )),
-                              DataColumn(
-                                  label: Expanded(
-                                child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.grey[300],
-                                    ),
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: const Text('Form C/O',
-                                        textAlign: TextAlign.center)),
-                              )),
-                              DataColumn(
-                                  label: Expanded(
-                                child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.grey[300],
-                                    ),
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: const Text('Ngày tạo',
-                                        textAlign: TextAlign.center)),
-                              )),
-                              DataColumn(
-                                  label: Expanded(
-                                child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.grey[300],
-                                    ),
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: const Text('Số tờ khai xuất-DKVC',
-                                        textAlign: TextAlign.center)),
-                              )),
-                              DataColumn(
-                                  label: Expanded(
-                                child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.grey[300],
-                                    ),
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: const Text('Số Invoice',
-                                        textAlign: TextAlign.center)),
-                              )),
-                              DataColumn(
-                                  label: Expanded(
-                                child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.grey[300],
-                                    ),
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: const Text('Khách hàng',
-                                        textAlign: TextAlign.center)),
-                              )),
-                              DataColumn(
-                                  label: Expanded(
-                                child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.grey[300],
-                                    ),
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: const Text('Nhân viên',
-                                        textAlign: TextAlign.center)),
-                              )),
-                              DataColumn(
-                                  label: Expanded(
-                                child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.grey[300],
-                                    ),
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: const Text('Trạng thái',
-                                        textAlign: TextAlign.center)),
-                              )),
-                              DataColumn(
-                                  label: Expanded(
-                                child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.grey[300],
-                                    ),
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: const Text('Action',
-                                        textAlign: TextAlign.center)),
-                              )),
-                            ],
-                            rows: documentList.map((doc) {
-                              return DataRow(cells: [
-                                DataCell(Container(
-                                    padding: const EdgeInsets.all(16),
-                                    child:
-                                        Text(doc.rowNumber?.toString() ?? ''))),
-                                DataCell(Container(
-                                  padding: const EdgeInsets.all(16),
-                                  child: Text(
-                                    doc.coDocumentId?.toString() ?? '',
-                                    style: GoogleFonts.robotoCondensed(
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.blue,
-                                    ),
-                                  ),
-                                )),
-                                DataCell(Container(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Text(doc.coFormId ?? ''))),
-                                DataCell(
-                                  Text(
-                                    doc.createdDate != null
-                                        ? DateFormat('dd/MM/yyyy').format(
-                                            DateTime.parse(doc.createdDate!))
-                                        : 'N/A',
-                                  ),
-                                ),
-                                DataCell(Container(
-                                  padding: const EdgeInsets.all(16),
-                                  child: Text(
-                                    doc.numberTkx?.join(', ') ?? '',
-                                    style: GoogleFonts.robotoCondensed(
-                                      color: Colors.blue,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                )),
-                                DataCell(Text(doc.numberTkxWithShippingTerms
-                                        ?.map((e) => e.invoiceNumber ?? '')
-                                        .join(', ') ??
-                                    '')),
-                                DataCell(Text(doc.customerName ?? '')),
-                                DataCell(Container(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Text(doc.employeeName ?? ''))),
-                                DataCell(Container(
-                                    padding: const EdgeInsets.all(8),
-                                    child: Text(
-                                      doc.statusName ?? '',
-                                      style: GoogleFonts.robotoCondensed(
-                                        color: Colors.orange,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ))),
-                                DataCell(
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          // Add your edit action here
-                                        },
-                                        icon: const Icon(
-                                          Icons.edit_outlined,
-                                          size: 22,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {
-                                          // Add your delete action here
-                                        },
-                                        icon: const Icon(
-                                          Icons.replay_rounded,
-                                          size: 22,
-                                          color: Colors.blue,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {
-                                          // Add your edit action here
-                                        },
-                                        icon: const Icon(
-                                          Icons.file_open_outlined,
-                                          size: 22,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {
-                                          // Add your edit action here
-                                        },
-                                        icon: const Icon(
-                                          Icons.delete_outlined,
-                                          size: 22,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ]);
-                            }).toList(),
+                            columns: _buildDataTableColumns(),
+                            rows: documentList
+                                .map((doc) => _buildDataRow(doc))
+                                .toList(),
                           ),
                         ),
                       ),
@@ -610,5 +350,73 @@ class _DshosocoState extends State<Dshosoco> {
         ],
       ),
     );
+  }
+
+  List<DataColumn> _buildDataTableColumns() {
+    const columnTitles = [
+      'STT',
+      'Mã định danh',
+      'Form C/O',
+      'Ngày tạo',
+      'Số tờ khai xuất-DKVC',
+      'Số Invoice',
+      'Khách hàng',
+      'Nhân viên',
+      'Trạng thái',
+    ];
+
+    return columnTitles.map((title) {
+      return DataColumn(
+        label: Text(title, textAlign: TextAlign.center),
+      );
+    }).toList();
+  }
+
+  DataRow _buildDataRow(Data doc) {
+    return DataRow(cells: [
+      DataCell(Text(doc.rowNumber?.toString() ?? '')),
+      DataCell(
+        Text(
+          doc.coDocumentId?.toString() ?? '',
+          style: GoogleFonts.robotoCondensed(
+            fontWeight: FontWeight.w700,
+            color: Colors.blue,
+          ),
+        ),
+      ),
+      DataCell(Text(doc.coFormId ?? '')),
+      DataCell(
+        Text(
+          doc.createdDate != null
+              ? DateFormat('dd/MM/yyyy')
+                  .format(DateTime.parse(doc.createdDate!))
+              : 'N/A',
+        ),
+      ),
+      DataCell(
+        Text(
+          doc.numberTkx?.join(', ') ?? '',
+          style: GoogleFonts.robotoCondensed(
+            color: Colors.blue,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      DataCell(Text(doc.numberTkxWithShippingTerms
+              ?.map((e) => e.invoiceNumber ?? '')
+              .join(', ') ??
+          '')),
+      DataCell(Text(doc.customerName ?? '')),
+      DataCell(Text(doc.employeeName ?? '')),
+      DataCell(
+        Text(
+          doc.statusName ?? '',
+          style: GoogleFonts.robotoCondensed(
+            color: Colors.orange,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    ]);
   }
 }
