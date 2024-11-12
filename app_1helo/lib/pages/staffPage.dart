@@ -38,7 +38,10 @@ class _StaffpageState extends State<Staffpage> {
   @override
   void initState() {
     super.initState();
-    users = userService.fetchUsers();
+    users = userService.fetchUsers().then((docs) {
+      _staffList = docs;
+      return docs;
+    });
     _fetchBranchData();
     _fetchRoomData();
     _fetchData();
@@ -228,6 +231,7 @@ class _StaffpageState extends State<Staffpage> {
 
   @override
   Widget build(BuildContext context) {
+    List<DataUser> displayList = _isSearching ? _searchResults : _staffList;
     return Container(
       padding: const EdgeInsets.all(10),
       width: MediaQuery.of(context).size.width,
@@ -315,82 +319,84 @@ class _StaffpageState extends State<Staffpage> {
                 ],
               ),
               padding: const EdgeInsets.all(10),
-              child: _isSearching && _searchResults.isEmpty
-                  ? Center(
-                      child: Text(
-                        "Dữ liệu tìm kiếm không có!!!",
-                        style: GoogleFonts.robotoCondensed(
-                          fontSize: 16,
-                          color:
-                              Provider.of<Providercolor>(context).selectedColor,
-                        ),
-                      ),
-                    )
-                  : SingleChildScrollView(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.all(5),
-                        child: Scrollbar(
-                          controller: _scrollController,
-                          thumbVisibility: true,
-                          radius: const Radius.circular(10),
-                          thickness: 8,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            controller: _scrollController,
-                            child: DataTable(
-                              columns: const [
-                                DataColumn(label: Text('STT')),
-                                DataColumn(label: Text('Tài khoản')),
-                                DataColumn(label: Text('Họ và tên')),
-                                DataColumn(label: Text('Số điện thoại')),
-                                DataColumn(label: Text('Email')),
-                                DataColumn(label: Text('Chức vụ')),
-                                DataColumn(label: Text('Chi nhánh')),
-                                DataColumn(label: Text('Phòng ban')),
-                                DataColumn(label: Text('Phân quyền')),
-                                // DataColumn(label: Text('Action')),
+              child: displayList.isEmpty && _isSearching
+                  ? const Center(child: CircularProgressIndicator())
+                  : displayList.isEmpty
+                      ? Text(
+                          "Dữ liệu tìm kiếm không có!!!",
+                          style: GoogleFonts.robotoCondensed(
+                            fontSize: 16,
+                            color: Provider.of<Providercolor>(context)
+                                .selectedColor,
+                          ),
+                        )
+                      : SingleChildScrollView(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
                               ],
-                              rows: (_isSearching ? _searchResults : _staffList)
-                                  .map((doc) {
-                                return DataRow(cells: [
-                                  DataCell(
-                                      Text(doc.rowNumber?.toString() ?? '')),
-                                  DataCell(Text(
-                                    doc.userName?.toString() ?? '',
-                                    style: GoogleFonts.robotoCondensed(
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.blue),
-                                  )),
-                                  DataCell(Text(doc.fullName ?? '')),
-                                  DataCell(Text(doc.phoneNumber ?? '')),
-                                  DataCell(Text(
-                                    doc.email ?? '',
-                                    style: GoogleFonts.robotoCondensed(
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.blue),
-                                  )),
-                                  DataCell(Text(doc.positionName ?? '')),
-                                  DataCell(Text(doc.branchName ?? '')),
-                                  DataCell(Text(doc.departmentName ?? '')),
-                                  DataCell(Text(doc.roleGroup ?? '')),
-                                ]);
-                              }).toList(),
+                            ),
+                            padding: const EdgeInsets.all(5),
+                            child: Scrollbar(
+                              controller: _scrollController,
+                              thumbVisibility: true,
+                              radius: const Radius.circular(10),
+                              thickness: 8,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                controller: _scrollController,
+                                child: DataTable(
+                                  columns: const [
+                                    DataColumn(label: Text('STT')),
+                                    DataColumn(label: Text('Tài khoản')),
+                                    DataColumn(label: Text('Họ và tên')),
+                                    DataColumn(label: Text('Số điện thoại')),
+                                    DataColumn(label: Text('Email')),
+                                    DataColumn(label: Text('Chức vụ')),
+                                    DataColumn(label: Text('Chi nhánh')),
+                                    DataColumn(label: Text('Phòng ban')),
+                                    DataColumn(label: Text('Phân quyền')),
+                                    // DataColumn(label: Text('Action')),
+                                  ],
+                                  rows: (_isSearching
+                                          ? _searchResults
+                                          : _staffList)
+                                      .map((doc) {
+                                    return DataRow(cells: [
+                                      DataCell(Text(
+                                          doc.rowNumber?.toString() ?? '')),
+                                      DataCell(Text(
+                                        doc.userName?.toString() ?? '',
+                                        style: GoogleFonts.robotoCondensed(
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.blue),
+                                      )),
+                                      DataCell(Text(doc.fullName ?? '')),
+                                      DataCell(Text(doc.phoneNumber ?? '')),
+                                      DataCell(Text(
+                                        doc.email ?? '',
+                                        style: GoogleFonts.robotoCondensed(
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.blue),
+                                      )),
+                                      DataCell(Text(doc.positionName ?? '')),
+                                      DataCell(Text(doc.branchName ?? '')),
+                                      DataCell(Text(doc.departmentName ?? '')),
+                                      DataCell(Text(doc.roleGroup ?? '')),
+                                    ]);
+                                  }).toList(),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
             ),
           ),
           Padding(

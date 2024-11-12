@@ -47,6 +47,7 @@ class _ProductreportpageState extends State<Productreportpage> {
   @override
   void initState() {
     super.initState();
+    displayList = allProductReport;
     fetchInitialProducts();
     _scrollController.addListener(_onScroll);
     _fetchCustomerData();
@@ -280,13 +281,6 @@ class _ProductreportpageState extends State<Productreportpage> {
         .toSet()
         .toList();
 
-    if (selectedEmployeeCustomer == null &&
-        _filteredEmployeeCustomer.isNotEmpty) {
-      selectedEmployeeCustomer = _filteredEmployeeCustomer[0];
-      customerid = selectedEmployeeCustomer?.customerId;
-      _fetchMaterialsReport(customerid);
-    }
-
     return buildDropdown(
       items: customerName,
       selectedItem: selectedEmployeeCustomer?.customerName,
@@ -406,6 +400,7 @@ class _ProductreportpageState extends State<Productreportpage> {
                         ),
                         borderSide: BorderSide.none,
                       ),
+                      
                       suffixIcon: GestureDetector(
                         onTap: () {
                           _searchProducts(_searchController.text);
@@ -444,70 +439,73 @@ class _ProductreportpageState extends State<Productreportpage> {
                                   .selectedColor),
                         ),
                       )
-                    : Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.grey[100],
-                            border: Border.all(width: 1, color: Colors.black12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0x005c6566).withOpacity(0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              )
-                            ]),
-                        padding: const EdgeInsets.all(8),
+                    : SingleChildScrollView(
                         child: Container(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Scrollbar(
-                            controller: _scrollController,
-                            thumbVisibility: true,
-                            radius: const Radius.circular(10),
-                            thickness: 8,
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.grey[100],
+                              border:
+                                  Border.all(width: 1, color: Colors.black12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      const Color(0x005c6566).withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                )
+                              ]),
+                          padding: const EdgeInsets.all(8),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Scrollbar(
                               controller: _scrollController,
+                              thumbVisibility: true,
+                              radius: const Radius.circular(10),
+                              thickness: 8,
                               child: SingleChildScrollView(
-                                scrollDirection: Axis.vertical,
-                                child: DataTable(
-                                  columns: const [
-                                    DataColumn(label: Text('STT')),
-                                    DataColumn(label: Text('Mã sản phẩm')),
-                                    DataColumn(label: Text('Tên sản phẩm')),
-                                    DataColumn(label: Text('Mã HS')),
-                                    DataColumn(label: Text('Số TKX')),
-                                    DataColumn(label: Text('Số lượng đã làm')),
-                                    DataColumn(label: Text('Số lượng tồn')),
-                          
-                                  ],
-                                  rows: displayList.map((doc) {
-                                    return DataRow(cells: [
-                                      DataCell(Text(
-                                          doc.rowNumber?.toString() ?? '')),
-                              
-                                      DataCell(Text(doc.productCode ?? '')),
-                                      DataCell(Text(doc.hsCode ?? '')),
-                                      DataCell(Text(doc.productName ?? '')),
-                                      DataCell(Text(doc.exportDeclarationNumber
-                                              ?.toString() ??
-                                          '')),
-                                      DataCell(
-                                          Text(doc.coUsed?.toString() ?? '')),
-                                      DataCell(Text(
-                                          doc.coAvailable?.toString() ?? '')),
-                                  
-                                    ]);
-                                  }).toList(),
+                                scrollDirection: Axis.horizontal,
+                                controller: _scrollController,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: DataTable(
+                                    columns: const [
+                                      DataColumn(label: Text('STT')),
+                                      DataColumn(label: Text('Mã sản phẩm')),
+                                      DataColumn(label: Text('Tên sản phẩm')),
+                                      DataColumn(label: Text('Mã HS')),
+                                      DataColumn(label: Text('Số TKX')),
+                                      DataColumn(
+                                          label: Text('Số lượng đã làm')),
+                                      DataColumn(label: Text('Số lượng tồn')),
+                                    ],
+                                    rows: displayList.map((doc) {
+                                      return DataRow(cells: [
+                                        DataCell(Text(
+                                            doc.rowNumber?.toString() ?? '')),
+                                        DataCell(Text(doc.productCode ?? '')),
+                                        DataCell(Text(doc.hsCode ?? '')),
+                                        DataCell(Text(doc.productName ?? '')),
+                                        DataCell(Text(doc
+                                                .exportDeclarationNumber
+                                                ?.toString() ??
+                                            '')),
+                                        DataCell(
+                                            Text(doc.coUsed?.toString() ?? '')),
+                                        DataCell(Text(
+                                            doc.coAvailable?.toString() ?? '')),
+                                      ]);
+                                    }).toList(),
+                                  ),
                                 ),
                               ),
                             ),
@@ -515,11 +513,6 @@ class _ProductreportpageState extends State<Productreportpage> {
                         ),
                       ),
           ),
-          if (isLoading)
-            const Padding(
-              padding: EdgeInsets.all(10.0),
-              child: CircularProgressIndicator(),
-            ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(

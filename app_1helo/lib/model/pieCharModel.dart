@@ -1,35 +1,23 @@
 class PieCharModel {
-  final int statusId;
-  final int quantity;
-  final int complete;
-  final int processing;
-  final int canceled;
+  int? statusId;
+  int? quantity;
+  String?
+      createdDate; // Assuming the date is in string format, or use DateTime directly
 
-  PieCharModel({
-    required this.statusId,
-    required this.quantity,
-    required this.complete,
-    required this.processing,
-    required this.canceled,
-  });
+  PieCharModel({this.statusId, this.quantity, this.createdDate});
 
-  factory PieCharModel.fromJson(Map<String, dynamic> json) {
-    return PieCharModel(
-      statusId: json['status_id'] ?? 0,
-      quantity: json['quantity'] ?? 0,
-      complete: json['complete'] ?? 0,
-      processing: json['processing'] ?? 0,
-      canceled: json['canceled'] ?? 0,
-    );
+  PieCharModel.fromJson(Map<String, dynamic> json) {
+    statusId = json['status_id'];
+    quantity = json['quantity'];
+    createdDate = json[
+        'created_date']; // Assuming created_date is returned from the server
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'status_id': statusId,
-      'quantity': quantity,
-      'complete': complete,
-      'processing': processing,
-      'canceled': canceled,
-    };
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['status_id'] = this.statusId;
+    data['quantity'] = this.quantity;
+    data['created_date'] = this.createdDate;
+    return data;
   }
 }

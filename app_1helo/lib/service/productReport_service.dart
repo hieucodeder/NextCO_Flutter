@@ -3,6 +3,7 @@ import 'package:app_1helo/model/body.dart';
 import 'package:app_1helo/model/bodyReport.dart';
 import 'package:app_1helo/model/prodcutReportModel.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'api_config.dart';
 
 class ProductReportService {
@@ -13,7 +14,13 @@ class ProductReportService {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
 
+      if (userId == null) {
+        print('No user ID found. User might not be logged in.');
+        return [];
+      }
       Bodyreport requestBody = Bodyreport(
         customerId: customerid,
         frCreatedDate: null,
@@ -22,7 +29,7 @@ class ProductReportService {
         searchContent: search,
         toCreatedDate: null,
         typeSearch: 1,
-        userId: "a80f412c-73cc-40be-bc12-83c201cb2c4d",
+        userId: userId,
       );
 
       final response = await http.post(
@@ -54,7 +61,13 @@ class ProductReportService {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
 
+      if (userId == null) {
+        print('No user ID found. User might not be logged in.');
+        return [];
+      }
       Bodyreport requestBody = Bodyreport(
         customerId: null,
         frCreatedDate: frdDate,
@@ -63,7 +76,7 @@ class ProductReportService {
         searchContent: "",
         toCreatedDate: toDate,
         typeSearch: 1,
-        userId: "a80f412c-73cc-40be-bc12-83c201cb2c4d",
+        userId: userId,
       );
 
       final response = await http.post(

@@ -11,13 +11,17 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:app_1helo/Cusstom/LegendItem.dart';
 
 class Linecharpage extends StatefulWidget {
-  const Linecharpage({super.key});
+  const Linecharpage({Key? key}) : super(key: key);
 
+  Future<void> fetchLineChartData() async {
+    await Future.delayed(Duration(seconds: 2));
+  }
   @override
   _LinecharpageState createState() => _LinecharpageState();
 }
 
 class _LinecharpageState extends State<Linecharpage> {
+  late Future<String> chartData;
   TextEditingController _searchControllerCustomer = TextEditingController();
   TextEditingController _searchControllerUsers = TextEditingController();
 
@@ -359,7 +363,7 @@ class _LinecharpageState extends State<Linecharpage> {
 
     if (selectedDropdownEmployee == null &&
         _filtereddropdownEmployee.isNotEmpty) {
-      selectedDropdownEmployee = _filtereddropdownEmployee[2];
+      selectedDropdownEmployee = _filtereddropdownEmployee[0];
       _fetchData();
     }
     return buildDropdown(

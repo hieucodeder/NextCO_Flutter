@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:app_1helo/model/bodyTotal.dart';
 import 'package:app_1helo/model/totalModel.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'api_config.dart';
 
 class TotalService {
@@ -10,8 +11,15 @@ class TotalService {
 
   Future<Data?> fetchTotalItemsUsers() async {
     final url = Uri.parse(apiUrl);
-    bodyTotal requestBody = bodyTotal(
-        userId: "a80f412c-73cc-40be-bc12-83c201cb2c4d", userName: "demo");
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    final userName = prefs.getString('userName');
+
+    if (userId == null) {
+      print('No user ID found. User might not be logged in.');
+      return null;
+    }
+    bodyTotal requestBody = bodyTotal(userId: userId, userName: userName);
 
     try {
       final headers = await ApiConfig.getHeaders();

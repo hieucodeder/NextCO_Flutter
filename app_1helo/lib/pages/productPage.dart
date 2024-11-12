@@ -293,11 +293,6 @@ class _ProductPageState extends State<ProductPage> {
                         ),
                       ),
           ),
-          if (isLoading)
-            const Padding(
-              padding: EdgeInsets.all(10.0),
-              child: CircularProgressIndicator(),
-            ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(

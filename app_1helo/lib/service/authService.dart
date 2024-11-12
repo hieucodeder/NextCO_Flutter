@@ -4,6 +4,7 @@ import 'package:app_1helo/model/bodylogin.dart';
 import 'package:app_1helo/model/dropdownBranchs.dart';
 import 'package:app_1helo/model/dropdownCustomer.dart';
 import 'package:app_1helo/model/dropdownEmployee.dart';
+import 'package:app_1helo/model/dropdownRoom.dart';
 import 'package:app_1helo/service/api_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,6 +30,7 @@ class AuthService {
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('userId', account.userId!);
+        await prefs.setString('userName', account.userName!);
         await prefs.setString('token', account.token!);
 
         return {
@@ -53,8 +55,15 @@ class AuthService {
       return null;
     }
 
-    final url = Uri.parse(
-        '${ApiConfig.baseUrl1}/users/getbyid/a80f412c-73cc-40be-bc12-83c201cb2c4d');
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+
+    if (userId == null) {
+      print('No user ID found. User might not be logged in.');
+      return null;
+    }
+
+    final url = Uri.parse('${ApiConfig.baseUrl1}/users/getbyid/$userId');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -83,8 +92,16 @@ class AuthService {
       return null;
     }
 
-    final url = Uri.parse(
-        '${ApiConfig.baseUrl}/employees/dropdown-employeeid/a80f412c-73cc-40be-bc12-83c201cb2c4d');
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+
+    if (userId == null) {
+      print('No user ID found. User might not be logged in.');
+      return null;
+    }
+
+    final url =
+        Uri.parse('${ApiConfig.baseUrl}/employees/dropdown-employeeid/$userId');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -92,10 +109,10 @@ class AuthService {
       if (response.statusCode == 200) {
         final List<dynamic> jsonResponse = json.decode(response.body);
 
-        List<dropdownEmployee> dropdownemploye = jsonResponse
+        List<dropdownEmployee> dropdownEmployeeList = jsonResponse
             .map((item) => dropdownEmployee.fromJson(item))
             .toList();
-        return dropdownemploye;
+        return dropdownEmployeeList;
       } else {
         print('Error: ${response.statusCode} - ${response.reasonPhrase}');
         return null;
@@ -112,9 +129,14 @@ class AuthService {
     if (!headers.containsKey('Authorization')) {
       return null;
     }
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
 
-    final url = Uri.parse(
-        '${ApiConfig.baseUrl1}/users/getbyid/a80f412c-73cc-40be-bc12-83c201cb2c4d');
+    if (userId == null) {
+      print('No user ID found. User might not be logged in.');
+      return null;
+    }
+    final url = Uri.parse('${ApiConfig.baseUrl1}/users/getbyid/$userId');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -134,12 +156,36 @@ class AuthService {
     }
   }
 
+  Future<List<Dropdownroom>?> getRoomInfo() async {
+    final headers = await ApiConfig.getHeaders();
+    if (!headers.containsKey('Authorization')) {
+      return Future.error('No token found. User not logged in.');
+    }
+
+    final url = Uri.parse('${ApiConfig.baseUrl}/departments/dropdown');
+
+    try {
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonResponse = json.decode(response.body);
+        return jsonResponse.map((item) => Dropdownroom.fromJson(item)).toList();
+      } else {
+        print('Error: ${response.statusCode} - ${response.reasonPhrase}');
+        return Future.error(
+            'Error: ${response.statusCode} - ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return Future.error('Exception: $e');
+    }
+  }
+
   Future<List<Dropdownbranchs>?> getBranchsInfo() async {
     final headers = await ApiConfig.getHeaders();
 
     if (!headers.containsKey('Authorization')) {
-      print('No token found. User not logged in.');
-      return null;
+      return Future.error('No token found. User not logged in.');
     }
 
     final url = Uri.parse('${ApiConfig.baseUrl}/branchs/dropdown');
@@ -150,16 +196,17 @@ class AuthService {
       if (response.statusCode == 200) {
         final List<dynamic> jsonResponse = json.decode(response.body);
 
-        List<Dropdownbranchs> dropdowbranchs =
+        List<Dropdownbranchs> dropdownBranchList =
             jsonResponse.map((item) => Dropdownbranchs.fromJson(item)).toList();
-        return dropdowbranchs;
+        return dropdownBranchList;
       } else {
         print('Error: ${response.statusCode} - ${response.reasonPhrase}');
-        return null;
+        return Future.error(
+            'Error: ${response.statusCode} - ${response.reasonPhrase}');
       }
     } catch (e) {
       print('Exception: $e');
-      return null;
+      return Future.error('Exception: $e');
     }
   }
 }

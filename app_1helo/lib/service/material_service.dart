@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:app_1helo/model/body.dart';
 import 'package:app_1helo/model/materials.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'api_config.dart';
 
 class MaterialService {
@@ -11,6 +12,8 @@ class MaterialService {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
 
       Body requestBody = Body(
         searchContent: "",
@@ -18,9 +21,9 @@ class MaterialService {
         pageSize: pageSize,
         frCreatedDate: null,
         toCreatedDate: null,
-        employeeId: "a80f412c-73cc-40be-bc12-83c201cb2c4d",
+        employeeId: null,
         customerId: null,
-        userId: "a80f412c-73cc-40be-bc12-83c201cb2c4d",
+        userId: userId,
       );
 
       final response = await http.post(
@@ -46,16 +49,17 @@ class MaterialService {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
-
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
       Body requestBody = Body(
         searchContent: searchContent,
         pageIndex: 1,
         pageSize: 10,
         frCreatedDate: null,
         toCreatedDate: null,
-        employeeId: "a80f412c-73cc-40be-bc12-83c201cb2c4d",
+        employeeId: null,
         customerId: null,
-        userId: "a80f412c-73cc-40be-bc12-83c201cb2c4d",
+        userId: userId,
       );
 
       final response = await http.post(

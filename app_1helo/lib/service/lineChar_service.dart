@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:app_1helo/model/dropdownEmployee.dart';
 import 'package:app_1helo/model/lineCharModel.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'api_config.dart';
 
 class LineChartService {
@@ -44,9 +45,19 @@ class LineChartService {
   }
 
   Future<List<dropdownEmployee>> fetchEmployeeList() async {
-    const String employeeApiUrl =
-        '${ApiConfig.baseUrl}/employees/dropdown-employeeid/a80f412c-73cc-40be-bc12-83c201cb2c4d';
     final headers = await ApiConfig.getHeaders();
+
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+
+    if (userId == null) {
+      print('No user ID found. User might not be logged in.');
+      return [];
+    }
+
+    // Remove 'const' because userId is not a constant value
+    final String employeeApiUrl =
+        '${ApiConfig.baseUrl}/employees/dropdown-employeeid/$userId';
 
     try {
       print('Fetching employee list from API: $employeeApiUrl');

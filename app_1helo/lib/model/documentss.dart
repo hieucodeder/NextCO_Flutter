@@ -94,14 +94,18 @@ class Data {
     formName = json['form_name'];
     statusName = json['status_name'];
     statusDeclarations = json['status_declarations'];
-    numberTkx = json['number_tkx'].cast<String>();
+
+    numberTkx = json['number_tkx'] != null
+        ? List<String>.from(json['number_tkx'])
+        : []; // Default to an empty list if null
+
     if (json['number_tkx_with_shipping_terms'] != null) {
       numberTkxWithShippingTerms = <NumberTkxWithShippingTerms>[];
       json['number_tkx_with_shipping_terms'].forEach((v) {
-        numberTkxWithShippingTerms!
-            .add(new NumberTkxWithShippingTerms.fromJson(v));
+        numberTkxWithShippingTerms!.add(NumberTkxWithShippingTerms.fromJson(v));
       });
     }
+
     ts = json['ts'];
     result = json['result'];
     cast = json['cast'];

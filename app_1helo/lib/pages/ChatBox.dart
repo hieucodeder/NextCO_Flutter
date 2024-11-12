@@ -15,8 +15,7 @@ class _ChatboxState extends State<Chatbox> {
   void initState() {
     super.initState();
     _controller = WebViewController()
-      ..loadRequest(Uri.parse(
-          'https://smartchat.aiacademy.edu.vn/chatbot-embed.js?chatbotCode=08b76cc3-ab34-4bd9-9e82-6577d47387a8'));
+      ..loadRequest(Uri.parse('https://www.google.com/?hl=vi'));
   }
 
   @override

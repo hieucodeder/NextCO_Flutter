@@ -25,8 +25,8 @@ class _MaterreportpageState extends State<Materialresportpage> {
   final int pageSize = 10;
 
   bool isLoading = false;
+  bool isSearching = false;
   bool hasMoreData = true;
-  bool _isSearching = false;
 
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
@@ -34,7 +34,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
       TextEditingController();
   final TextEditingController _controller = TextEditingController();
   final TextEditingController _controller1 = TextEditingController();
-
+  late Future<List<Data>> materialResport;
   List<Data> allMaterialsResport = [];
   List<Data> displayList = [];
   List<Data> _searchResults = [];
@@ -53,6 +53,9 @@ class _MaterreportpageState extends State<Materialresportpage> {
   @override
   void initState() {
     super.initState();
+    materialResport = _materialresportservice.fetchMaterialsReport(
+        search, customerid, currentPage, pageSize);
+
     fetchInitialMaterials();
     _scrollController.addListener(_onScroll);
     _fetchCustomerData();
@@ -128,7 +131,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
   Future<void> _searchMaterial(String searchQuery) async {
     if (searchQuery.isEmpty) {
       setState(() {
-        _isSearching = false;
+        isSearching = false;
         _searchResults.clear();
         displayList = allMaterialsResport;
       });
@@ -136,7 +139,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
     }
     if (mounted) {
       setState(() {
-        _isSearching = true;
+        isSearching = true;
         _searchResults.clear();
         currentPage = 1;
         hasMoreData = true;
@@ -281,13 +284,6 @@ class _MaterreportpageState extends State<Materialresportpage> {
         .toSet()
         .toList();
 
-    if (selectedemployeeCustomer == null &&
-        _filteredEmployeeCustomer.isNotEmpty) {
-      selectedemployeeCustomer = _filteredEmployeeCustomer[0];
-      customerid = selectedemployeeCustomer?.customerId;
-      _fetchMaterialsReport(customerid);
-    }
-
     return buildDropdown(
       items: customerName,
       selectedItem: selectedemployeeCustomer?.customerName,
@@ -317,7 +313,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Data> displayList = _isSearching
+    List<Data> displayList = isSearching
         ? _searchResults
         : (startDate1 != null && endDate1 != null
             ? allMaterialsResport.where((data) {
@@ -533,11 +529,6 @@ class _MaterreportpageState extends State<Materialresportpage> {
                         ),
                       ),
           ),
-          if (isLoading)
-            const Padding(
-              padding: EdgeInsets.all(10.0),
-              child: CircularProgressIndicator(),
-            ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(

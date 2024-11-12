@@ -106,6 +106,16 @@ class _DshosocoState extends State<Dshosoco> {
     }
   }
 
+  void _clearDateRange() {
+    if (mounted) {
+      setState(() {
+        startDate = null;
+        endDate = null;
+        _controller.clear();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -119,40 +129,50 @@ class _DshosocoState extends State<Dshosoco> {
             child: Container(
               width: double.infinity,
               height: 40,
-              margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+              margin: const EdgeInsets.only(top: 10),
               padding: const EdgeInsets.symmetric(horizontal: 5),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.black38),
               ),
-              child: AbsorbPointer(
-                child: TextField(
-                  controller: _controller,
-                  readOnly: true,
-                  onTap: () => _selectDateRange(),
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    hintText: 'Chọn Ngày Bắt Đầu và Kết Thúc',
-                    hintStyle: GoogleFonts.robotoCondensed(
-                      fontSize: 14,
-                      color: Colors.black38,
-                    ),
-                    border: InputBorder.none,
-                    suffixIcon: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        VerticalDivider(
-                          width: 20,
-                          thickness: 1,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      readOnly: true,
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                        hintText: 'Chọn Ngày Bắt Đầu và Kết Thúc',
+                        hintStyle: GoogleFonts.robotoCondensed(
+                          fontSize: 14,
                           color: Colors.black38,
                         ),
-                        Icon(Icons.calendar_today),
-                      ],
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.all(5),
+                      ),
                     ),
-                    contentPadding: const EdgeInsets.all(5),
                   ),
-                ),
+                  if (_controller.text.isNotEmpty)
+                    GestureDetector(
+                      onTap: _clearDateRange,
+                      child: Icon(
+                        Icons.close_sharp,
+                        color: Colors.black54,
+                        size: 20,
+                      ),
+                    ),
+                  VerticalDivider(
+                    width: 20,
+                    thickness: 1,
+                    color: Colors.black38,
+                  ),
+                  GestureDetector(
+                    onTap: _selectDateRange,
+                    child: Icon(Icons.calendar_today, color: Colors.black54),
+                  ),
+                ],
               ),
             ),
           ),

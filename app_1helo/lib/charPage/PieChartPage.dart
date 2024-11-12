@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'package:app_1helo/model/customers.dart';
 import 'package:app_1helo/model/dropdownEmployee.dart';
 import 'package:app_1helo/model/pieCharModel.dart';
@@ -16,7 +17,11 @@ import 'package:app_1helo/model/dropdownCustomer.dart';
 import 'package:app_1helo/model/documentss.dart' as Documents;
 
 class Piechartpage extends StatefulWidget {
-  const Piechartpage({super.key});
+  const Piechartpage({Key? key}) : super(key: key);
+
+  Future<void> fetchPieChartData() async {
+    await Future.delayed(Duration(seconds: 2)); // Simulate loading delay
+  }
 
   @override
   _PiechartpageState createState() => _PiechartpageState();
@@ -102,30 +107,74 @@ class _PiechartpageState extends State<Piechartpage> {
 
   void _processPieChartData(List<PieCharModel>? pieChartData) {
     if (pieChartData != null && pieChartData.isNotEmpty) {
-      double waiting = 0;
-      double completed = 0;
-      double processing = 0;
-      double canceled = 0;
+      int completedTotal = 0;
+      int processingTotal = 0;
+      int waitingcancelTotal = 0;
+      int waitingTotal = 0;
+      int refusedconsider = 0;
+      int cancel = 0;
+      int editor = 0;
+      int waitingrepair = 0;
 
       for (var item in pieChartData) {
-        waiting += item.statusId == 4 ? item.quantity.toDouble() : 0;
-        completed += item.complete.toDouble() ?? 0;
-        processing += item.processing.toDouble() ?? 0;
-        canceled += item.canceled.toDouble() ?? 0;
+        switch (item.statusId) {
+          case 1:
+            completedTotal += item.quantity?.toInt() ?? 0;
+            break;
+          case 2:
+            processingTotal += item.quantity?.toInt() ?? 0;
+            break;
+          case 3:
+            waitingcancelTotal += item.quantity?.toInt() ?? 0;
+            break;
+          case 4:
+            waitingTotal += item.quantity?.toInt() ?? 0;
+            break;
+          case 5:
+            refusedconsider += item.quantity?.toInt() ?? 0;
+            break;
+          case 6:
+            cancel += item.quantity?.toInt() ?? 0;
+            break;
+          case 7:
+            editor += item.quantity?.toInt() ?? 0;
+            break;
+          case 8:
+            waitingrepair += item.quantity?.toInt() ?? 0;
+            break;
+        }
       }
 
-      print(
-          "Data totals - Waiting: $waiting, Completed: $completed, Processing: $processing, Canceled: $canceled"); // Debugging line
-
-      double total = waiting + completed + processing + canceled;
+      int total = completedTotal +
+          processingTotal +
+          waitingcancelTotal +
+          waitingTotal +
+          refusedconsider +
+          cancel +
+          editor +
+          waitingrepair;
 
       setState(() {
         dataMap = total > 0
             ? {
-                "Chờ duyệt": (waiting / total) * 100,
-                "Hoàn thành": (completed / total) * 100,
-                "Đang xử lý": (processing / total) * 100,
-                "Đã hủy": (canceled / total) * 100,
+                if (completedTotal > 0)
+                  "Hoàn thành: ($completedTotal)":
+                      (completedTotal / total) * 100,
+                if (processingTotal > 0)
+                  "Đang thực hiện: ($processingTotal)":
+                      (processingTotal / total) * 100,
+                if (waitingcancelTotal > 0)
+                  "Chờ hủy: ($waitingcancelTotal)":
+                      (waitingcancelTotal / total) * 100,
+                if (waitingTotal > 0)
+                  "Chờ duyệt: ($waitingTotal)": (waitingTotal / total) * 100,
+                if (refusedconsider > 0)
+                  "Từ chối xét duyệt: ($refusedconsider)":
+                      (refusedconsider / total) * 100,
+                if (cancel > 0) "Đã hủy: ($cancel)": (cancel / total) * 100,
+                if (editor > 0) "Đang sửa: ($editor)": (editor / total) * 100,
+                if (waitingrepair > 0)
+                  "Chờ sửa: ($waitingrepair)": (waitingrepair / total) * 100,
               }
             : {"Không có dữ liệu": 0};
       });
@@ -254,7 +303,7 @@ class _PiechartpageState extends State<Piechartpage> {
 
     if (selectedDropdownEmployee == null &&
         _filtereddropdownEmployee.isNotEmpty) {
-      selectedDropdownEmployee = _filtereddropdownEmployee[2];
+      selectedDropdownEmployee = _filtereddropdownEmployee[0];
       fetchDataCustomer();
     }
     return buildDropdown(
@@ -341,6 +390,19 @@ class _PiechartpageState extends State<Piechartpage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorList = dataMap.keys.contains("Không có dữ liệu")
+        ? [Colors.grey]
+        : [
+            Colors.black,
+            Colors.orange,
+            Colors.green,
+            Colors.black,
+            Colors.orange,
+            Colors.red,
+            Colors.red,
+            Colors.black,
+            Colors.black,
+          ];
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6.0),
@@ -351,7 +413,7 @@ class _PiechartpageState extends State<Piechartpage> {
               child: Container(
                 width: double.infinity,
                 height: 40,
-                margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                margin: const EdgeInsets.only(top: 10),
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -378,9 +440,7 @@ class _PiechartpageState extends State<Piechartpage> {
                     ),
                     if (_controller.text.isNotEmpty)
                       GestureDetector(
-                        onTap: () {
-                          _clearDateRange();
-                        },
+                        onTap: _clearDateRange,
                         child: Icon(
                           Icons.close_sharp,
                           color: Colors.black54,
@@ -400,22 +460,21 @@ class _PiechartpageState extends State<Piechartpage> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   renderCustomerDropdown(),
                   const SizedBox(width: 6.0),
-                  renderUserDropdown(),
+                  Expanded(child: renderUserDropdown()),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
             SizedBox(
               width: double.infinity,
+              height: 250,
               child: _isFetchingData
                   ? const Center(child: CircularProgressIndicator())
                   : Padding(
@@ -423,24 +482,27 @@ class _PiechartpageState extends State<Piechartpage> {
                       child: PieChart(
                         dataMap: dataMap,
                         chartType: ChartType.disc,
-                        colorList: const [
-                          Colors.orange,
-                          Colors.green,
-                          Colors.blue,
-                          Colors.red
-                        ],
+                        colorList: colorList,
                         animationDuration: const Duration(milliseconds: 800),
-                        chartRadius: MediaQuery.of(context).size.width / 2,
-                        legendOptions: const LegendOptions(
+                        chartRadius: double.infinity,
+                        legendOptions: LegendOptions(
                           legendPosition: LegendPosition.right,
                           showLegendsInRow: false,
+                          legendTextStyle: GoogleFonts.robotoCondensed(
+                            fontSize: 13,
+                            color: Colors.black,
+                          ),
                         ),
-                        chartValuesOptions: const ChartValuesOptions(
+                        chartValuesOptions: ChartValuesOptions(
                           showChartValueBackground: false,
                           showChartValues: true,
                           showChartValuesInPercentage: true,
                           showChartValuesOutside: false,
                           decimalPlaces: 1,
+                          chartValueStyle: GoogleFonts.robotoCondensed(
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),

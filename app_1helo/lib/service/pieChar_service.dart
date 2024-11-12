@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'package:app_1helo/model/bodySearchPieChar.dart';
+import 'package:app_1helo/model/documentss.dart';
 import 'package:app_1helo/model/dropdownEmployee.dart';
 import 'package:app_1helo/model/pieCharModel.dart';
+import 'package:app_1helo/model/user.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'api_config.dart';
 
 class PiecharService {
@@ -50,9 +54,17 @@ class PiecharService {
   }
 
   Future<List<dropdownEmployee>> fetchEmployeeList() async {
-    const String employeeApiUrl =
-        '${ApiConfig.baseUrl}/employees/dropdown-employeeid/a80f412c-73cc-40be-bc12-83c201cb2c4d';
     final headers = await ApiConfig.getHeaders();
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+
+    if (userId == null) {
+      print('No user ID found. User might not be logged in.');
+      return [];
+    }
+
+    final String employeeApiUrl =
+        '${ApiConfig.baseUrl}/employees/dropdown-employeeid/$userId';
 
     try {
       print('Fetching employee list from API: $employeeApiUrl');
@@ -107,14 +119,14 @@ class PiecharService {
     return '';
   }
 
-  Future<List<PieCharModel>> searchByDateRange(
-      DateTime? startDate, DateTime? endDate, String? employeeId, String? customerid) async {
+  Future<List<PieCharModel>> searchByDateRange(DateTime? startDate,
+      DateTime? endDate, String? employeeId, String? customerId) async {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
 
       Bodysearchpiechar requestBody = Bodysearchpiechar(
-        customerId: customerid,
+        customerId: customerId,
         employeeId: employeeId,
         frCreatedDate: startDate,
         toCreatedDate: endDate,
@@ -138,9 +150,33 @@ class PiecharService {
           throw Exception("Unexpected JSON format");
         }
 
-        return data
-            .map((item) => PieCharModel.fromJson(item as Map<String, dynamic>))
+        // Convert the fetched data into a list of `Data` objects
+        List<Data> dataList = data
+            .map((item) => Data.fromJson(item as Map<String, dynamic>))
             .toList();
+
+        // Filter the data based on the date range
+        List<Data> filteredData = dataList.where((dataItem) {
+          DateTime createdDate = DateFormat("yyyy-MM-dd")
+              .parse(dataItem.createdDate!); // Parse created date to DateTime
+
+          // Check if the createdDate is within the provided date range
+          bool isAfterStartDate =
+              startDate != null ? createdDate.isAfter(startDate) : true;
+          bool isBeforeEndDate =
+              endDate != null ? createdDate.isBefore(endDate) : true;
+
+          return isAfterStartDate && isBeforeEndDate;
+        }).toList();
+
+        // Convert the filtered data into PieCharModel
+        return filteredData.map((item) {
+          return PieCharModel(
+            statusId: item.statusId,
+            quantity:
+                item.result, // Assuming quantity comes from `result` or similar
+          );
+        }).toList();
       } else {
         print('Failed to load documents: ${response.body}');
         throw Exception('Failed to load documents');

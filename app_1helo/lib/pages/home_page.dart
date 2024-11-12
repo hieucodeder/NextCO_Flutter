@@ -19,6 +19,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  late Future<List<void>> loadData;
+// Xử lý bất đồng bộ
+  Future<List<void>> loadAllData() {
+    return Future.wait([
+      _fetchTotalData(),
+      Linecharpage().fetchLineChartData(),
+      Piechartpage().fetchPieChartData(),
+    ]);
+  }
+
   int? totalItems, totalDocuments, totalUser;
   int? totalCustomer,
       totalProduct,
@@ -37,6 +47,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _resetState();
     _startRandomNumberGenerator();
     _fetchAllData();
+    loadData = loadAllData();
   }
 
   @override
@@ -82,6 +93,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Future<void> _fetchTotalData() async {
+    await Future.delayed(Duration(seconds: 2));
     try {
       final Data? data = await totalService.fetchTotalItemsUsers();
       if (mounted) {

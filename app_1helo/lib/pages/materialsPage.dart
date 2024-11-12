@@ -18,7 +18,6 @@ class _MaterialspageState extends State<Materialspage> {
   final List<int> itemsPerPageOptions = [10, 20, 30, 50];
 
   final ScrollController _scrollController = ScrollController();
-
   List<Data> materialList = [];
   bool isLoading = false;
   int currentPage = 1;
@@ -247,11 +246,6 @@ class _MaterialspageState extends State<Materialspage> {
                         ),
                       ),
           ),
-          if (isLoading)
-            const Padding(
-              padding: EdgeInsets.all(10.0),
-              child: CircularProgressIndicator(),
-            ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
