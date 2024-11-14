@@ -1,5 +1,6 @@
 import 'package:app_1helo/model/customers.dart';
 import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/service/columnChar_service.dart';
 import 'package:app_1helo/service/customer_service..dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,18 +15,15 @@ class Clientpage extends StatefulWidget {
 
 class _ClientpageState extends State<Clientpage> {
   final ScrollController _scrollController = ScrollController();
-  late Future<List<Data>> customers;
   CustomerService customerService = CustomerService();
-
-  @override
-  void initState() {
-    super.initState();
-    customers = customerService.fetchCustomer();
-  }
-
+  bool isLoading = false;
   int currentPage = 1;
+  int pageSize = 10;
+  List<Data> customerList = [];
+  bool hasMoreData = true;
+
   int itemsPerPage = 10;
-  final List<int> itemsPerPageOptions = [10, 20, 30, 50];
+  final List<int> itemsPerPageOptions = [10, 20, 30];
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
@@ -35,6 +33,13 @@ class _ClientpageState extends State<Clientpage> {
 
   List<Data> _searchResults = [];
   bool _isSearching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchInitialCustomers();
+    _scrollController.addListener(_onScroll);
+  }
 
   Future<void> _searchCustomers(String searchQuery) async {
     if (searchQuery.isEmpty) {
@@ -51,10 +56,49 @@ class _ClientpageState extends State<Clientpage> {
     });
   }
 
-  void _changePage(int pageNumber) {
-    setState(() {
-      currentPage = pageNumber;
-    });
+  Future<void> fetchInitialCustomers() async {
+    if (mounted) {
+      setState(() => isLoading = true);
+    }
+    List<Data> initialCustomers =
+        await customerService.fetchCustomer(currentPage, itemsPerPage);
+
+    if (mounted) {
+      setState(() {
+        customerList = initialCustomers;
+        isLoading = false;
+        if (initialCustomers.length < itemsPerPage) {
+          hasMoreData = false;
+        }
+      });
+    }
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent &&
+        !isLoading) {
+      _loadMoreCustomer();
+    }
+  }
+
+  Future<void> _loadMoreCustomer() async {
+    if (isLoading || !hasMoreData) return;
+
+    setState(() => isLoading = true);
+    currentPage++;
+    List<Data> moreProducts =
+        await customerService.fetchCustomer(currentPage, pageSize);
+
+    if (mounted) {
+      setState(() {
+        customerList.addAll(moreProducts);
+        isLoading = false;
+        if (moreProducts.length < pageSize) {
+          hasMoreData = false;
+        }
+      });
+    }
   }
 
   @override
@@ -68,183 +112,11 @@ class _ClientpageState extends State<Clientpage> {
     super.dispose();
   }
 
-  Future<void> _showAddCustomerDialog() async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Provider.of<Providercolor>(context).selectedColor,
-              ),
-              child: Center(
-                child: Text(
-                  'Thêm mới khách hàng',
-                  style: GoogleFonts.robotoCondensed(
-                      fontWeight: FontWeight.w600, color: Colors.white),
-                ),
-              )),
-          content: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                Column(
-                  children: [
-                    const Row(
-                      children: [
-                        Text(
-                          '*',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text('Tên khách hàng'),
-                      ],
-                    ),
-                    TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(
-                        hintText: 'Tên khách hàng',
-                        hintStyle:
-                            TextStyle(color: Colors.black12, fontSize: 14),
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Column(
-                  children: [
-                    const Row(
-                      children: [
-                        Text(
-                          '*',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text('Số điện thoại'),
-                      ],
-                    ),
-                    TextField(
-                      controller: phoneController,
-                      keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(
-                        hintText: 'Số điện thoại',
-                        hintStyle:
-                            TextStyle(color: Colors.black12, fontSize: 14),
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Column(
-                  children: [
-                    const Row(
-                      children: [
-                        Text(
-                          '*',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text('Mã số thuế'),
-                      ],
-                    ),
-                    TextField(
-                      controller: taxCodeController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        hintText: 'Mã thuế',
-                        hintStyle:
-                            TextStyle(color: Colors.black12, fontSize: 14),
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Column(
-                  children: [
-                    const Row(
-                      children: [
-                        Text(
-                          '*',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text('Địa chỉ'),
-                      ],
-                    ),
-                    TextField(
-                      maxLines: 3,
-                      controller: addressController,
-                      decoration: const InputDecoration(
-                        hintText: 'Địa chỉ',
-                        hintStyle:
-                            TextStyle(color: Colors.black12, fontSize: 14),
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            Container(
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                    width: 2,
-                    color: Provider.of<Providercolor>(context).selectedColor),
-              ),
-              child: TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  'Đóng',
-                  style: GoogleFonts.robotoCondensed(
-                      color: Provider.of<Providercolor>(context).selectedColor),
-                ),
-              ),
-            ),
-            // ElevatedButton(
-            //   onPressed: () {
-            //     // Thêm logic lưu khách hàng
-            //     Navigator.of(context).pop();
-            //   },
-            //   style: ElevatedButton.styleFrom(
-            //     backgroundColor:
-            //         Provider.of<Providercolor>(context).selectedColor,
-            //     shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(10),
-            //         side: BorderSide.none),
-            //   ),
-            //   child: Text(
-            //     'Lưu',
-            //     style: GoogleFonts.robotoCondensed(color: Colors.white),
-            //   ),
-            // ),
-          ],
-        );
-      },
-    );
-  }
-
   final style = const TextStyle(fontWeight: FontWeight.bold);
 
   @override
   Widget build(BuildContext context) {
+    List<Data> displayList = _isSearching ? _searchResults : customerList;
     return Container(
         constraints: const BoxConstraints.expand(),
         padding: const EdgeInsets.all(10),
@@ -308,43 +180,20 @@ class _ClientpageState extends State<Clientpage> {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.grey[100],
-                    border: Border.all(width: 1, color: Colors.black12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      )
-                    ]),
-                padding: const EdgeInsets.all(10),
-                child: FutureBuilder<List<Data>>(
-                  future: customers,
-                  builder: (context, snapshot) {
-                    if (_isSearching && _searchResults.isEmpty) {
-                      return Center(
-                        child: Text(
-                          "Dữ liệu tìm kiếm không có!!!",
-                          style: GoogleFonts.robotoCondensed(
-                              fontSize: 16,
-                              color: Provider.of<Providercolor>(context)
-                                  .selectedColor),
-                        ),
-                      );
-                    }
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return const Center(child: Text("Đã xảy ra lỗi"));
-                    } else if (snapshot.hasData) {
-                      List<Data> displayList =
-                          _isSearching ? _searchResults : snapshot.data!;
-                      return SingleChildScrollView(
-                        child: Container(
-                          decoration: BoxDecoration(
+                child: displayList.isEmpty && isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : displayList.isEmpty
+                        ? Center(
+                            child: Text(
+                              "Dữ liệu tìm kiếm không có!!!",
+                              style: GoogleFonts.robotoCondensed(
+                                  fontSize: 16,
+                                  color: Provider.of<Providercolor>(context)
+                                      .selectedColor),
+                            ),
+                          )
+                        : Container(
+                            decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               color: Colors.white,
                               boxShadow: [
@@ -352,116 +201,91 @@ class _ClientpageState extends State<Clientpage> {
                                   color: Colors.grey.withOpacity(0.5),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
-                                )
-                              ]),
-                          padding: const EdgeInsets.all(5),
-                          child: Scrollbar(
-                            controller: _scrollController,
-                            thumbVisibility: true,
-                            radius: const Radius.circular(10),
-                            thickness: 8,
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
+                                ),
+                              ],
+                            ),
+                            padding: const EdgeInsets.all(5),
+                            child: Scrollbar(
                               controller: _scrollController,
+                              thumbVisibility: true,
+                              radius: const Radius.circular(10),
+                              thickness: 8,
                               child: SingleChildScrollView(
-                                scrollDirection: Axis.vertical,
-                                child: DataTable(
-                                  columns: const [
-                                    DataColumn(
-                                        label: Text('STT',
-                                            textAlign: TextAlign.center)),
-                                    DataColumn(
-                                        label: Text('Mã khách hàng',
-                                            textAlign: TextAlign.center)),
-                                    DataColumn(
-                                        label: Text('Tên khách hàng',
-                                            textAlign: TextAlign.center)),
-                                    DataColumn(
-                                      label: Text('Số điện thoại',
-                                          textAlign: TextAlign.center),
-                                    ),
-                                    DataColumn(
-                                        label: Text('Mã số thuế',
-                                            textAlign: TextAlign.center)),
-                                    DataColumn(
-                                        label: Text('Địa chỉ',
-                                            textAlign: TextAlign.center)),
-                                    // DataColumn(
-                                    //     label: Expanded(
-                                    //   child: Container(
-                                    //       decoration: BoxDecoration(
-                                    //         borderRadius:
-                                    //             BorderRadius.circular(10),
-                                    //         color: Colors.grey[300],
-                                    //       ),
-                                    //       padding: const EdgeInsets.all(8.0),
-                                    //       child: const Text('Action',
-                                    //           textAlign: TextAlign.center)),
-                                    // )),
-                                  ],
-                                  rows: displayList.map((doc) {
-                                    return DataRow(cells: [
-                                      DataCell(Container(
-                                        padding: const EdgeInsets.all(16),
-                                        child: Text(
-                                          doc.rowNumber?.toString() ?? '',
-                                        ),
-                                      )),
-                                      DataCell(InkWell(
-                                        onTap: () {
-                                          showCustomerDetailsDialog(
-                                              context,
-                                              doc.customerName ?? '',
-                                              doc.phoneNumber ?? '',
-                                              doc.taxCode ?? '',
-                                              doc.address ?? '');
-                                        },
-                                        child: Container(
+                                scrollDirection: Axis.horizontal,
+                                controller: _scrollController,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: DataTable(
+                                    columns: const [
+                                      DataColumn(
+                                          label: Text('STT',
+                                              textAlign: TextAlign.center)),
+                                      DataColumn(
+                                          label: Text('Mã khách hàng',
+                                              textAlign: TextAlign.center)),
+                                      DataColumn(
+                                          label: Text('Tên khách hàng',
+                                              textAlign: TextAlign.center)),
+                                      DataColumn(
+                                        label: Text('Số điện thoại',
+                                            textAlign: TextAlign.center),
+                                      ),
+                                      DataColumn(
+                                          label: Text('Mã số thuế',
+                                              textAlign: TextAlign.center)),
+                                      DataColumn(
+                                          label: Text('Địa chỉ',
+                                              textAlign: TextAlign.center)),
+                                    ],
+                                    rows: displayList.map((doc) {
+                                      return DataRow(cells: [
+                                        DataCell(Container(
                                           padding: const EdgeInsets.all(16),
                                           child: Text(
-                                            doc.customerId ?? '',
-                                            style: GoogleFonts.robotoCondensed(
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.blue),
+                                            doc.rowNumber?.toString() ?? '',
                                           ),
-                                        ),
-                                      )),
-                                      DataCell(Text(
-                                          doc.customerName?.toString() ?? '')),
-                                      DataCell(Container(
-                                          padding: const EdgeInsets.all(8),
-                                          child: Text(doc.phoneNumber ?? ''))),
-                                      DataCell(Container(
-                                          padding: const EdgeInsets.all(8),
-                                          child: Text(doc.taxCode ?? ''))),
-                                      DataCell(Container(
-                                          padding: const EdgeInsets.all(8),
-                                          child: Text(doc.address ?? ''))),
-                                      // DataCell(IconButton(
-                                      //   icon: const Icon(
-                                      //     Icons.delete_outline,
-                                      //     size: 24,
-                                      //     color: Colors.red,
-                                      //   ),
-                                      //   onPressed: () {
-                                      //     showDeleteCustomerDialog(
-                                      //         context, doc.customerName ?? '');
-                                      //   },
-                                      // )),
-                                    ]);
-                                  }).toList(),
+                                        )),
+                                        DataCell(InkWell(
+                                          onTap: () {
+                                            showCustomerDetailsDialog(
+                                                context,
+                                                doc.customerName ?? '',
+                                                doc.phoneNumber ?? '',
+                                                doc.taxCode ?? '',
+                                                doc.address ?? '');
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.all(16),
+                                            child: Text(
+                                              doc.customerId ?? '',
+                                              style:
+                                                  GoogleFonts.robotoCondensed(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Colors.blue),
+                                            ),
+                                          ),
+                                        )),
+                                        DataCell(Text(
+                                            doc.customerName?.toString() ??
+                                                '')),
+                                        DataCell(Container(
+                                            padding: const EdgeInsets.all(8),
+                                            child:
+                                                Text(doc.phoneNumber ?? ''))),
+                                        DataCell(Container(
+                                            padding: const EdgeInsets.all(8),
+                                            child: Text(doc.taxCode ?? ''))),
+                                        DataCell(Container(
+                                            padding: const EdgeInsets.all(8),
+                                            child: Text(doc.address ?? ''))),
+                                      ]);
+                                    }).toList(),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                      );
-                    }
-                    return const SizedBox();
-                  },
-                ),
-              ),
-            ),
+                          )),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -469,16 +293,21 @@ class _ClientpageState extends State<Clientpage> {
                 children: [
                   IconButton(
                     onPressed: currentPage > 1
-                        ? () => _changePage(currentPage - 1)
+                        ? () {
+                            setState(() {
+                              currentPage -= 1;
+                            });
+                            fetchInitialCustomers();
+                          }
                         : null,
                     icon: const Icon(
                       Icons.chevron_left,
-                      color: Colors.black12,
+                      color: Colors.black,
                     ),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 3.0, horizontal: 10.0),
+                        vertical: 2.0, horizontal: 10.0),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.black),
                       borderRadius: BorderRadius.circular(4.0),
@@ -489,18 +318,26 @@ class _ClientpageState extends State<Clientpage> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => _changePage(currentPage + 1),
+                    onPressed: hasMoreData
+                        ? () {
+                            setState(() {
+                              currentPage += 1;
+                            });
+                            fetchInitialCustomers();
+                          }
+                        : null,
                     icon: const Icon(
                       Icons.chevron_right,
-                      color: Colors.black12,
+                      color: Colors.black,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Container(
                     height: 30,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(width: 1, color: Colors.black12)),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(width: 1, color: Colors.black12),
+                    ),
                     child: DropdownButton<int>(
                       value: itemsPerPage,
                       items: itemsPerPageOptions.map((int value) {
@@ -510,12 +347,16 @@ class _ClientpageState extends State<Clientpage> {
                         );
                       }).toList(),
                       onChanged: (int? newValue) {
-                        setState(() {
-                          itemsPerPage = newValue!;
-                        });
+                        if (newValue != null) {
+                          setState(() {
+                            itemsPerPage = newValue;
+                            currentPage = 1;
+                          });
+                          fetchInitialCustomers();
+                        }
                       },
                     ),
-                  ),
+                  )
                 ],
               ),
             )
@@ -669,112 +510,10 @@ void showCustomerDetailsDialog(BuildContext context, String customerName,
                 const SizedBox(
                   width: 5,
                 ),
-                // ElevatedButton(
-                //   onPressed: () {
-                //     Navigator.of(context).pop();
-                //   },
-                //   style: ElevatedButton.styleFrom(
-                //     backgroundColor:
-                //         Provider.of<Providercolor>(context).selectedColor,
-                //     shape: RoundedRectangleBorder(
-                //         borderRadius: BorderRadius.circular(10),
-                //         side: BorderSide.none),
-                //   ),
-                //   child: Text(
-                //     'Lưu',
-                //     style: GoogleFonts.robotoCondensed(color: Colors.white),
-                //   ),
-                // ),
               ],
             ),
           ],
         ),
-      );
-    },
-  );
-}
-
-void showDeleteCustomerDialog(BuildContext context, String customerName) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Center(
-          child: Text(
-            'Xóa khách hàng',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        // backgroundColor: Provider.of<Providercolor>(context).selectedColor,
-        content: RichText(
-          text: TextSpan(
-            children: [
-              const TextSpan(
-                text: 'Bạn có muốn xóa khách hàng ',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                ),
-              ),
-              TextSpan(
-                text: customerName,
-                style: const TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const TextSpan(
-                text: ' ?',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          Container(
-            height: 40,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                  width: 2,
-                  color: Provider.of<Providercolor>(context).selectedColor),
-            ),
-            child: TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                'KHông',
-                style: GoogleFonts.robotoCondensed(
-                    color: Provider.of<Providercolor>(context).selectedColor),
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Thêm logic lưu khách hàng
-              Navigator.of(context).pop();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor:
-                  Provider.of<Providercolor>(context).selectedColor,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  side: BorderSide.none),
-            ),
-            child: Text(
-              'Có',
-              style: GoogleFonts.robotoCondensed(color: Colors.white),
-            ),
-          ),
-        ],
       );
     },
   );

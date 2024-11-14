@@ -8,7 +8,7 @@ import 'api_config.dart';
 class DocumentService {
   final String apiUrl = '${ApiConfig.baseUrl}/co-documents/search';
 
-  Future<List<Data>> fetchDocuments() async {
+  Future<List<Data>> fetchDocuments(int page, int pageSize) async {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
@@ -21,8 +21,8 @@ class DocumentService {
       }
       Body requestBody = Body(
         searchContent: "",
-        pageIndex: 1,
-        pageSize: 10,
+        pageIndex: page,
+        pageSize: pageSize,
         frCreatedDate: null,
         toCreatedDate: null,
         employeeId: null,

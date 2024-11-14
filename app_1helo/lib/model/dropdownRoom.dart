@@ -6,7 +6,8 @@ class Dropdownroom {
 
   Dropdownroom.fromJson(Map<String, dynamic> json) {
     label = json['label'];
-    value = json['value'];
+    // Handle type mismatch by converting the value to a String
+    value = json['value']?.toString();
   }
 
   Map<String, dynamic> toJson() {

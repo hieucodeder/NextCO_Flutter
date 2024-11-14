@@ -28,7 +28,7 @@ class AppScreen extends StatefulWidget {
 }
 
 class _AppScreenState extends State<AppScreen> {
-  String _appBarTitle = "BÁO CÁO HOẠT ĐỘNG TẠO HỒ SƠ C/O";
+  String _appBarTitle = "BÁO CÁO HOẠT ĐỘNG NEXTCO";
   int _currenIndex = 0;
 
   void _changeCurrentIndex(int index) {
@@ -41,16 +41,16 @@ class _AppScreenState extends State<AppScreen> {
   void _updateAppBarTitle(int index) {
     switch (index) {
       case 0:
-        _appBarTitle = "BÁO CÁO HOẠT ĐỘNG NEXT C/O";
+        _appBarTitle = "BÁO CÁO HOẠT ĐỘNG NEXTCO";
         break;
       case 1:
-        _appBarTitle = "CHỨC NĂNG NEXT C/O";
+        _appBarTitle = "CHỨC NĂNG NEXT NEXTCO";
         break;
       case 2:
         _appBarTitle = "CÁ NHÂN";
         break;
       case 3:
-        _appBarTitle = "DANH SÁCH HỒ SƠ C/O";
+        _appBarTitle = "DANH SÁCH HỒ SƠ NEXTCO";
         break;
       case 4:
         _appBarTitle = "THÔNG TIN CÁ NHÂN";
@@ -75,13 +75,15 @@ class _AppScreenState extends State<AppScreen> {
         break;
       case 11:
         _appBarTitle = "THÔNG TIN THANH TOÁN";
+        break;
       case 12:
         _appBarTitle = "BÁO CÁO TỒN SẢN PHẨM ";
+        break;
       case 13:
         _appBarTitle = "BÁO CÁO TỒN NGUYÊN VẬT LIỆU ";
         break;
       default:
-        _appBarTitle = "BÁO CÁO HOẠT ĐỘNG TẠO HỒ SƠ C/O";
+        _appBarTitle = "BÁO CÁO HOẠT ĐỘNG NEXTCO";
     }
   }
 
@@ -90,9 +92,7 @@ class _AppScreenState extends State<AppScreen> {
       case 0:
         return HomePage(onSelectPage: _changeCurrentIndex);
       case 1:
-        return NotificationPage(
-          onSelectPage: _changeCurrentIndex,
-        );
+        return NotificationPage(onSelectPage: _changeCurrentIndex);
       case 2:
         return AcountPage(onSelectPage: _changeCurrentIndex);
       case 3:
@@ -100,9 +100,7 @@ class _AppScreenState extends State<AppScreen> {
       case 4:
         return PersonalInfo(onSelectPage: _changeCurrentIndex);
       case 5:
-        return Changepassword(
-          onSelectPage: _changeCurrentIndex,
-        );
+        return Changepassword(onSelectPage: _changeCurrentIndex);
       case 6:
         return const Staffpage();
       case 7:

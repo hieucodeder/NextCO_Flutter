@@ -14,8 +14,9 @@ class Staffpage extends StatefulWidget {
 
 class _StaffpageState extends State<Staffpage> {
   int currentPage = 1;
+  int pageSize = 10;
   int itemsPerPage = 10;
-  final List<int> itemsPerPageOptions = [10, 20, 30, 50];
+  final List<int> itemsPerPageOptions = [10, 20, 30];
   final ScrollController _scrollController = ScrollController();
 
   late Future<List<DataUser>> users;
@@ -34,17 +35,33 @@ class _StaffpageState extends State<Staffpage> {
   DataUser? selectedRoomUser;
   bool _isSearching = false;
   bool isDropDownVisible = false;
-
+  bool isLoading = false;
+  bool hasMoreData = true;
   @override
   void initState() {
     super.initState();
-    users = userService.fetchUsers().then((docs) {
-      _staffList = docs;
-      return docs;
-    });
+    fetchInitialStaff();
     _fetchBranchData();
     _fetchRoomData();
     _fetchData();
+  }
+
+  Future<void> fetchInitialStaff() async {
+    if (mounted) {
+      setState(() => isLoading = true);
+    }
+    List<DataUser> initialStaff =
+        await userService.fetchUsers(currentPage, itemsPerPage);
+
+    if (mounted) {
+      setState(() {
+        _staffList = initialStaff;
+        isLoading = false;
+        if (initialStaff.length < itemsPerPage) {
+          hasMoreData = false;
+        }
+      });
+    }
   }
 
   Future<void> _searchUsers(String searchQuery) async {
@@ -75,17 +92,14 @@ class _StaffpageState extends State<Staffpage> {
       final branchName = selectedBranchUser?.branchName;
       final departmentName = selectedRoomUser?.departmentName;
 
-      final userResponse =
-          await userService.fetchUserData(branchName, departmentName);
+      final userResponse = await userService.fetchUserData(
+          currentPage, pageSize, branchName, departmentName);
 
       if (!mounted) return;
 
       setState(() {
         _isSearching = false;
         _staffList = userResponse?.data ?? [];
-        if (_staffList.isEmpty) {
-          print("No user data available");
-        }
       });
     } catch (e) {
       if (mounted) {
@@ -99,7 +113,8 @@ class _StaffpageState extends State<Staffpage> {
 
   Future<void> _fetchRoomData() async {
     try {
-      List<DataUser> staff = await userService.fetchUsers();
+      List<DataUser> staff =
+          await userService.fetchUsers(currentPage, pageSize);
       if (mounted) {
         setState(() {
           _staffList = staff;
@@ -113,7 +128,8 @@ class _StaffpageState extends State<Staffpage> {
 
   Future<void> _fetchBranchData() async {
     try {
-      List<DataUser> staff = await userService.fetchUsers();
+      List<DataUser> staff =
+          await userService.fetchUsers(currentPage, pageSize);
       if (mounted) {
         setState(() {
           _staffList = staff;
@@ -301,103 +317,81 @@ class _StaffpageState extends State<Staffpage> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.grey[100],
-                border: Border.all(width: 1, color: Colors.black12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  )
-                ],
-              ),
-              padding: const EdgeInsets.all(10),
-              child: displayList.isEmpty && _isSearching
-                  ? const Center(child: CircularProgressIndicator())
-                  : displayList.isEmpty
-                      ? Text(
-                          "Dữ liệu tìm kiếm không có!!!",
-                          style: GoogleFonts.robotoCondensed(
-                            fontSize: 16,
-                            color: Provider.of<Providercolor>(context)
-                                .selectedColor,
-                          ),
-                        )
-                      : SingleChildScrollView(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
+            child: displayList.isEmpty && _isSearching
+                ? const Center(child: CircularProgressIndicator())
+                : displayList.isEmpty
+                    ? Text(
+                        "Dữ liệu tìm kiếm không có!!!",
+                        style: GoogleFonts.robotoCondensed(
+                          fontSize: 16,
+                          color:
+                              Provider.of<Providercolor>(context).selectedColor,
+                        ),
+                      )
+                    : Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
-                            padding: const EdgeInsets.all(5),
-                            child: Scrollbar(
-                              controller: _scrollController,
-                              thumbVisibility: true,
-                              radius: const Radius.circular(10),
-                              thickness: 8,
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                controller: _scrollController,
-                                child: DataTable(
-                                  columns: const [
-                                    DataColumn(label: Text('STT')),
-                                    DataColumn(label: Text('Tài khoản')),
-                                    DataColumn(label: Text('Họ và tên')),
-                                    DataColumn(label: Text('Số điện thoại')),
-                                    DataColumn(label: Text('Email')),
-                                    DataColumn(label: Text('Chức vụ')),
-                                    DataColumn(label: Text('Chi nhánh')),
-                                    DataColumn(label: Text('Phòng ban')),
-                                    DataColumn(label: Text('Phân quyền')),
-                                    // DataColumn(label: Text('Action')),
-                                  ],
-                                  rows: (_isSearching
-                                          ? _searchResults
-                                          : _staffList)
-                                      .map((doc) {
-                                    return DataRow(cells: [
-                                      DataCell(Text(
-                                          doc.rowNumber?.toString() ?? '')),
-                                      DataCell(Text(
-                                        doc.userName?.toString() ?? '',
-                                        style: GoogleFonts.robotoCondensed(
-                                            fontWeight: FontWeight.w700,
-                                            color: Colors.blue),
-                                      )),
-                                      DataCell(Text(doc.fullName ?? '')),
-                                      DataCell(Text(doc.phoneNumber ?? '')),
-                                      DataCell(Text(
-                                        doc.email ?? '',
-                                        style: GoogleFonts.robotoCondensed(
-                                            fontWeight: FontWeight.w700,
-                                            color: Colors.blue),
-                                      )),
-                                      DataCell(Text(doc.positionName ?? '')),
-                                      DataCell(Text(doc.branchName ?? '')),
-                                      DataCell(Text(doc.departmentName ?? '')),
-                                      DataCell(Text(doc.roleGroup ?? '')),
-                                    ]);
-                                  }).toList(),
-                                ),
-                              ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(5),
+                        child: Scrollbar(
+                          controller: _scrollController,
+                          thumbVisibility: true,
+                          radius: const Radius.circular(10),
+                          thickness: 8,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            controller: _scrollController,
+                            child: DataTable(
+                              columns: const [
+                                DataColumn(label: Text('STT')),
+                                DataColumn(label: Text('Tài khoản')),
+                                DataColumn(label: Text('Họ và tên')),
+                                DataColumn(label: Text('Số điện thoại')),
+                                DataColumn(label: Text('Email')),
+                                DataColumn(label: Text('Chức vụ')),
+                                DataColumn(label: Text('Chi nhánh')),
+                                DataColumn(label: Text('Phòng ban')),
+                                DataColumn(label: Text('Phân quyền')),
+                                // DataColumn(label: Text('Action')),
+                              ],
+                              rows: displayList.map((doc) {
+                                return DataRow(cells: [
+                                  DataCell(
+                                      Text(doc.rowNumber?.toString() ?? '')),
+                                  DataCell(Text(
+                                    doc.userName?.toString() ?? '',
+                                    style: GoogleFonts.robotoCondensed(
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.blue),
+                                  )),
+                                  DataCell(Text(doc.fullName ?? '')),
+                                  DataCell(Text(doc.phoneNumber ?? '')),
+                                  DataCell(Text(
+                                    doc.email ?? '',
+                                    style: GoogleFonts.robotoCondensed(
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.blue),
+                                  )),
+                                  DataCell(Text(doc.positionName ?? '')),
+                                  DataCell(Text(doc.branchName ?? '')),
+                                  DataCell(Text(doc.departmentName ?? '')),
+                                  DataCell(Text(doc.roleGroup ?? '')),
+                                ]);
+                              }).toList(),
                             ),
                           ),
                         ),
-            ),
+                      ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -405,15 +399,22 @@ class _StaffpageState extends State<Staffpage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  onPressed: currentPage > 1 ? () => (currentPage - 1) : null,
+                  onPressed: currentPage > 1
+                      ? () {
+                          setState(() {
+                            currentPage -= 1;
+                          });
+                          fetchInitialStaff();
+                        }
+                      : null,
                   icon: const Icon(
                     Icons.chevron_left,
-                    color: Colors.black12,
+                    color: Colors.black,
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      vertical: 3.0, horizontal: 10.0),
+                      vertical: 2.0, horizontal: 10.0),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black),
                     borderRadius: BorderRadius.circular(4.0),
@@ -424,18 +425,26 @@ class _StaffpageState extends State<Staffpage> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => (currentPage + 1),
+                  onPressed: hasMoreData
+                      ? () {
+                          setState(() {
+                            currentPage += 1;
+                          });
+                          fetchInitialStaff();
+                        }
+                      : null,
                   icon: const Icon(
                     Icons.chevron_right,
-                    color: Colors.black12,
+                    color: Colors.black,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Container(
                   height: 30,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(width: 1, color: Colors.black12)),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(width: 1, color: Colors.black12),
+                  ),
                   child: DropdownButton<int>(
                     value: itemsPerPage,
                     items: itemsPerPageOptions.map((int value) {
@@ -445,12 +454,16 @@ class _StaffpageState extends State<Staffpage> {
                       );
                     }).toList(),
                     onChanged: (int? newValue) {
-                      setState(() {
-                        itemsPerPage = newValue!;
-                      });
+                      if (newValue != null) {
+                        setState(() {
+                          itemsPerPage = newValue;
+                          currentPage = 1;
+                        });
+                        fetchInitialStaff();
+                      }
                     },
                   ),
-                ),
+                )
               ],
             ),
           )

@@ -186,7 +186,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             children: [
                               renderNumberResult(
                                 totalCustomer,
-                                const Color(0xff9254DE),
+                                const Color.fromARGB(255, 108, 55, 172),
                               ),
                               Text(
                                 'Khách hàng',
@@ -395,7 +395,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       children: [
                         renderNumberResult(
                           totalEmployee,
-                          const Color(0xff13C2C2),
+                          const Color.fromARGB(255, 17, 167, 167),
                         ),
                         Text('Nhân viên',
                             style: GoogleFonts.robotoCondensed(

@@ -8,7 +8,7 @@ import 'api_config.dart';
 class CustomerService {
   final String apiUrl = '${ApiConfig.baseUrl}/customers/search';
 
-  Future<List<Data>> fetchCustomer() async {
+  Future<List<Data>> fetchCustomer(int page , int pageSize) async {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
@@ -22,8 +22,8 @@ class CustomerService {
       }
       Body requestBody = Body(
         searchContent: "",
-        pageIndex: 1,
-        pageSize: 10,
+        pageIndex: page,
+        pageSize: pageSize,
         frCreatedDate: null,
         toCreatedDate: null,
         employeeId: null,

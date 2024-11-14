@@ -11,9 +11,6 @@ class Materialresportservice {
   Future<List<Data>> fetchMaterialsReport(
       String? search, String? customerid, int page, int pageSize) async {
     try {
-      // Debugging the value of customerid
-      print('Fetching materials report for customer ID: $customerid');
-
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
       final prefs = await SharedPreferences.getInstance();
@@ -57,7 +54,52 @@ class Materialresportservice {
       return [];
     }
   }
+Future<List<Data>> fetchMateriaDataAlllsReport(
+       int page, int pageSize) async {
+    try {
+      final url = Uri.parse(apiUrl);
+      final headers = await ApiConfig.getHeaders();
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
 
+      if (userId == null) {
+        print('No user ID found. User might not be logged in.');
+        return [];
+      }
+      Bodyreport requestBody = Bodyreport(
+        customerId: null,
+        frCreatedDate: null,
+        pageIndex: page,
+        pageSize: pageSize,
+        searchContent: "",
+        toCreatedDate: null,
+        typeSearch: 1,
+        userId: userId,
+      );
+
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode(requestBody.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        // Parse the JSON response
+        final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
+        final Materialreportmodel materialReportModel =
+            Materialreportmodel.fromJson(jsonResponse);
+        return materialReportModel.data ?? [];
+      } else {
+        print(
+            'Error: Server responded with status code ${response.statusCode}');
+        print('Response body: ${response.body}');
+        throw Exception('Failed to load documents');
+      }
+    } catch (error) {
+      print('Error fetching documents: $error');
+      return [];
+    }
+  }
   Future<List<Data>> fetchMaterialsReportDate(
       DateTime? frdDate, DateTime? toDate) async {
     try {

@@ -16,17 +16,24 @@ class Dshosoco extends StatefulWidget {
 class _DshosocoState extends State<Dshosoco> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
-  late Future<List<Data>> documents;
   DocumentService documentService = DocumentService();
-  List<Data> allDocuments = [];
+  List<Data> documentLits = [];
   final TextEditingController _searchControllerDocuments =
       TextEditingController();
   List<Data> _searchResults = [];
   bool _isSearching = false;
-
+  bool isLoading = false;
+  bool hasMoreData = true;
+  int pageSize = 10;
   int currentPage = 1;
   int itemsPerPage = 10;
-  final List<int> itemsPerPageOptions = [10, 20, 30, 50];
+  final List<int> itemsPerPageOptions = [10, 20, 30];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchInitialDocuments();
+  }
 
   Future<void> _searchDocuments(String searchQuery) async {
     if (searchQuery.isEmpty) {
@@ -48,13 +55,49 @@ class _DshosocoState extends State<Dshosoco> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    documents = documentService.fetchDocuments().then((docs) {
-      allDocuments = docs;
-      return docs;
-    });
+  Future<void> fetchInitialDocuments() async {
+    if (mounted) {
+      setState(() => isLoading = true);
+    }
+    List<Data> initialDocument =
+        await documentService.fetchDocuments(currentPage, itemsPerPage);
+
+    if (mounted) {
+      setState(() {
+        documentLits = initialDocument;
+        isLoading = false;
+        if (initialDocument.length < itemsPerPage) {
+          hasMoreData = false;
+        }
+      });
+    }
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent &&
+        !isLoading) {
+      _loadMoreDocuments();
+    }
+  }
+
+  Future<void> _loadMoreDocuments() async {
+    if (isLoading || !hasMoreData) return;
+
+    setState(() => isLoading = true);
+    currentPage++;
+    List<Data> moreProducts =
+        await documentService.fetchDocuments(currentPage, pageSize);
+
+    if (mounted) {
+      setState(() {
+        documentLits.addAll(moreProducts);
+        isLoading = false;
+        if (moreProducts.length < pageSize) {
+          hasMoreData = false;
+        }
+      });
+    }
   }
 
   String? startDate;
@@ -95,11 +138,14 @@ class _DshosocoState extends State<Dshosoco> {
           DateFormat('yyyy-MM-dd').parse(startDate!);
       final DateTime parsedEndDate = DateFormat('yyyy-MM-dd').parse(endDate!);
 
+      final List<Data> documents =
+          await documentService.searchDocumentsByDateRange(
+        parsedStartDate,
+        parsedEndDate,
+      );
+
       setState(() {
-        documents = documentService.searchDocumentsByDateRange(
-          parsedStartDate,
-          parsedEndDate,
-        );
+        documentLits = documents;
       });
     } catch (error) {
       print('Error searching documents by date range: ${error.toString()}');
@@ -118,6 +164,7 @@ class _DshosocoState extends State<Dshosoco> {
 
   @override
   Widget build(BuildContext context) {
+    List<Data> displayList = _isSearching ? _searchResults : documentLits;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -232,84 +279,48 @@ class _DshosocoState extends State<Dshosoco> {
             height: 10,
           ),
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.grey[100],
-                border: Border.all(width: 1, color: Colors.black12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.all(10),
-              child: FutureBuilder<List<Data>>(
-                future: documents,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (snapshot.hasError) {
-                    return Center(child: Text("Error: ${snapshot.error}"));
-                  }
-                  if (_isSearching && _searchResults.isEmpty) {
-                    return Center(
-                      child: Text(
-                        "Dữ liệu tìm kiếm không có!!!",
-                        style: GoogleFonts.robotoCondensed(
-                          fontSize: 16,
-                          color:
-                              Provider.of<Providercolor>(context).selectedColor,
-                        ),
-                      ),
-                    );
-                  }
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text("Không có dữ liệu nào!"));
-                  }
-
-                  final documentList =
-                      _isSearching ? _searchResults : snapshot.data!;
-
-                  return SingleChildScrollView(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+              child: displayList.isEmpty && isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : displayList.isEmpty
+                      ? Center(
+                          child: Text(
+                            "Dữ liệu tìm kiếm không có!!!",
+                            style: GoogleFonts.robotoCondensed(
+                                fontSize: 16,
+                                color: Provider.of<Providercolor>(context)
+                                    .selectedColor),
                           ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.all(5),
-                      child: Scrollbar(
-                        controller: _scrollController,
-                        thumbVisibility: true,
-                        radius: const Radius.circular(10),
-                        thickness: 8,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          controller: _scrollController,
-                          child: DataTable(
-                            columns: _buildDataTableColumns(),
-                            rows: documentList
-                                .map((doc) => _buildDataRow(doc))
-                                .toList(),
+                        )
+                      : Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
+                          padding: const EdgeInsets.all(5),
+                          child: Scrollbar(
+                            controller: _scrollController,
+                            thumbVisibility: true,
+                            radius: const Radius.circular(10),
+                            thickness: 8,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              controller: _scrollController,
+                              child: DataTable(
+                                columns: _buildDataTableColumns(),
+                                rows: displayList
+                                    .map((doc) => _buildDataRow(doc))
+                                    .toList(),
+                              ),
+                            ),
+                          ),
+                        )),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -317,16 +328,21 @@ class _DshosocoState extends State<Dshosoco> {
               children: [
                 IconButton(
                   onPressed: currentPage > 1
-                      ? () => _changePage(currentPage - 1)
+                      ? () {
+                          setState(() {
+                            currentPage -= 1;
+                          });
+                          fetchInitialDocuments();
+                        }
                       : null,
                   icon: const Icon(
                     Icons.chevron_left,
-                    color: Colors.black12,
+                    color: Colors.black,
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      vertical: 3.0, horizontal: 10.0),
+                      vertical: 2.0, horizontal: 10.0),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black),
                     borderRadius: BorderRadius.circular(4.0),
@@ -337,18 +353,26 @@ class _DshosocoState extends State<Dshosoco> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => _changePage(currentPage + 1),
+                  onPressed: hasMoreData
+                      ? () {
+                          setState(() {
+                            currentPage += 1;
+                          });
+                          fetchInitialDocuments();
+                        }
+                      : null,
                   icon: const Icon(
                     Icons.chevron_right,
-                    color: Colors.black12,
+                    color: Colors.black,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Container(
                   height: 30,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(width: 1, color: Colors.black12)),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(width: 1, color: Colors.black12),
+                  ),
                   child: DropdownButton<int>(
                     value: itemsPerPage,
                     items: itemsPerPageOptions.map((int value) {
@@ -358,12 +382,16 @@ class _DshosocoState extends State<Dshosoco> {
                       );
                     }).toList(),
                     onChanged: (int? newValue) {
-                      setState(() {
-                        itemsPerPage = newValue!;
-                      });
+                      if (newValue != null) {
+                        setState(() {
+                          itemsPerPage = newValue;
+                          currentPage = 1;
+                        });
+                        fetchInitialDocuments();
+                      }
                     },
                   ),
-                ),
+                )
               ],
             ),
           ),

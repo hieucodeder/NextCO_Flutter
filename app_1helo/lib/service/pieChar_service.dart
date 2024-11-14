@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'package:app_1helo/model/bodySearchPieChar.dart';
-import 'package:app_1helo/model/documentss.dart';
 import 'package:app_1helo/model/dropdownEmployee.dart';
 import 'package:app_1helo/model/pieCharModel.dart';
-import 'package:app_1helo/model/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,32 +11,28 @@ class PiecharService {
   final String apiUrl =
       '${ApiConfig.baseUrlBasic}/api-co/co-documents/dashboard';
 
-  // Service to fetch pie chart data
-  Future<List<PieCharModel>?> fetchPieChartData(
-      String? employeeId, String? customerId) async {
+  // Fetches pie chart data
+  Future<List<PieCharModel>?> fetchPieChartData(DateTime? startDate,
+      DateTime? endDate, String? employeeId, String? customerId) async {
     final url = Uri.parse(apiUrl);
     final Map<String, dynamic> requestBody = {
       if (employeeId != null) "employee_id": employeeId,
       if (customerId != null) "customer_id": customerId,
+      if (startDate != null)
+        "start_date": DateFormat('yyyy-MM-dd').format(startDate),
+      if (endDate != null) "end_date": DateFormat('yyyy-MM-dd').format(endDate),
     };
 
     try {
       final headers = await ApiConfig.getHeaders();
-      print(
-          'Fetching pie chart data with employeeId: $employeeId, customerId: $customerId');
-
       final response = await http.post(
         url,
         headers: headers,
         body: jsonEncode(requestBody),
       );
 
-      print('Response status: ${response.statusCode}');
-
       if (response.statusCode == 200) {
         final List<dynamic> dataList = jsonDecode(response.body);
-        print('Pie chart data fetched successfully. Count: ${dataList.length}');
-
         return dataList
             .map((data) => PieCharModel.fromJson(data as Map<String, dynamic>))
             .toList();
@@ -53,6 +47,7 @@ class PiecharService {
     return [];
   }
 
+  // Fetches a list of employees for dropdown
   Future<List<dropdownEmployee>> fetchEmployeeList() async {
     final headers = await ApiConfig.getHeaders();
     final prefs = await SharedPreferences.getInstance();
@@ -67,36 +62,32 @@ class PiecharService {
         '${ApiConfig.baseUrl}/employees/dropdown-employeeid/$userId';
 
     try {
-      print('Fetching employee list from API: $employeeApiUrl');
       final response =
           await http.get(Uri.parse(employeeApiUrl), headers: headers);
 
-      print('Employee list response status: ${response.statusCode}');
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = jsonDecode(response.body);
-        print('Employee list fetched successfully. Count: ${jsonData.length}');
         return jsonData.map((json) => dropdownEmployee.fromJson(json)).toList();
       } else {
         print(
             'Failed to fetch employee list. Status code: ${response.statusCode}');
-        return [];
       }
     } catch (error) {
       print('Error fetching employees: $error');
-      return [];
     }
+    return [];
   }
 
+  // Fetches data for a specific employee based on full name
   Future<void> fetchDataForUser(String fullName) async {
     print('Fetching data for user: $fullName');
 
     List<dropdownEmployee> employees = await fetchEmployeeList();
     String employeeId = getEmployeeIdByFullName(fullName, employees);
-    print('Retrieved employeeId: $employeeId for full name: $fullName');
 
     if (employeeId.isNotEmpty) {
       final List<PieCharModel>? response =
-          await fetchPieChartData(employeeId, null);
+          await fetchPieChartData(null, null, employeeId, null);
       if (response != null && response.isNotEmpty) {
         print(
             'Pie chart data fetched successfully for employeeId: $employeeId');
@@ -108,6 +99,7 @@ class PiecharService {
     }
   }
 
+  // Helper to get employee ID by full name
   String getEmployeeIdByFullName(
       String fullName, List<dropdownEmployee> employees) {
     for (var employee in employees) {
@@ -125,12 +117,15 @@ class PiecharService {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
 
-      Bodysearchpiechar requestBody = Bodysearchpiechar(
+      final requestBody = Bodysearchpiechar(
         customerId: customerId,
         employeeId: employeeId,
         frCreatedDate: startDate,
         toCreatedDate: endDate,
       );
+
+      // Log the request body to ensure it's correctly formed
+      print('Request Body: ${jsonEncode(requestBody.toJson())}');
 
       final response = await http.post(
         url,
@@ -138,45 +133,31 @@ class PiecharService {
         body: jsonEncode(requestBody.toJson()),
       );
 
+      // Log the status code and response body for debugging
+      print('Response Status: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
 
-        List<dynamic> data;
-        if (jsonResponse is List) {
-          data = jsonResponse;
-        } else if (jsonResponse is Map) {
-          data = [jsonResponse];
+        if (jsonResponse is Map) {
+          final message = jsonResponse['message'];
+          if (message == 'Không có kết quả!') {
+            print('API Message: $message');
+            return [];
+          }
+
+          if (jsonResponse.containsKey('data')) {
+            List<dynamic> data = jsonResponse['data'];
+            return data
+                .map((jsonItem) => PieCharModel.fromJson(jsonItem))
+                .toList();
+          } else {
+            throw Exception('No data found in the response.');
+          }
         } else {
-          throw Exception("Unexpected JSON format");
+          throw Exception('Unexpected response format.');
         }
-
-        // Convert the fetched data into a list of `Data` objects
-        List<Data> dataList = data
-            .map((item) => Data.fromJson(item as Map<String, dynamic>))
-            .toList();
-
-        // Filter the data based on the date range
-        List<Data> filteredData = dataList.where((dataItem) {
-          DateTime createdDate = DateFormat("yyyy-MM-dd")
-              .parse(dataItem.createdDate!); // Parse created date to DateTime
-
-          // Check if the createdDate is within the provided date range
-          bool isAfterStartDate =
-              startDate != null ? createdDate.isAfter(startDate) : true;
-          bool isBeforeEndDate =
-              endDate != null ? createdDate.isBefore(endDate) : true;
-
-          return isAfterStartDate && isBeforeEndDate;
-        }).toList();
-
-        // Convert the filtered data into PieCharModel
-        return filteredData.map((item) {
-          return PieCharModel(
-            statusId: item.statusId,
-            quantity:
-                item.result, // Assuming quantity comes from `result` or similar
-          );
-        }).toList();
       } else {
         print('Failed to load documents: ${response.body}');
         throw Exception('Failed to load documents');

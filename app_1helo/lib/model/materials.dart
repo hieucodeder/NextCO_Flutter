@@ -45,16 +45,17 @@ class Data {
   int? coUsing;
   int? recordCount;
 
-  Data(
-      {this.rowNumber,
-      this.materialId,
-      this.hsCode,
-      this.materialName,
-      this.materialCode,
-      this.unit,
-      this.coAvailable,
-      this.coUsing,
-      this.recordCount});
+  Data({
+    this.rowNumber,
+    this.materialId,
+    this.hsCode,
+    this.materialName,
+    this.materialCode,
+    this.unit,
+    this.coAvailable,
+    this.coUsing,
+    this.recordCount,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     rowNumber = json['RowNumber'];
@@ -63,22 +64,32 @@ class Data {
     materialName = json['material_name'];
     materialCode = json['material_code'];
     unit = json['unit'];
-    coAvailable = json['co_available'];
-    coUsing = json['co_using'];
-    recordCount = json['RecordCount'];
+
+    // Use casting to handle double-to-int conversion
+    coAvailable = (json['co_available'] is int)
+        ? json['co_available']
+        : (json['co_available'] as double?)?.toInt();
+
+    coUsing = (json['co_using'] is int)
+        ? json['co_using']
+        : (json['co_using'] as double?)?.toInt();
+
+    recordCount = (json['RecordCount'] is int)
+        ? json['RecordCount']
+        : (json['RecordCount'] as double?)?.toInt();
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['RowNumber'] = this.rowNumber;
-    data['material_id'] = this.materialId;
-    data['hs_code'] = this.hsCode;
-    data['material_name'] = this.materialName;
-    data['material_code'] = this.materialCode;
-    data['unit'] = this.unit;
-    data['co_available'] = this.coAvailable;
-    data['co_using'] = this.coUsing;
-    data['RecordCount'] = this.recordCount;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['RowNumber'] = rowNumber;
+    data['material_id'] = materialId;
+    data['hs_code'] = hsCode;
+    data['material_name'] = materialName;
+    data['material_code'] = materialCode;
+    data['unit'] = unit;
+    data['co_available'] = coAvailable;
+    data['co_using'] = coUsing;
+    data['RecordCount'] = recordCount;
     return data;
   }
 }

@@ -6,7 +6,6 @@ import 'package:app_1helo/model/pieCharModel.dart';
 import 'package:app_1helo/model/user.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:app_1helo/service/customer_service..dart';
-import 'package:app_1helo/service/document_service.dart';
 import 'package:app_1helo/service/pieChar_service.dart';
 import 'package:app_1helo/service/user_service.dart';
 import 'package:flutter/material.dart';
@@ -14,13 +13,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:app_1helo/model/dropdownCustomer.dart';
-import 'package:app_1helo/model/documentss.dart' as Documents;
 
 class Piechartpage extends StatefulWidget {
   const Piechartpage({Key? key}) : super(key: key);
 
   Future<void> fetchPieChartData() async {
-    await Future.delayed(Duration(seconds: 2)); // Simulate loading delay
+    await Future.delayed(Duration(seconds: 2));
   }
 
   @override
@@ -44,11 +42,12 @@ class _PiechartpageState extends State<Piechartpage> {
   EmployeeCustomer? selectedDropdownCustomer;
   List<EmployeeCustomer> _filtereddropdownCustomer = [];
   bool _isFetchingData = false;
-
+  List<PieCharModel> pieCharChartData = [];
+  int currentPage = 1;
+  int pageSize = 10;
   @override
   void initState() {
     super.initState();
-    _fetchCustomersData();
     _fetchUsersData();
     if (mounted) {
       fetchData();
@@ -58,6 +57,8 @@ class _PiechartpageState extends State<Piechartpage> {
 
   Future<void> fetchData() async {
     await _fetchPieChartData(
+      startDate != null ? DateTime.parse(startDate!) : null,
+      endDate != null ? DateTime.parse(endDate!) : null,
       selectedDropdownEmployee?.value,
       selectedDropdownCustomer?.customerId,
       true,
@@ -66,6 +67,8 @@ class _PiechartpageState extends State<Piechartpage> {
 
   Future<void> fetchDataCustomer() async {
     await _fetchPieChartData(
+      startDate != null ? DateTime.parse(startDate!) : null,
+      endDate != null ? DateTime.parse(endDate!) : null,
       selectedDropdownEmployee?.value,
       selectedDropdownCustomer?.customerId,
       false,
@@ -73,17 +76,18 @@ class _PiechartpageState extends State<Piechartpage> {
   }
 
   Future<void> _fetchPieChartData(
-      String? employeeId, String? customerId, bool isUserFetch) async {
-    if (mounted) {
-      setState(() {
-        _isFetchingData = true;
-      });
-    }
+    DateTime? startDate,
+    DateTime? endDate,
+    String? employeeId,
+    String? customerId,
+    bool isUserFetch,
+  ) async {
+    setState(() => _isFetchingData = true);
 
     try {
       final pieCharService = PiecharService();
-      final List<PieCharModel>? pieChartData =
-          await pieCharService.fetchPieChartData(employeeId, customerId);
+      final List<PieCharModel>? pieChartData = await pieCharService
+          .fetchPieChartData(startDate, endDate, employeeId, customerId);
 
       print("Pie chart data: $pieChartData");
       await _fetchEmployeeOrCustomerData(isUserFetch);
@@ -206,22 +210,9 @@ class _PiechartpageState extends State<Piechartpage> {
     }
   }
 
-  Future<void> _fetchCustomersData() async {
-    try {
-      _customerList = await _customerService.fetchCustomer();
-      if (mounted) {
-        setState(() {
-          _filteredCustomers = _customerList;
-        });
-      }
-    } catch (e) {
-      print("Error fetching customer data: $e");
-    }
-  }
-
   Future<void> _fetchUsersData() async {
     try {
-      _userList = await _userService.fetchUsers();
+      _userList = await _userService.fetchUsers(currentPage, pageSize);
       if (mounted) {
         setState(() {
           _filteredUsers = _userList;
@@ -332,8 +323,6 @@ class _PiechartpageState extends State<Piechartpage> {
   final TextEditingController _controller = TextEditingController();
   late Future<List<PieCharModel>> searchPieChar;
   final PiecharService piecharService = PiecharService();
-  String? selectedEmployeeId;
-  String? selectedCustomer;
 
   void _selectDateRange() async {
     final DateTime? startPicked = await showDatePicker(
@@ -369,10 +358,46 @@ class _PiechartpageState extends State<Piechartpage> {
           DateFormat('yyyy-MM-dd').parse(startDate!);
       final DateTime parsedEndDate = DateFormat('yyyy-MM-dd').parse(endDate!);
 
+      final selectedEmployeeId = selectedDropdownEmployee?.value;
+      final selectedCustomer = selectedDropdownCustomer?.customerId;
       setState(() {
-        searchPieChar = piecharService.searchByDateRange(parsedStartDate,
-            parsedEndDate, selectedEmployeeId, selectedCustomer);
+        _isFetchingData = true;
       });
+
+      try {
+        final pieCharService = PiecharService();
+        final List<PieCharModel> pieCharData =
+            await pieCharService.searchByDateRange(
+          parsedStartDate,
+          parsedEndDate,
+          selectedEmployeeId,
+          selectedCustomer,
+        );
+
+        if (pieCharData.isNotEmpty) {
+          setState(() {
+            pieCharChartData = pieCharData;
+          });
+        } else {
+          print('No data found for the selected date range.');
+          setState(() {
+            pieCharChartData = [];
+          });
+        }
+      } catch (e) {
+        print("Error fetching data: $e");
+        if (mounted) {
+          setState(() {
+            pieCharChartData = [];
+          });
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isFetchingData = false;
+          });
+        }
+      }
     } else {
       print('Start date and end date cannot be null.');
     }
@@ -393,14 +418,13 @@ class _PiechartpageState extends State<Piechartpage> {
     final colorList = dataMap.keys.contains("Không có dữ liệu")
         ? [Colors.grey]
         : [
-            Colors.black,
-            Colors.orange,
-            Colors.green,
-            Colors.black,
-            Colors.orange,
-            Colors.red,
-            Colors.red,
-            Colors.black,
+            Colors.green, 
+            Colors.orange, 
+            Colors.orange, 
+            Colors.black, 
+            Colors.red, 
+            Colors.red, 
+            Colors.black, 
             Colors.black,
           ];
     return Center(
@@ -460,7 +484,7 @@ class _PiechartpageState extends State<Piechartpage> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
             Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,

@@ -185,19 +185,26 @@ class AuthService {
     final headers = await ApiConfig.getHeaders();
 
     if (!headers.containsKey('Authorization')) {
+      print('Error: No token found. User not logged in.');
       return Future.error('No token found. User not logged in.');
     }
 
     final url = Uri.parse('${ApiConfig.baseUrl}/branchs/dropdown');
+    print('Requesting branch dropdown data from $url with headers: $headers');
 
     try {
       final response = await http.get(url, headers: headers);
+      print('Response status code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonResponse = json.decode(response.body);
+        print('Response body: $jsonResponse'); // Log the entire JSON response
 
         List<Dropdownbranchs> dropdownBranchList =
             jsonResponse.map((item) => Dropdownbranchs.fromJson(item)).toList();
+
+        print(
+            'Parsed dropdown branch list: $dropdownBranchList'); // Log the parsed list
         return dropdownBranchList;
       } else {
         print('Error: ${response.statusCode} - ${response.reasonPhrase}');
@@ -205,7 +212,7 @@ class AuthService {
             'Error: ${response.statusCode} - ${response.reasonPhrase}');
       }
     } catch (e) {
-      print('Exception: $e');
+      print('Exception caught during branch info fetching: $e');
       return Future.error('Exception: $e');
     }
   }

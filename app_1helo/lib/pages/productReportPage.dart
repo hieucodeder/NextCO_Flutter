@@ -18,7 +18,7 @@ class Productreportpage extends StatefulWidget {
 
 class _ProductreportpageState extends State<Productreportpage> {
   int itemsPerPage = 10;
-  final List<int> itemsPerPageOptions = [10, 20, 30, 50];
+  final List<int> itemsPerPageOptions = [10, 20, 30];
   int currentPage = 1;
   final int pageSize = 10;
 
@@ -27,7 +27,6 @@ class _ProductreportpageState extends State<Productreportpage> {
   bool _isSearching = false;
 
   List<Data> allProductReport = [];
-  List<Data> displayList = [];
   List<Data> _searchResults = [];
 
   List<EmployeeCustomer> _filteredEmployeeCustomer = [];
@@ -47,7 +46,6 @@ class _ProductreportpageState extends State<Productreportpage> {
   @override
   void initState() {
     super.initState();
-    displayList = allProductReport;
     fetchInitialProducts();
     _scrollController.addListener(_onScroll);
     _fetchCustomerData();
@@ -58,14 +56,15 @@ class _ProductreportpageState extends State<Productreportpage> {
     setState(() => isLoading = true);
 
     List<Data> initialProducts = await _productreportService
-        .fetchProductsReport(currentPage, pageSize, search, customerid);
+        .fetchProductsReport(currentPage, itemsPerPage, search, customerid);
 
     if (mounted) {
       setState(() {
         allProductReport = initialProducts;
-        displayList = initialProducts;
         isLoading = false;
-        hasMoreData = initialProducts.length == pageSize;
+        if (initialProducts.length < itemsPerPage) {
+          hasMoreData = false;
+        }
       });
     }
   }
@@ -75,7 +74,7 @@ class _ProductreportpageState extends State<Productreportpage> {
       setState(() {
         _isSearching = false;
         _searchResults.clear();
-        displayList = allProductReport;
+        allProductReport = allProductReport;
       });
       return;
     }
@@ -92,7 +91,7 @@ class _ProductreportpageState extends State<Productreportpage> {
     if (mounted) {
       setState(() {
         _searchResults = results;
-        displayList = _searchResults;
+        allProductReport = _searchResults;
         hasMoreData = results.length == pageSize;
       });
     }
@@ -130,7 +129,6 @@ class _ProductreportpageState extends State<Productreportpage> {
 
     setState(() {
       allProductReport.clear();
-      displayList.clear();
       currentPage = 1;
       hasMoreData = true;
     });
@@ -141,7 +139,6 @@ class _ProductreportpageState extends State<Productreportpage> {
     if (mounted) {
       setState(() {
         allProductReport = reportData;
-        displayList = reportData;
         hasMoreData = reportData.length == pageSize;
       });
     }
@@ -159,7 +156,6 @@ class _ProductreportpageState extends State<Productreportpage> {
     if (mounted) {
       setState(() {
         allProductReport.addAll(moreProducts);
-        displayList.addAll(moreProducts);
         isLoading = false;
         hasMoreData = moreProducts.length == pageSize;
       });
@@ -209,7 +205,6 @@ class _ProductreportpageState extends State<Productreportpage> {
       if (mounted) {
         setState(() {
           allProductReport = dateFilteredList;
-          displayList = dateFilteredList;
         });
       }
     } catch (error) {
@@ -391,7 +386,7 @@ class _ProductreportpageState extends State<Productreportpage> {
                   padding: const EdgeInsets.symmetric(horizontal: 5),
                   child: TextField(
                     decoration: InputDecoration(
-                      hintText: 'Số hồ sơ, tờ khai xuất, tình trạng',
+                      hintText: 'Mã sản phẩm, tên sản phẩm',
                       hintStyle: GoogleFonts.robotoCondensed(
                           fontSize: 14, color: Colors.black38),
                       border: const OutlineInputBorder(
@@ -400,7 +395,6 @@ class _ProductreportpageState extends State<Productreportpage> {
                         ),
                         borderSide: BorderSide.none,
                       ),
-                      
                       suffixIcon: GestureDetector(
                         onTap: () {
                           _searchProducts(_searchController.text);
@@ -413,7 +407,10 @@ class _ProductreportpageState extends State<Productreportpage> {
                               thickness: 1,
                               color: Colors.black38,
                             ),
-                            Icon(Icons.search_outlined)
+                            Icon(
+                              Icons.search_outlined,
+                              color: Colors.black54,
+                            )
                           ],
                         ),
                       ),
@@ -426,6 +423,7 @@ class _ProductreportpageState extends State<Productreportpage> {
               renderCustomerDrop(),
             ],
           ),
+          const SizedBox(height: 10),
           Expanded(
             child: displayList.isEmpty && isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -439,74 +437,54 @@ class _ProductreportpageState extends State<Productreportpage> {
                                   .selectedColor),
                         ),
                       )
-                    : SingleChildScrollView(
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.grey[100],
-                              border:
-                                  Border.all(width: 1, color: Colors.black12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color:
-                                      const Color(0x005c6566).withOpacity(0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                )
-                              ]),
-                          padding: const EdgeInsets.all(8),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
+                    : Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
-                            child: Scrollbar(
-                              controller: _scrollController,
-                              thumbVisibility: true,
-                              radius: const Radius.circular(10),
-                              thickness: 8,
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                controller: _scrollController,
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  child: DataTable(
-                                    columns: const [
-                                      DataColumn(label: Text('STT')),
-                                      DataColumn(label: Text('Mã sản phẩm')),
-                                      DataColumn(label: Text('Tên sản phẩm')),
-                                      DataColumn(label: Text('Mã HS')),
-                                      DataColumn(label: Text('Số TKX')),
-                                      DataColumn(
-                                          label: Text('Số lượng đã làm')),
-                                      DataColumn(label: Text('Số lượng tồn')),
-                                    ],
-                                    rows: displayList.map((doc) {
-                                      return DataRow(cells: [
-                                        DataCell(Text(
-                                            doc.rowNumber?.toString() ?? '')),
-                                        DataCell(Text(doc.productCode ?? '')),
-                                        DataCell(Text(doc.hsCode ?? '')),
-                                        DataCell(Text(doc.productName ?? '')),
-                                        DataCell(Text(doc
-                                                .exportDeclarationNumber
-                                                ?.toString() ??
-                                            '')),
-                                        DataCell(
-                                            Text(doc.coUsed?.toString() ?? '')),
-                                        DataCell(Text(
-                                            doc.coAvailable?.toString() ?? '')),
-                                      ]);
-                                    }).toList(),
-                                  ),
-                                ),
+                          ],
+                        ),
+                        child: Scrollbar(
+                          controller: _scrollController,
+                          thumbVisibility: true,
+                          radius: const Radius.circular(10),
+                          thickness: 8,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            controller: _scrollController,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                              child: DataTable(
+                                columns: const [
+                                  DataColumn(label: Text('STT')),
+                                  DataColumn(label: Text('Mã sản phẩm')),
+                                  DataColumn(label: Text('Tên sản phẩm')),
+                                  DataColumn(label: Text('Mã HS')),
+                                  DataColumn(label: Text('Số TKX')),
+                                  DataColumn(label: Text('Số lượng đã làm')),
+                                  DataColumn(label: Text('Số lượng tồn')),
+                                ],
+                                rows: displayList.map((doc) {
+                                  return DataRow(cells: [
+                                    DataCell(
+                                        Text(doc.rowNumber?.toString() ?? '')),
+                                    DataCell(Text(doc.productCode ?? '')),
+                                    DataCell(Text(doc.hsCode ?? '')),
+                                    DataCell(Text(doc.productName ?? '')),
+                                    DataCell(Text(doc.exportDeclarationNumber
+                                            ?.toString() ??
+                                        '')),
+                                    DataCell(
+                                        Text(doc.coUsed?.toString() ?? '')),
+                                    DataCell(Text(
+                                        doc.coAvailable?.toString() ?? '')),
+                                  ]);
+                                }).toList(),
                               ),
                             ),
                           ),
@@ -519,15 +497,22 @@ class _ProductreportpageState extends State<Productreportpage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  onPressed: currentPage > 1 ? () => (currentPage - 1) : null,
+                  onPressed: currentPage > 1
+                      ? () {
+                          setState(() {
+                            currentPage -= 1;
+                          });
+                          fetchInitialProducts();
+                        }
+                      : null,
                   icon: const Icon(
                     Icons.chevron_left,
-                    color: Colors.black12,
+                    color: Colors.black,
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      vertical: 3.0, horizontal: 10.0),
+                      vertical: 2.0, horizontal: 10.0),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black),
                     borderRadius: BorderRadius.circular(4.0),
@@ -538,18 +523,26 @@ class _ProductreportpageState extends State<Productreportpage> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => (currentPage + 1),
+                  onPressed: hasMoreData
+                      ? () {
+                          setState(() {
+                            currentPage += 1;
+                          });
+                          fetchInitialProducts();
+                        }
+                      : null,
                   icon: const Icon(
                     Icons.chevron_right,
-                    color: Colors.black12,
+                    color: Colors.black,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Container(
                   height: 30,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(width: 1, color: Colors.black12)),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(width: 1, color: Colors.black12),
+                  ),
                   child: DropdownButton<int>(
                     value: itemsPerPage,
                     items: itemsPerPageOptions.map((int value) {
@@ -559,12 +552,16 @@ class _ProductreportpageState extends State<Productreportpage> {
                       );
                     }).toList(),
                     onChanged: (int? newValue) {
-                      setState(() {
-                        itemsPerPage = newValue!;
-                      });
+                      if (newValue != null) {
+                        setState(() {
+                          itemsPerPage = newValue;
+                          currentPage = 1;
+                        });
+                        fetchInitialProducts();
+                      }
                     },
                   ),
-                ),
+                )
               ],
             ),
           )

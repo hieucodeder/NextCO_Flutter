@@ -19,7 +19,7 @@ class Materialresportpage extends StatefulWidget {
 
 class _MaterreportpageState extends State<Materialresportpage> {
   int itemsPerPage = 10;
-  final List<int> itemsPerPageOptions = [10, 20, 30, 50];
+  final List<int> itemsPerPageOptions = [10, 20, 30];
 
   int currentPage = 1;
   final int pageSize = 10;
@@ -30,13 +30,9 @@ class _MaterreportpageState extends State<Materialresportpage> {
 
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
-  final TextEditingController _searchControllerDocuments =
-      TextEditingController();
   final TextEditingController _controller = TextEditingController();
   final TextEditingController _controller1 = TextEditingController();
-  late Future<List<Data>> materialResport;
   List<Data> allMaterialsResport = [];
-  List<Data> displayList = [];
   List<Data> _searchResults = [];
   List<EmployeeCustomer> _filteredEmployeeCustomer = [];
   EmployeeCustomer? selectedemployeeCustomer;
@@ -53,37 +49,33 @@ class _MaterreportpageState extends State<Materialresportpage> {
   @override
   void initState() {
     super.initState();
-    materialResport = _materialresportservice.fetchMaterialsReport(
-        search, customerid, currentPage, pageSize);
-
     fetchInitialMaterials();
     _scrollController.addListener(_onScroll);
     _fetchCustomerData();
   }
 
   Future<void> fetchInitialMaterials() async {
-    if (!mounted) return; // Mounted check before any async call
+    if (!mounted) return;
     setState(() => isLoading = true);
 
-    List<Data> initialProducts =
+    List<Data> initialMaterials =
         await _materialresportservice.fetchMaterialsReport(
-      search ?? '',
-      customerid ?? '',
+      search,
+      customerid,
       currentPage,
-      pageSize,
+      itemsPerPage,
     );
 
     if (mounted) {
       setState(() {
-        allMaterialsResport = initialProducts;
-        displayList = initialProducts;
+        allMaterialsResport = initialMaterials;
         isLoading = false;
-        hasMoreData = initialProducts.length == pageSize;
+        hasMoreData = initialMaterials.length == itemsPerPage;
       });
     }
   }
 
-  Future<void> _loadMoreProducts() async {
+  Future<void> _loadMoreMaterial() async {
     if (isLoading || !hasMoreData) return;
 
     setState(() => isLoading = true);
@@ -95,9 +87,9 @@ class _MaterreportpageState extends State<Materialresportpage> {
     if (mounted) {
       setState(() {
         allMaterialsResport.addAll(moreProducts);
-        displayList = allMaterialsResport;
-        isLoading = false;
-        hasMoreData = moreProducts.length == pageSize;
+        if (moreProducts.length < pageSize) {
+          hasMoreData = false;
+        }
       });
     }
   }
@@ -124,7 +116,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
     if (_scrollController.position.pixels ==
             _scrollController.position.maxScrollExtent &&
         !isLoading) {
-      _loadMoreProducts();
+      _loadMoreMaterial();
     }
   }
 
@@ -133,7 +125,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
       setState(() {
         isSearching = false;
         _searchResults.clear();
-        displayList = allMaterialsResport;
+        allMaterialsResport = allMaterialsResport;
       });
       return;
     }
@@ -151,7 +143,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
     if (mounted) {
       setState(() {
         _searchResults = results;
-        displayList = _searchResults;
+        allMaterialsResport = _searchResults;
         hasMoreData = results.length == pageSize;
       });
     }
@@ -162,7 +154,6 @@ class _MaterreportpageState extends State<Materialresportpage> {
 
     setState(() {
       allMaterialsResport.clear();
-      displayList.clear();
       currentPage = 1;
       hasMoreData = true;
     });
@@ -172,7 +163,6 @@ class _MaterreportpageState extends State<Materialresportpage> {
     if (mounted) {
       setState(() {
         allMaterialsResport = reportData;
-        displayList = reportData;
         hasMoreData = reportData.length == pageSize;
       });
     }
@@ -182,7 +172,6 @@ class _MaterreportpageState extends State<Materialresportpage> {
   void dispose() {
     _scrollController.dispose();
     _searchController.dispose();
-    _searchControllerDocuments.dispose();
     _controller.dispose();
     _controller1.dispose();
     super.dispose();
@@ -232,7 +221,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
 
       setState(() {
         allMaterialsResport = dateFilteredList;
-        displayList = dateFilteredList;
+        allMaterialsResport = dateFilteredList;
       });
     } catch (error) {
       print('Error searching documents by date range: ${error.toString()}');
@@ -313,20 +302,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Data> displayList = isSearching
-        ? _searchResults
-        : (startDate1 != null && endDate1 != null
-            ? allMaterialsResport.where((data) {
-                if (data.dateOfDeclaration != null) {
-                  DateTime dataDate = DateTime.parse(data.dateOfDeclaration!);
-                  DateTime parsedStartDate = DateTime.parse(startDate1!);
-                  DateTime parsedEndDate = DateTime.parse(endDate1!);
-                  return dataDate.isAfter(parsedStartDate) &&
-                      dataDate.isBefore(parsedEndDate);
-                }
-                return false;
-              }).toList()
-            : allMaterialsResport);
+    List<Data> displayList = isSearching ? _searchResults : allMaterialsResport;
 
     return Container(
       width: double.infinity,
@@ -460,69 +436,55 @@ class _MaterreportpageState extends State<Materialresportpage> {
                       )
                     : Container(
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.grey[100],
-                            border: Border.all(width: 1, color: Colors.black12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0x005c6566).withOpacity(0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              )
-                            ]),
-                        padding: const EdgeInsets.all(8),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Scrollbar(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Scrollbar(
+                          controller: _scrollController,
+                          thumbVisibility: true,
+                          radius: const Radius.circular(10),
+                          thickness: 8,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
                             controller: _scrollController,
-                            thumbVisibility: true,
-                            radius: const Radius.circular(10),
-                            thickness: 8,
                             child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              controller: _scrollController,
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.vertical,
-                                child: DataTable(
-                                  columns: const [
-                                    DataColumn(label: Text('STT')),
-                                    DataColumn(label: Text('Mã NVL')),
-                                    DataColumn(label: Text('Tên NVL')),
-                                    DataColumn(label: Text('Số TKN/VAT')),
-                                    DataColumn(label: Text('STT TKN/VAT')),
-                                    DataColumn(label: Text('SL đã làm C/O')),
-                                    DataColumn(label: Text('Khả dụng')),
-                                    DataColumn(label: Text('Số lượng tồn')),
-                                  ],
-                                  rows: displayList.map((doc) {
-                                    return DataRow(cells: [
-                                      DataCell(Text(
-                                          doc.rowNumber?.toString() ?? '')),
-                                      DataCell(Text(doc.materialCode ?? '')),
-                                      DataCell(Text(doc.materialName ?? '')),
-                                      DataCell(
-                                          Text(doc.importDeclarationVat ?? '')),
-                                      DataCell(Text(
-                                          doc.sortOrder?.toString() ?? '')),
-                                      DataCell(Text(
-                                          doc.coAvailable?.toString() ?? '')),
-                                      DataCell(
-                                          Text(doc.coUsing?.toString() ?? '')),
-                                      DataCell(
-                                          Text(doc.quantity?.toString() ?? '')),
-                                    ]);
-                                  }).toList(),
-                                ),
+                              scrollDirection: Axis.vertical,
+                              child: DataTable(
+                                columns: const [
+                                  DataColumn(label: Text('STT')),
+                                  DataColumn(label: Text('Mã NVL')),
+                                  DataColumn(label: Text('Tên NVL')),
+                                  DataColumn(label: Text('Số TKN/VAT')),
+                                  DataColumn(label: Text('STT TKN/VAT')),
+                                  DataColumn(label: Text('SL đã làm C/O')),
+                                  DataColumn(label: Text('Khả dụng')),
+                                  DataColumn(label: Text('Số lượng tồn')),
+                                ],
+                                rows: displayList.map((doc) {
+                                  return DataRow(cells: [
+                                    DataCell(
+                                        Text(doc.rowNumber?.toString() ?? '')),
+                                    DataCell(Text(doc.materialCode ?? '')),
+                                    DataCell(Text(doc.materialName ?? '')),
+                                    DataCell(
+                                        Text(doc.importDeclarationVat ?? '')),
+                                    DataCell(
+                                        Text(doc.sortOrder?.toString() ?? '')),
+                                    DataCell(Text(
+                                        doc.coAvailable?.toString() ?? '')),
+                                    DataCell(
+                                        Text(doc.coUsing?.toString() ?? '')),
+                                    DataCell(
+                                        Text(doc.quantity?.toString() ?? '')),
+                                  ]);
+                                }).toList(),
                               ),
                             ),
                           ),
@@ -535,15 +497,22 @@ class _MaterreportpageState extends State<Materialresportpage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  onPressed: currentPage > 1 ? () => (currentPage - 1) : null,
+                  onPressed: currentPage > 1
+                      ? () {
+                          setState(() {
+                            currentPage -= 1;
+                          });
+                          fetchInitialMaterials();
+                        }
+                      : null,
                   icon: const Icon(
                     Icons.chevron_left,
-                    color: Colors.black12,
+                    color: Colors.black,
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      vertical: 3.0, horizontal: 10.0),
+                      vertical: 2.0, horizontal: 10.0),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black),
                     borderRadius: BorderRadius.circular(4.0),
@@ -554,18 +523,26 @@ class _MaterreportpageState extends State<Materialresportpage> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => (currentPage + 1),
+                  onPressed: hasMoreData
+                      ? () {
+                          setState(() {
+                            currentPage += 1;
+                          });
+                          fetchInitialMaterials();
+                        }
+                      : null,
                   icon: const Icon(
                     Icons.chevron_right,
-                    color: Colors.black12,
+                    color: Colors.black,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Container(
                   height: 30,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(width: 1, color: Colors.black12)),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(width: 1, color: Colors.black12),
+                  ),
                   child: DropdownButton<int>(
                     value: itemsPerPage,
                     items: itemsPerPageOptions.map((int value) {
@@ -575,12 +552,16 @@ class _MaterreportpageState extends State<Materialresportpage> {
                       );
                     }).toList(),
                     onChanged: (int? newValue) {
-                      setState(() {
-                        itemsPerPage = newValue!;
-                      });
+                      if (newValue != null) {
+                        setState(() {
+                          itemsPerPage = newValue;
+                          currentPage = 1;
+                        });
+                        fetchInitialMaterials();
+                      }
                     },
                   ),
-                ),
+                )
               ],
             ),
           )

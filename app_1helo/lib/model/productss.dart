@@ -36,8 +36,8 @@ class Productss {
 
 class Data {
   String? productId;
-  Null? normId;
-  Null? productExpenseId;
+  int? normId; // Update from Null? to int?
+  int? productExpenseId; // Update from Null? to int?
   String? productCode;
   String? hsCode;
   String? productName;
@@ -48,24 +48,25 @@ class Data {
   int? rowNumber;
   String? recordCount;
 
-  Data(
-      {this.productId,
-      this.normId,
-      this.productExpenseId,
-      this.productCode,
-      this.hsCode,
-      this.productName,
-      this.unit,
-      this.customerId,
-      this.customerName,
-      this.ts,
-      this.rowNumber,
-      this.recordCount});
+  Data({
+    this.productId,
+    this.normId,
+    this.productExpenseId,
+    this.productCode,
+    this.hsCode,
+    this.productName,
+    this.unit,
+    this.customerId,
+    this.customerName,
+    this.ts,
+    this.rowNumber,
+    this.recordCount,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     productId = json['product_id'];
-    normId = json['norm_id'];
-    productExpenseId = json['product_expense_id'];
+    normId = json['norm_id']; // Will accept int values
+    productExpenseId = json['product_expense_id']; // Will accept int values
     productCode = json['product_code'];
     hsCode = json['hs_code'];
     productName = json['product_name'];
@@ -78,19 +79,19 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['product_id'] = this.productId;
-    data['norm_id'] = this.normId;
-    data['product_expense_id'] = this.productExpenseId;
-    data['product_code'] = this.productCode;
-    data['hs_code'] = this.hsCode;
-    data['product_name'] = this.productName;
-    data['unit'] = this.unit;
-    data['customer_id'] = this.customerId;
-    data['customer_name'] = this.customerName;
-    data['ts'] = this.ts;
-    data['RowNumber'] = this.rowNumber;
-    data['RecordCount'] = this.recordCount;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['product_id'] = productId;
+    data['norm_id'] = normId;
+    data['product_expense_id'] = productExpenseId;
+    data['product_code'] = productCode;
+    data['hs_code'] = hsCode;
+    data['product_name'] = productName;
+    data['unit'] = unit;
+    data['customer_id'] = customerId;
+    data['customer_name'] = customerName;
+    data['ts'] = ts;
+    data['RowNumber'] = rowNumber;
+    data['RecordCount'] = recordCount;
     return data;
   }
 }

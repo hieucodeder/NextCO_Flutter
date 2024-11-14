@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:app_1helo/model/body.dart';
+import 'package:app_1helo/model/bodySearchUser.dart';
 import 'package:app_1helo/model/dropdownBranchs.dart';
 import 'package:app_1helo/model/lineCharModel.dart';
 import 'package:app_1helo/model/user.dart';
@@ -10,7 +11,7 @@ import 'api_config.dart';
 class UserService {
   final String apiUrl = '${ApiConfig.baseUrl1}/users/search';
 
-  Future<List<DataUser>> fetchUsers() async {
+  Future<List<DataUser>> fetchUsers(int page, int pageSize) async {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
@@ -24,8 +25,8 @@ class UserService {
 
       Body requestBody = Body(
         searchContent: "",
-        pageIndex: 1,
-        pageSize: 10,
+        pageIndex: page,
+        pageSize: pageSize,
         frCreatedDate: null,
         toCreatedDate: null,
         employeeId: null,
@@ -95,7 +96,7 @@ class UserService {
     }
   }
 
-  Future<User?> fetchUserData(
+  Future<User?> fetchUserData(int page, int pageSize,
       String? branchName, String? departmentName) async {
     final url = Uri.parse(apiUrl);
     final prefs = await SharedPreferences.getInstance();
@@ -108,8 +109,8 @@ class UserService {
 
     Body requestBody = Body(
       searchContent: branchName ?? departmentName,
-      pageIndex: 1,
-      pageSize: 10,
+      pageIndex: page,
+      pageSize: pageSize,
       frCreatedDate: null,
       toCreatedDate: null,
       employeeId: null,
@@ -142,6 +143,49 @@ class UserService {
     } catch (error) {
       print('Error fetching user data: $error');
       return null;
+    }
+  }
+
+  Future<List<DataUser>> fetchUserData2(
+      String? branchName, String? departmentName) async {
+    try {
+      final url = Uri.parse(apiUrl);
+      final headers = await ApiConfig.getHeaders();
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
+
+      if (userId == null) {
+        print('No user ID found. User might not be logged in.');
+        return [];
+      }
+
+      Bodysearchuser requestBodysearchuser = Bodysearchuser(
+        branchId: branchName,
+        customerId: null,
+        departmentId: departmentName,
+        searchContent: "",
+        pageIndex: 1,
+        pageSize: 10,
+        userId: userId,
+      );
+
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode(requestBodysearchuser.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
+        final User userData = User.fromJson(jsonResponse);
+
+        return userData.data ?? [];
+      } else {
+        throw Exception('Failed to load customers');
+      }
+    } catch (error) {
+      print('Error fetching customers: $error');
+      return [];
     }
   }
 }

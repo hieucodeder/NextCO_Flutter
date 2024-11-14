@@ -50,8 +50,8 @@ class Data {
   String? hsCode;
   String? materialName;
   String? originCountry;
-  double? unitPrice; 
-  double? unitPriceTransport; 
+  double? unitPrice;
+  double? unitPriceTransport;
   String? unit;
   int? quantity;
   int? coAvailable;
@@ -97,20 +97,23 @@ class Data {
     importDeclarationVat = json['import_declaration_vat'] as String?;
     serialNumber = json['serial_number'] as String?;
     dateOfDeclaration = json['date_of_declaration'] as String?;
-    usdExchangeRate = json['usd_exchange_rate'] as int?;
-    sortOrder = json['sort_order'] as int?;
+
+    usdExchangeRate = _parseToInt(json['usd_exchange_rate']);
+    sortOrder = _parseToInt(json['sort_order']);
     materialCode = json['material_code'] as String?;
     hsCode = json['hs_code'] as String?;
     materialName = json['material_name'] as String?;
     originCountry = json['origin_country'] as String?;
-    unitPrice = (json['unit_price'] as num?)?.toDouble(); // Changed to double
-    unitPriceTransport =
-        (json['unit_price_transport'] as num?)?.toDouble(); // Changed to double
+
+    unitPrice = _parseToDouble(json['unit_price']);
+    unitPriceTransport = _parseToDouble(json['unit_price_transport']);
     unit = json['unit'] as String?;
-    quantity = json['quantity'] as int?;
-    coAvailable = json['co_available'] as int?;
-    coUsing = json['co_using'] as int?;
-    coUsed = json['co_used'] as int?;
+
+    quantity = _parseToInt(json['quantity']);
+    coAvailable = _parseToInt(json['co_available']);
+    coUsing = _parseToInt(json['co_using']);
+    coUsed = _parseToInt(json['co_used']);
+
     listJsonMaterialNormCoDocuments =
         json['list_json_material_norm_co_documents'];
     jsonAmaDetail = json['json_ama_detail'];
@@ -118,8 +121,8 @@ class Data {
     jsonTieuhuyDetail = json['json_tieuhuy_detail'];
     listJsonTamtaiDetail = json['list_json_tamtai_detail'];
     listJsonThanhlyDetail = json['list_json_thanhly_detail'];
-    recordCount =
-        (json['RecordCount'] as num?)?.toDouble(); // Changed to double
+
+    recordCount = _parseToDouble(json['RecordCount']);
   }
 
   Map<String, dynamic> toJson() {
@@ -150,5 +153,21 @@ class Data {
     data['list_json_thanhly_detail'] = listJsonThanhlyDetail;
     data['RecordCount'] = recordCount;
     return data;
+  }
+
+  // Helper method to parse int values that might be double or String
+  int? _parseToInt(dynamic value) {
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    if (value is String) return int.tryParse(value);
+    return null;
+  }
+
+  // Helper method to parse double values that might be String
+  double? _parseToDouble(dynamic value) {
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value);
+    return null;
   }
 }

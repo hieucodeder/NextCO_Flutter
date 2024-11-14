@@ -13,9 +13,8 @@ class Materialspage extends StatefulWidget {
 }
 
 class _MaterialspageState extends State<Materialspage> {
-  int currentPage1 = 1;
   int itemsPerPage = 10;
-  final List<int> itemsPerPageOptions = [10, 20, 30, 50];
+  final List<int> itemsPerPageOptions = [10, 20, 30];
 
   final ScrollController _scrollController = ScrollController();
   List<Data> materialList = [];
@@ -54,16 +53,18 @@ class _MaterialspageState extends State<Materialspage> {
   }
 
   Future<void> fetchInitialMaterials() async {
-    setState(() => isLoading = true);
+    if (mounted) {
+      setState(() => isLoading = true);
+    }
     List<Data> initialMaterial =
-        await materialService.fetchMaterials(currentPage, pageSize);
+        await materialService.fetchMaterials(currentPage, itemsPerPage);
 
     if (!mounted) return;
 
     setState(() {
       materialList = initialMaterial;
       isLoading = false;
-      if (initialMaterial.length < pageSize) {
+      if (initialMaterial.length < itemsPerPage) {
         hasMoreData = false;
       }
     });
@@ -74,15 +75,15 @@ class _MaterialspageState extends State<Materialspage> {
 
     setState(() => isLoading = true);
     currentPage++;
-    List<Data> moreProducts =
+    List<Data> moreMaterial =
         await materialService.fetchMaterials(currentPage, pageSize);
 
     if (!mounted) return;
 
     setState(() {
-      materialList.addAll(moreProducts);
+      materialList.addAll(moreMaterial);
       isLoading = false;
-      if (moreProducts.length < pageSize) {
+      if (moreMaterial.length < pageSize) {
         hasMoreData = false;
       }
     });
@@ -169,77 +170,59 @@ class _MaterialspageState extends State<Materialspage> {
                                   .selectedColor),
                         ),
                       )
-                    : SingleChildScrollView(
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.grey[100],
-                              border:
-                                  Border.all(width: 1, color: Colors.black12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                )
-                              ]),
-                          padding: const EdgeInsets.all(10),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  )
-                                ]),
-                            padding: const EdgeInsets.all(5),
-                            child: Scrollbar(
-                              controller: _scrollController,
-                              thumbVisibility: true,
-                              radius: const Radius.circular(10),
-                              thickness: 8,
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                controller: _scrollController,
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  child: DataTable(
-                                    columns: const [
-                                      DataColumn(label: Text('STT')),
-                                      DataColumn(
-                                          label: Text('Mã nguyên vật liệu')),
-                                      DataColumn(
-                                          label: Text('Tên nguyên vật liệu')),
-                                      DataColumn(label: Text('ĐVT')),
-                                      DataColumn(label: Text('Tổng tồn')),
-                                      DataColumn(label: Text('Tổng chiếm giữ')),
-                                      DataColumn(label: Text('Tổng khả dụng')),
-                                    ],
-                                    rows: displayList.map((doc) {
-                                      return DataRow(cells: [
-                                        DataCell(Text(
-                                            doc.rowNumber?.toString() ?? '')),
-                                        DataCell(Text(
-                                          doc.materialCode ?? '',
-                                          style: GoogleFonts.robotoCondensed(
-                                              fontWeight: FontWeight.w700,
-                                              color: Colors.blue),
-                                        )),
-                                        DataCell(Text(doc.materialName ?? '')),
-                                        DataCell(Text(doc.unit ?? '')),
-                                        DataCell(Text(
-                                            doc.coAvailable?.toString() ?? '')),
-                                        DataCell(Text(
-                                            doc.coUsing?.toString() ?? '')),
-                                        DataCell(Text(
-                                            doc.recordCount?.toString() ?? '')),
-                                      ]);
-                                    }).toList(),
-                                  ),
-                                ),
+                    : Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              )
+                            ]),
+                        padding: const EdgeInsets.all(5),
+                        child: Scrollbar(
+                          controller: _scrollController,
+                          thumbVisibility: true,
+                          radius: const Radius.circular(10),
+                          thickness: 8,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            controller: _scrollController,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                              child: DataTable(
+                                columns: const [
+                                  DataColumn(label: Text('STT')),
+                                  DataColumn(label: Text('Mã nguyên vật liệu')),
+                                  DataColumn(
+                                      label: Text('Tên nguyên vật liệu')),
+                                  DataColumn(label: Text('ĐVT')),
+                                  DataColumn(label: Text('Tổng tồn')),
+                                  DataColumn(label: Text('Tổng chiếm giữ')),
+                                  DataColumn(label: Text('Tổng khả dụng')),
+                                ],
+                                rows: displayList.map((doc) {
+                                  return DataRow(cells: [
+                                    DataCell(
+                                        Text(doc.rowNumber?.toString() ?? '')),
+                                    DataCell(Text(
+                                      doc.materialCode ?? '',
+                                      style: GoogleFonts.robotoCondensed(
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.blue),
+                                    )),
+                                    DataCell(Text(doc.materialName ?? '')),
+                                    DataCell(Text(doc.unit ?? '')),
+                                    DataCell(Text(
+                                        doc.coAvailable?.toString() ?? '')),
+                                    DataCell(
+                                        Text(doc.coUsing?.toString() ?? '')),
+                                    DataCell(Text(
+                                        doc.recordCount?.toString() ?? '')),
+                                  ]);
+                                }).toList(),
                               ),
                             ),
                           ),
@@ -252,15 +235,22 @@ class _MaterialspageState extends State<Materialspage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  onPressed: currentPage > 1 ? () => (currentPage - 1) : null,
+                  onPressed: currentPage > 1
+                      ? () {
+                          setState(() {
+                            currentPage -= 1;
+                          });
+                          fetchInitialMaterials();
+                        }
+                      : null,
                   icon: const Icon(
                     Icons.chevron_left,
-                    color: Colors.black12,
+                    color: Colors.black,
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      vertical: 3.0, horizontal: 10.0),
+                      vertical: 2.0, horizontal: 10.0),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black),
                     borderRadius: BorderRadius.circular(4.0),
@@ -271,18 +261,26 @@ class _MaterialspageState extends State<Materialspage> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => (currentPage + 1),
+                  onPressed: hasMoreData
+                      ? () {
+                          setState(() {
+                            currentPage += 1;
+                          });
+                          fetchInitialMaterials();
+                        }
+                      : null,
                   icon: const Icon(
                     Icons.chevron_right,
-                    color: Colors.black12,
+                    color: Colors.black,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Container(
                   height: 30,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(width: 1, color: Colors.black12)),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(width: 1, color: Colors.black12),
+                  ),
                   child: DropdownButton<int>(
                     value: itemsPerPage,
                     items: itemsPerPageOptions.map((int value) {
@@ -292,12 +290,16 @@ class _MaterialspageState extends State<Materialspage> {
                       );
                     }).toList(),
                     onChanged: (int? newValue) {
-                      setState(() {
-                        itemsPerPage = newValue!;
-                      });
+                      if (newValue != null) {
+                        setState(() {
+                          itemsPerPage = newValue;
+                          currentPage = 1;
+                        });
+                        fetchInitialMaterials();
+                      }
                     },
                   ),
-                ),
+                )
               ],
             ),
           )
