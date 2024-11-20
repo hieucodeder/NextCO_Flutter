@@ -204,7 +204,6 @@ class _ClientpageState extends State<Clientpage> {
                                 ),
                               ],
                             ),
-                            padding: const EdgeInsets.all(5),
                             child: Scrollbar(
                               controller: _scrollController,
                               thumbVisibility: true,

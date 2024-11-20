@@ -36,7 +36,7 @@ class Documentss {
 
 class Data {
   int? coDocumentId;
-  Null? coDocumentNumber;
+  String? coDocumentNumber; 
   String? createdDate;
   String? employeeId;
   String? employeeName;
@@ -47,7 +47,7 @@ class Data {
   String? customerName;
   String? formName;
   String? statusName;
-  Null? statusDeclarations;
+  String? statusDeclarations;
   List<String>? numberTkx;
   List<NumberTkxWithShippingTerms>? numberTkxWithShippingTerms;
   int? ts;
@@ -82,7 +82,8 @@ class Data {
 
   Data.fromJson(Map<String, dynamic> json) {
     coDocumentId = json['co_document_id'];
-    coDocumentNumber = json['co_document_number'];
+    coDocumentNumber =
+        json['co_document_number'] as String?; 
     createdDate = json['created_date'];
     employeeId = json['employee_id'];
     employeeName = json['employee_name'];
@@ -93,11 +94,12 @@ class Data {
     customerName = json['customer_name'];
     formName = json['form_name'];
     statusName = json['status_name'];
-    statusDeclarations = json['status_declarations'];
+    statusDeclarations =
+        json['status_declarations'] as String?; 
 
     numberTkx = json['number_tkx'] != null
         ? List<String>.from(json['number_tkx'])
-        : []; // Default to an empty list if null
+        : []; 
 
     if (json['number_tkx_with_shipping_terms'] != null) {
       numberTkxWithShippingTerms = <NumberTkxWithShippingTerms>[];

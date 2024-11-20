@@ -11,7 +11,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => Providercolor()),
         ChangeNotifierProvider(create: (_) => Bottomnavprovider()),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }

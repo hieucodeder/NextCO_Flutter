@@ -69,230 +69,228 @@ class _PersonalInfoState extends State<PersonalInfo> {
     return Container(
       constraints: const BoxConstraints.expand(),
       margin: const EdgeInsets.all(10),
-      child: Expanded(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        '*',
-                        style: colorsRed,
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      const Text('Họ và tên')
-                    ],
-                  ),
-                  TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(
-                      hintText: 'Họ và tên',
-                      border: OutlineInputBorder(),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      '*',
+                      style: colorsRed,
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Column(
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        '*',
-                        style: colorsRed,
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      const Text('Tài khoản')
-                    ],
-                  ),
-                  TextField(
-                    controller: accountController,
-                    readOnly: true,
-                    enabled: false,
-                    decoration: const InputDecoration(
-                      hintText: 'Tài khoản',
-                      border: OutlineInputBorder(),
+                    const SizedBox(
+                      width: 5,
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Column(
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        '*',
-                        style: colorsRed,
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      const Text('Ngày sinh')
-                    ],
-                  ),
-                  TextField(
-                    controller: dateController,
-                    decoration: const InputDecoration(
-                      hintText: 'Ngày sinh',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Column(
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        '*',
-                        style: colorsRed,
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      const Text('Giới tính')
-                    ],
-                  ),
-                  DropdownButtonFormField<int>(
-                    decoration: const InputDecoration(
-                      hintText: 'Giới tính',
-                      border: OutlineInputBorder(),
-                    ),
-                    value: gender,
-                    onChanged: (value) {
-                      setState(() {
-                        gender = value;
-                      });
-                    },
-                    items: const [
-                      DropdownMenuItem(
-                        value: 0, // Nam
-                        child: Text('Nữ'),
-                      ),
-                      DropdownMenuItem(
-                        value: 1, // Nữ
-                        child: Text('Nam'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Column(
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        '*',
-                        style: colorsRed,
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      const Text('Email')
-                    ],
-                  ),
-                  TextField(
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                      hintText: 'Email',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Column(
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        '*',
-                        style: colorsRed,
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      const Text('Số điện thoại')
-                    ],
-                  ),
-                  TextField(
-                    controller: foneController,
-                    decoration: const InputDecoration(
-                      hintText: 'Số điện thoại',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              const Text('Mô tả'),
-              TextField(
-                controller: descriptionController,
-                decoration: const InputDecoration(
-                  hintText: 'Mô tả',
-                  border: OutlineInputBorder(),
+                    const Text('Họ và tên')
+                  ],
                 ),
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    hintText: 'Họ và tên',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      '*',
+                      style: colorsRed,
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    const Text('Tài khoản')
+                  ],
+                ),
+                TextField(
+                  controller: accountController,
+                  readOnly: true,
+                  enabled: false,
+                  decoration: const InputDecoration(
+                    hintText: 'Tài khoản',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      '*',
+                      style: colorsRed,
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    const Text('Ngày sinh')
+                  ],
+                ),
+                TextField(
+                  controller: dateController,
+                  decoration: const InputDecoration(
+                    hintText: 'Ngày sinh',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      '*',
+                      style: colorsRed,
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    const Text('Giới tính')
+                  ],
+                ),
+                DropdownButtonFormField<int>(
+                  decoration: const InputDecoration(
+                    hintText: 'Giới tính',
+                    border: OutlineInputBorder(),
+                  ),
+                  value: gender,
+                  onChanged: (value) {
+                    setState(() {
+                      gender = value;
+                    });
+                  },
+                  items: const [
+                    DropdownMenuItem(
+                      value: 0, // Nam
+                      child: Text('Nữ'),
+                    ),
+                    DropdownMenuItem(
+                      value: 1, // Nữ
+                      child: Text('Nam'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      '*',
+                      style: colorsRed,
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    const Text('Email')
+                  ],
+                ),
+                TextField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                    hintText: 'Email',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      '*',
+                      style: colorsRed,
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    const Text('Số điện thoại')
+                  ],
+                ),
+                TextField(
+                  controller: foneController,
+                  decoration: const InputDecoration(
+                    hintText: 'Số điện thoại',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            const Text('Mô tả'),
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(
+                hintText: 'Mô tả',
+                border: OutlineInputBorder(),
               ),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    height: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                          width: 2,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                        width: 2,
+                        color:
+                            Provider.of<Providercolor>(context).selectedColor),
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      widget.onSelectPage(2);
+                    },
+                    child: Text(
+                      'Quay lại',
+                      style: GoogleFonts.robotoCondensed(
                           color: Provider.of<Providercolor>(context)
                               .selectedColor),
                     ),
-                    child: TextButton(
-                      onPressed: () {
-                        widget.onSelectPage(2);
-                      },
-                      child: Text(
-                        'Quay lại',
-                        style: GoogleFonts.robotoCondensed(
-                            color: Provider.of<Providercolor>(context)
-                                .selectedColor),
-                      ),
-                    ),
                   ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  // ElevatedButton(
-                  //   onPressed: () {
-                  //     Navigator.of(context).pop();
-                  //   },
-                  //   style: ElevatedButton.styleFrom(
-                  //     backgroundColor:
-                  //         Provider.of<Providercolor>(context).selectedColor,
-                  //     shape: RoundedRectangleBorder(
-                  //         borderRadius: BorderRadius.circular(10),
-                  //         side: BorderSide.none),
-                  //   ),
-                  //   child: Text(
-                  //     'Lưu',
-                  //     style: GoogleFonts.robotoCondensed(color: Colors.white),
-                  //   ),
-                  // ),
-                ],
-              ),
-            ],
-          ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     Navigator.of(context).pop();
+                //   },
+                //   style: ElevatedButton.styleFrom(
+                //     backgroundColor:
+                //         Provider.of<Providercolor>(context).selectedColor,
+                //     shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(10),
+                //         side: BorderSide.none),
+                //   ),
+                //   child: Text(
+                //     'Lưu',
+                //     style: GoogleFonts.robotoCondensed(color: Colors.white),
+                //   ),
+                // ),
+              ],
+            ),
+          ],
         ),
       ),
     );

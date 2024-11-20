@@ -11,7 +11,6 @@ class PiecharService {
   final String apiUrl =
       '${ApiConfig.baseUrlBasic}/api-co/co-documents/dashboard';
 
-  // Fetches pie chart data
   Future<List<PieCharModel>?> fetchPieChartData(DateTime? startDate,
       DateTime? endDate, String? employeeId, String? customerId) async {
     final url = Uri.parse(apiUrl);
@@ -32,10 +31,26 @@ class PiecharService {
       );
 
       if (response.statusCode == 200) {
-        final List<dynamic> dataList = jsonDecode(response.body);
-        return dataList
-            .map((data) => PieCharModel.fromJson(data as Map<String, dynamic>))
-            .toList();
+        final responseBody = jsonDecode(response.body);
+
+        if (responseBody is List) {
+          return responseBody
+              .map(
+                  (data) => PieCharModel.fromJson(data as Map<String, dynamic>))
+              .toList();
+        } else if (responseBody is Map<String, dynamic>) {
+          if (responseBody.containsKey('data') &&
+              responseBody['data'] is List) {
+            return (responseBody['data'] as List)
+                .map((data) =>
+                    PieCharModel.fromJson(data as Map<String, dynamic>))
+                .toList();
+          } else {
+            print('Unexpected format: ${responseBody}');
+          }
+        } else {
+          print('Unexpected response format: ${responseBody}');
+        }
       } else {
         print(
             'Failed to fetch pie chart data. Status code: ${response.statusCode}, body: ${response.body}');

@@ -181,7 +181,6 @@ class _MaterialspageState extends State<Materialspage> {
                                 offset: const Offset(0, 4),
                               )
                             ]),
-                        padding: const EdgeInsets.all(5),
                         child: Scrollbar(
                           controller: _scrollController,
                           thumbVisibility: true,

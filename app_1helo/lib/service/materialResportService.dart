@@ -16,10 +16,6 @@ class Materialresportservice {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
 
-      if (userId == null) {
-        print('No user ID found. User might not be logged in.');
-        return [];
-      }
       Bodyreport requestBody = Bodyreport(
         customerId: customerid,
         frCreatedDate: null,
@@ -38,15 +34,11 @@ class Materialresportservice {
       );
 
       if (response.statusCode == 200) {
-        // Parse the JSON response
         final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-        final Materialreportmodel materialReportModel =
+        final Materialreportmodel MaterialreportmodelData =
             Materialreportmodel.fromJson(jsonResponse);
-        return materialReportModel.data ?? [];
+        return MaterialreportmodelData.data ?? []; 
       } else {
-        print(
-            'Error: Server responded with status code ${response.statusCode}');
-        print('Response body: ${response.body}');
         throw Exception('Failed to load documents');
       }
     } catch (error) {
@@ -54,8 +46,8 @@ class Materialresportservice {
       return [];
     }
   }
-Future<List<Data>> fetchMateriaDataAlllsReport(
-       int page, int pageSize) async {
+
+  Future<List<Data>> fetchMateriaDataAlllsReport(int page, int pageSize) async {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
@@ -100,6 +92,7 @@ Future<List<Data>> fetchMateriaDataAlllsReport(
       return [];
     }
   }
+
   Future<List<Data>> fetchMaterialsReportDate(
       DateTime? frdDate, DateTime? toDate) async {
     try {

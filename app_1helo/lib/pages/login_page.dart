@@ -118,9 +118,11 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            constraints: const BoxConstraints.expand(),
+            margin: const EdgeInsets.fromLTRB(0, 200, 0, 0),
+            child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.robotoCondensed(
                       fontSize: 14,
-                      fontWeight: FontWeight.w400,
+                      fontWeight: FontWeight.w500,
                       color: const Color(0xFF064265),
                     ),
                   ),
@@ -185,11 +187,16 @@ class _LoginPageState extends State<LoginPage> {
                               style: const TextStyle(color: Colors.black),
                               controller: _usernameController,
                               decoration: InputDecoration(
+                                filled: true,
+                                fillColor:
+                                    const Color.fromARGB(237, 250, 248, 248),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                                 hintText: 'Tài khoản',
                                 hintStyle: GoogleFonts.robotoCondensed(
                                     fontSize: 14,
                                     color: const Color(0xFF064265)),
-                                border: const OutlineInputBorder(),
                                 prefixIcon: const Icon(
                                   Icons.account_box_outlined,
                                   size: 24,
@@ -214,7 +221,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             const SizedBox(
-                              height: 5,
+                              height: 10,
                             ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,7 +263,13 @@ class _LoginPageState extends State<LoginPage> {
                                           fontSize: 14,
                                           color: const Color(0xFF064265),
                                         ),
-                                        border: const OutlineInputBorder(),
+                                        filled: true,
+                                        fillColor: const Color.fromARGB(
+                                            237, 250, 248, 248),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
                                         prefixIcon: const Icon(
                                           Icons.lock_outline,
                                           size: 24,
@@ -267,7 +280,8 @@ class _LoginPageState extends State<LoginPage> {
                                             _isPasswordVisible
                                                 ? Icons.visibility_outlined
                                                 : Icons.visibility_off_outlined,
-                                            color: const Color(0xFFDFE2E2),
+                                            color: const Color.fromARGB(
+                                                236, 85, 80, 80),
                                             size: 18,
                                           ),
                                           onPressed: () {
@@ -337,39 +351,37 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width,
                     height: 40,
-                    child: Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF064265),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.all(8),
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          side: const BorderSide(
-                            width: 2,
-                            color: Color.fromARGB(255, 9, 105, 160),
-                          ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF064265),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.all(8),
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        onPressed: _login,
-                        child: Row(
-                          children: [
-                            const Align(
-                                alignment: Alignment.centerLeft,
-                                child: Icon(Icons.keyboard_double_arrow_right)),
-                            const Spacer(),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                'Đăng nhập',
-                                style: GoogleFonts.robotoCondensed(
-                                    fontSize: 16, fontWeight: FontWeight.w700),
-                              ),
+                        side: const BorderSide(
+                          width: 2,
+                          color: Color.fromARGB(255, 9, 105, 160),
+                        ),
+                      ),
+                      onPressed: _login,
+                      child: Row(
+                        children: [
+                          const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Icon(Icons.keyboard_double_arrow_right)),
+                          const Spacer(),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Đăng nhập',
+                              style: GoogleFonts.robotoCondensed(
+                                  fontSize: 16, fontWeight: FontWeight.w700),
                             ),
-                            const Spacer()
-                          ],
-                        ),
+                          ),
+                          const Spacer()
+                        ],
                       ),
                     ),
                   )

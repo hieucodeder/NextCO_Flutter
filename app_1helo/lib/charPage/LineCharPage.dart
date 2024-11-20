@@ -16,6 +16,7 @@ class Linecharpage extends StatefulWidget {
   Future<void> fetchLineChartData() async {
     await Future.delayed(Duration(seconds: 2));
   }
+
   @override
   _LinecharpageState createState() => _LinecharpageState();
 }
@@ -235,12 +236,14 @@ class _LinecharpageState extends State<Linecharpage> {
     }
   }
 
-  // hàm lấy thông tin biểu đồ
   List<FlSpot> _mapDataToFlSpot(List<dynamic>? dataList) {
     if (dataList == null || dataList.isEmpty) return [];
 
     final Map<String, double> monthQuantityMap = {};
+    DateTime? minDate;
+    DateTime? maxDate;
 
+    // First loop to collect quantities and determine the min/max dates
     for (var entry in dataList) {
       Map<String, dynamic> value = entry.toJson();
 
@@ -255,17 +258,45 @@ class _LinecharpageState extends State<Linecharpage> {
         monthQuantityMap.update(
             monthKey, (existingQty) => existingQty + quantity,
             ifAbsent: () => quantity);
+
+        // Track the min and max dates for the range
+        if (minDate == null || createdDate.isBefore(minDate))
+          minDate = createdDate;
+        if (maxDate == null || createdDate.isAfter(maxDate))
+          maxDate = createdDate;
       } catch (e) {
         print("Error parsing entry: $entry - $e");
       }
     }
 
+    // If no data is available, return an empty list
+    if (monthQuantityMap.isEmpty) return [];
+
+    // Generate all month keys between minDate and maxDate
+    List<String> allMonths = [];
+    DateTime currentDate = minDate!;
+    while (currentDate.isBefore(maxDate!)) {
+      allMonths.add(
+          "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}");
+      currentDate = DateTime(currentDate.year, currentDate.month + 1);
+    }
+    allMonths
+        .add("${maxDate.year}-${maxDate.month.toString().padLeft(2, '0')}");
+
+    // Ensure all months are represented in the monthQuantityMap
+    for (var month in allMonths) {
+      monthQuantityMap.putIfAbsent(month, () => 0);
+    }
+
+    // Sort the months in ascending order
     monthLabels = monthQuantityMap.keys.toList()..sort();
 
+    // Convert the map data to FlSpot
     List<FlSpot> flSpotList = [];
     for (int xIndex = 0; xIndex < monthLabels.length; xIndex++) {
       final month = monthLabels[xIndex];
-      flSpotList.add(FlSpot(xIndex.toDouble(), monthQuantityMap[month]!));
+      final quantity = monthQuantityMap[month]!;
+      flSpotList.add(FlSpot(xIndex.toDouble(), quantity));
     }
 
     return flSpotList;
@@ -389,151 +420,154 @@ class _LinecharpageState extends State<Linecharpage> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  renderCustomerDropdown(),
-                  const SizedBox(width: 2),
-                  renderUserDropdown(),
-                ],
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                renderCustomerDropdown(),
+                const SizedBox(width: 2),
+                renderUserDropdown(),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: _legendItems,
               ),
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: _legendItems,
-                ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: AspectRatio(
-                  aspectRatio: 1.4,
-                  child: _isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                          child: LineChart(
-                            LineChartData(
-                              gridData: FlGridData(
-                                show: true,
-                                drawVerticalLine: true,
-                                horizontalInterval: 4,
-                                getDrawingHorizontalLine: (value) => FlLine(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  strokeWidth: 1,
-                                ),
-                                getDrawingVerticalLine: (value) => FlLine(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  strokeWidth: 1,
-                                ),
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.9,
+              height: MediaQuery.of(context).size.height * 0.33,
+              child: AspectRatio(
+                aspectRatio: 1.4,
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
+                        child: LineChart(
+                          LineChartData(
+                            gridData: FlGridData(
+                              show: true,
+                              drawVerticalLine: true,
+                              horizontalInterval: 4,
+                              getDrawingHorizontalLine: (value) => FlLine(
+                                color: Colors.grey.withOpacity(0.2),
+                                strokeWidth: 1,
                               ),
-                              titlesData: FlTitlesData(
-                                topTitles: const AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: false,
-                                  ),
-                                ),
-                                rightTitles: const AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: false,
-                                  ),
-                                ),
-                                leftTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    reservedSize: 40,
-                                    interval: 4,
-                                    getTitlesWidget: (value, meta) {
-                                      return Text(
-                                        value.toInt().toString(),
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                bottomTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    reservedSize: 30,
-                                    interval: 1,
-                                    getTitlesWidget: (value, meta) {
-                                      int index = value.toInt();
-                                      if (index < 0 ||
-                                          index >= monthLabels.length) {
-                                        return const SizedBox.shrink();
-                                      }
-
-                                      final selectedMonth = monthLabels[index];
-                                      final parts = selectedMonth.split('-');
-                                      final year = parts[0];
-                                      final month = parts[1];
-
-                                      return Text(
-                                        '$month/$year',
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
+                              getDrawingVerticalLine: (value) => FlLine(
+                                color: Colors.grey.withOpacity(0.2),
+                                strokeWidth: 1,
                               ),
-                              lineBarsData: [
-                                LineChartBarData(
-                                  spots: _completeCoSpots,
-                                  isCurved: true,
-                                  color: Colors.green,
-                                  barWidth: 3,
-                                  dotData: const FlDotData(show: true),
-                                  belowBarData: BarAreaData(show: false),
-                                ),
-                                LineChartBarData(
-                                  spots: _processingCoSpots,
-                                  isCurved: true,
-                                  color: Colors.orange,
-                                  barWidth: 3,
-                                  dotData: const FlDotData(show: true),
-                                  belowBarData: BarAreaData(show: false),
-                                ),
-                                LineChartBarData(
-                                  spots: _canceledCoSpots,
-                                  isCurved: true,
-                                  color: Colors.red,
-                                  barWidth: 3,
-                                  dotData: const FlDotData(show: true),
-                                  belowBarData: BarAreaData(show: false),
-                                ),
-                              ],
-                              borderData: FlBorderData(
-                                show: true,
-                                border: Border.all(
-                                  color: const Color(0xff37434d),
-                                  width: 1,
-                                ),
-                              ),
-                              minX: _minX,
-                              maxX: _maxX,
-                              minY: _minY,
-                              maxY: _maxY,
                             ),
+                            titlesData: FlTitlesData(
+                              topTitles: const AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: false,
+                                ),
+                              ),
+                              rightTitles: const AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: false,
+                                ),
+                              ),
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  reservedSize: 40,
+                                  interval: 4,
+                                  getTitlesWidget: (value, meta) {
+                                    return Text(
+                                      value.toInt().toString(),
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 12,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  reservedSize: 30,
+                                  interval: 1,
+                                  getTitlesWidget: (value, meta) {
+                                    int index = value.toInt();
+
+                                    // Check if the index is valid, if not return an empty widget
+                                    if (index < 0 ||
+                                        index >= monthLabels.length) {
+                                      return const SizedBox.shrink();
+                                    }
+
+                                    // Get the selected month in 'YYYY-MM' format from monthLabels
+                                    final selectedMonth = monthLabels[index];
+                                    final parts = selectedMonth.split('-');
+                                    final year = parts[0];
+                                    final month = parts[1];
+
+                                    // Return the formatted month/year as text
+                                    return Text(
+                                      '$month/$year', // Format the month/year as MM/YYYY
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 12,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                            lineBarsData: [
+                              LineChartBarData(
+                                spots: _completeCoSpots,
+                                isCurved: true,
+                                color: Colors.green,
+                                barWidth: 3,
+                                dotData: const FlDotData(show: true),
+                                belowBarData: BarAreaData(show: false),
+                              ),
+                              LineChartBarData(
+                                spots: _processingCoSpots,
+                                isCurved: true,
+                                color: Colors.orange,
+                                barWidth: 3,
+                                dotData: const FlDotData(show: true),
+                                belowBarData: BarAreaData(show: false),
+                              ),
+                              LineChartBarData(
+                                spots: _canceledCoSpots,
+                                isCurved: true,
+                                color: Colors.red,
+                                barWidth: 3,
+                                dotData: const FlDotData(show: true),
+                                belowBarData: BarAreaData(show: false),
+                              ),
+                            ],
+                            borderData: FlBorderData(
+                              show: true,
+                              border: Border.all(
+                                color: const Color(0xff37434d),
+                                width: 1,
+                              ),
+                            ),
+                            minX: _minX,
+                            maxX: _maxX,
+                            minY: _minY,
+                            maxY: _maxY,
                           ),
                         ),
-                ),
+                      ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

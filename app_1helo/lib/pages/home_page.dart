@@ -405,6 +405,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ],
                     ),
                   ),
+                  SizedBox(width: 10),
                   Center(
                     child: SvgPicture.asset(
                       'resources/Employed.svg',
@@ -436,25 +437,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ],
                     ),
                     width: MediaQuery.of(context).size.width,
-                    height: 400,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 40,
-                            padding: const EdgeInsets.all(8),
-                            child: Text('Số lượng hồ sơ C/O theo trạng thái',
-                                style: GoogleFonts.robotoCondensed(
-                                    fontSize: 16, fontWeight: FontWeight.bold)),
-                          ),
-                          const Divider(color: Color(0xffC4C9CA)),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          const Linecharpage(),
-                        ],
-                      ),
+                    height: 450,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 40,
+                          padding: const EdgeInsets.all(8),
+                          child: Text('Số lượng hồ sơ C/O theo trạng thái',
+                              style: GoogleFonts.robotoCondensed(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                        ),
+                        const Divider(color: Color(0xffC4C9CA)),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        const Linecharpage(),
+                      ],
                     ),
                   ),
                 ],
@@ -480,7 +479,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             blurRadius: 8)
                       ]),
                   width: MediaQuery.of(context).size.width,
-                  height: 470,
+                  height: 450,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -494,10 +493,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                       const Divider(color: Color(0xffC4C9CA)),
-                      Container(
-                          width: double.infinity,
-                          height: 400,
-                          child: SingleChildScrollView(child: Piechartpage())),
+                      Piechartpage(),
                     ],
                   ),
                 ),

@@ -204,20 +204,21 @@ class _DshosocoState extends State<Dshosoco> {
                   if (_controller.text.isNotEmpty)
                     GestureDetector(
                       onTap: _clearDateRange,
-                      child: Icon(
+                      child: const Icon(
                         Icons.close_sharp,
                         color: Colors.black54,
                         size: 20,
                       ),
                     ),
-                  VerticalDivider(
+                  const VerticalDivider(
                     width: 20,
                     thickness: 1,
                     color: Colors.black38,
                   ),
                   GestureDetector(
                     onTap: _selectDateRange,
-                    child: Icon(Icons.calendar_today, color: Colors.black54),
+                    child:
+                        const Icon(Icons.calendar_today, color: Colors.black54),
                   ),
                 ],
               ),
@@ -303,7 +304,6 @@ class _DshosocoState extends State<Dshosoco> {
                               ),
                             ],
                           ),
-                          padding: const EdgeInsets.all(5),
                           child: Scrollbar(
                             controller: _scrollController,
                             thumbVisibility: true,
@@ -312,11 +312,14 @@ class _DshosocoState extends State<Dshosoco> {
                             child: SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               controller: _scrollController,
-                              child: DataTable(
-                                columns: _buildDataTableColumns(),
-                                rows: displayList
-                                    .map((doc) => _buildDataRow(doc))
-                                    .toList(),
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: DataTable(
+                                  columns: _buildDataTableColumns(),
+                                  rows: displayList
+                                      .map((doc) => _buildDataRow(doc))
+                                      .toList(),
+                                ),
                               ),
                             ),
                           ),

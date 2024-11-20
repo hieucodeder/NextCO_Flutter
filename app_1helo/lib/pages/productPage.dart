@@ -15,18 +15,20 @@ class ProductPage extends StatefulWidget {
 class _ProductPageState extends State<ProductPage> {
   int itemsPerPage = 10;
   final List<int> itemsPerPageOptions = [10, 20, 30];
-
-  final ScrollController _scrollController = ScrollController();
-  List<Data> productList = [];
-  bool isLoading = false;
   int currentPage = 1;
   int pageSize = 10;
-  ProductService productService = ProductService();
-  bool hasMoreData = true;
-  final TextEditingController _searchController = TextEditingController();
-  List<Data> _searchResults = [];
-  bool _isSearching = false;
 
+  List<Data> productList = [];
+  List<Data> _searchResults = [];
+
+  ProductService productService = ProductService();
+  final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
+  bool _isSearching = false;
+  bool isLoading = false;
+  bool hasMoreData = true;
+  
   Future<void> _searchProducts(String searchQuery) async {
     if (searchQuery.isEmpty) {
       setState(() {

@@ -39,10 +39,10 @@ class _PaypageState extends State<Paypage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints.expand(),
+      constraints: const BoxConstraints.expand(),
       color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -66,45 +66,42 @@ class _PaypageState extends State<Paypage> {
                 Container(
                   margin: const EdgeInsets.fromLTRB(0, 90, 0, 0),
                   padding: const EdgeInsets.symmetric(horizontal: 70),
-                  child: Positioned(
-                    bottom: 40,
-                    child: Column(
-                      children: [
-                        Text(
-                          'CÔNG TY CỔ PHẦN CÔNG NGHỆ AI-TEKWORKS VIETNAM',
-                          style: GoogleFonts.robotoCondensed(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          textAlign: TextAlign.center,
-                          softWrap: true,
-                          overflow: TextOverflow.visible,
-                          maxLines: 2,
+                  child: Column(
+                    children: [
+                      Text(
+                        'CÔNG TY CỔ PHẦN CÔNG NGHỆ AI-TEKWORKS VIETNAM',
+                        style: GoogleFonts.robotoCondensed(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '1348748888',
-                              style: GoogleFonts.robotoCondensed(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                        textAlign: TextAlign.center,
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                        maxLines: 2,
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '1348748888',
+                            style: GoogleFonts.robotoCondensed(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Row(
@@ -125,10 +122,10 @@ class _PaypageState extends State<Paypage> {
               ],
             ),
             Text(
-              ' Vietcombank-chi nhánh Thăng Long',
+              'Vietcombank-chi nhánh Thăng Long',
               style: GoogleFonts.robotoCondensed(fontSize: 16),
             ),
-            SizedBox(
+            const SizedBox(
               height: 30,
             ),
             Screenshot(
@@ -153,7 +150,7 @@ class _PaypageState extends State<Paypage> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 30,
             ),
             ElevatedButton(

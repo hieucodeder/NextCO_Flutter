@@ -18,7 +18,7 @@ class Piechartpage extends StatefulWidget {
   const Piechartpage({Key? key}) : super(key: key);
 
   Future<void> fetchPieChartData() async {
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2));
   }
 
   @override
@@ -418,13 +418,13 @@ class _PiechartpageState extends State<Piechartpage> {
     final colorList = dataMap.keys.contains("Không có dữ liệu")
         ? [Colors.grey]
         : [
-            Colors.green, 
-            Colors.orange, 
-            Colors.orange, 
-            Colors.black, 
-            Colors.red, 
-            Colors.red, 
-            Colors.black, 
+            Colors.green,
+            Colors.orange,
+            Colors.black,
+            Colors.orange,
+            Colors.red,
+            Colors.red,
+            Colors.black,
             Colors.black,
           ];
     return Center(
@@ -465,20 +465,20 @@ class _PiechartpageState extends State<Piechartpage> {
                     if (_controller.text.isNotEmpty)
                       GestureDetector(
                         onTap: _clearDateRange,
-                        child: Icon(
+                        child: const Icon(
                           Icons.close_sharp,
                           color: Colors.black54,
                           size: 20,
                         ),
                       ),
-                    VerticalDivider(
+                    const VerticalDivider(
                       width: 20,
                       thickness: 1,
                       color: Colors.black38,
                     ),
                     GestureDetector(
                       onTap: _selectDateRange,
-                      child: Icon(Icons.calendar_today, color: Colors.black54),
+                      child: const Icon(Icons.calendar_today, color: Colors.black54),
                     ),
                   ],
                 ),
@@ -508,7 +508,7 @@ class _PiechartpageState extends State<Piechartpage> {
                         chartType: ChartType.disc,
                         colorList: colorList,
                         animationDuration: const Duration(milliseconds: 800),
-                        chartRadius: double.infinity,
+                        chartRadius: MediaQuery.of(context).size.width / 1.5,
                         legendOptions: LegendOptions(
                           legendPosition: LegendPosition.right,
                           showLegendsInRow: false,

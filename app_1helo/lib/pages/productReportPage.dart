@@ -1,6 +1,5 @@
 import 'package:app_1helo/model/dropdownCustomer.dart';
 import 'package:app_1helo/model/prodcutReportModel.dart';
-import 'package:app_1helo/model/prodcutReportModel.dart';
 import 'package:app_1helo/provider/providerColor.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:app_1helo/service/productReport_service.dart';
@@ -26,7 +25,7 @@ class _ProductreportpageState extends State<Productreportpage> {
   bool hasMoreData = true;
   bool _isSearching = false;
 
-  List<Data> allProductReport = [];
+  List<Data> productReportList = [];
   List<Data> _searchResults = [];
 
   List<EmployeeCustomer> _filteredEmployeeCustomer = [];
@@ -37,7 +36,7 @@ class _ProductreportpageState extends State<Productreportpage> {
   String? startDate1;
   String? endDate1;
 
-  ProductReportService _productreportService = ProductReportService();
+  final ProductReportService _productreportService = ProductReportService();
   final AuthService _authService = AuthService();
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
@@ -46,21 +45,22 @@ class _ProductreportpageState extends State<Productreportpage> {
   @override
   void initState() {
     super.initState();
-    fetchInitialProducts();
+    fetchInitialProductsResPort();
     _scrollController.addListener(_onScroll);
     _fetchCustomerData();
   }
 
-  Future<void> fetchInitialProducts() async {
-    if (isLoading) return;
-    setState(() => isLoading = true);
+  Future<void> fetchInitialProductsResPort() async {
+    if (mounted) {
+      setState(() => isLoading = true);
+    }
 
     List<Data> initialProducts = await _productreportService
         .fetchProductsReport(currentPage, itemsPerPage, search, customerid);
 
     if (mounted) {
       setState(() {
-        allProductReport = initialProducts;
+        productReportList = initialProducts;
         isLoading = false;
         if (initialProducts.length < itemsPerPage) {
           hasMoreData = false;
@@ -73,26 +73,16 @@ class _ProductreportpageState extends State<Productreportpage> {
     if (searchQuery.isEmpty) {
       setState(() {
         _isSearching = false;
-        _searchResults.clear();
-        allProductReport = allProductReport;
       });
       return;
     }
-
-    setState(() {
-      _isSearching = true;
-      _searchResults.clear();
-      currentPage = 1;
-      hasMoreData = true;
-    });
 
     List<Data> results = await _productreportService.fetchProductsReport(
         currentPage, pageSize, searchQuery, customerid);
     if (mounted) {
       setState(() {
         _searchResults = results;
-        allProductReport = _searchResults;
-        hasMoreData = results.length == pageSize;
+        _isSearching = true;
       });
     }
   }
@@ -102,7 +92,7 @@ class _ProductreportpageState extends State<Productreportpage> {
             _scrollController.position.maxScrollExtent &&
         !isLoading &&
         hasMoreData) {
-      _loadMoreProducts();
+      _loadMoreProductsResPort();
     }
   }
 
@@ -128,7 +118,7 @@ class _ProductreportpageState extends State<Productreportpage> {
     if (customerId == null) return;
 
     setState(() {
-      allProductReport.clear();
+      productReportList.clear();
       currentPage = 1;
       hasMoreData = true;
     });
@@ -138,26 +128,28 @@ class _ProductreportpageState extends State<Productreportpage> {
 
     if (mounted) {
       setState(() {
-        allProductReport = reportData;
+        productReportList = reportData;
         hasMoreData = reportData.length == pageSize;
       });
     }
   }
 
-  Future<void> _loadMoreProducts() async {
+  Future<void> _loadMoreProductsResPort() async {
     if (isLoading || !hasMoreData) return;
 
     setState(() => isLoading = true);
     currentPage++;
 
-    List<Data> moreProducts = await _productreportService.fetchProductsReport(
-        currentPage, pageSize, search, customerid);
+    List<Data> moreProductsResPort = await _productreportService
+        .fetchProductsReport(currentPage, pageSize, search, customerid);
 
     if (mounted) {
       setState(() {
-        allProductReport.addAll(moreProducts);
+        productReportList.addAll(moreProductsResPort);
         isLoading = false;
-        hasMoreData = moreProducts.length == pageSize;
+        if (moreProductsResPort.length < pageSize) {
+          hasMoreData = false;
+        }
       });
     }
   }
@@ -204,7 +196,7 @@ class _ProductreportpageState extends State<Productreportpage> {
 
       if (mounted) {
         setState(() {
-          allProductReport = dateFilteredList;
+          productReportList = dateFilteredList;
         });
       }
     } catch (error) {
@@ -300,7 +292,7 @@ class _ProductreportpageState extends State<Productreportpage> {
     List<Data> displayList = _isSearching
         ? _searchResults
         : (startDate1 != null && endDate1 != null
-            ? allProductReport.where((data) {
+            ? productReportList.where((data) {
                 if (data.dateOfDeclaration != null) {
                   DateTime dataDate = DateTime.parse(data.dateOfDeclaration!);
                   DateTime parsedStartDate = DateTime.parse(startDate1!);
@@ -310,8 +302,7 @@ class _ProductreportpageState extends State<Productreportpage> {
                 }
                 return false;
               }).toList()
-            : allProductReport);
-
+            : productReportList);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -353,20 +344,21 @@ class _ProductreportpageState extends State<Productreportpage> {
                       onTap: () {
                         _clearDateRange();
                       },
-                      child: Icon(
+                      child: const Icon(
                         Icons.close_sharp,
                         color: Colors.black54,
                         size: 20,
                       ),
                     ),
-                  VerticalDivider(
+                  const VerticalDivider(
                     width: 20,
                     thickness: 1,
                     color: Colors.black38,
                   ),
                   GestureDetector(
                     onTap: _selectDateRange,
-                    child: Icon(Icons.calendar_today, color: Colors.black54),
+                    child:
+                        const Icon(Icons.calendar_today, color: Colors.black54),
                   ),
                 ],
               ),
@@ -385,6 +377,7 @@ class _ProductreportpageState extends State<Productreportpage> {
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 5),
                   child: TextField(
+                    controller: _searchController,
                     decoration: InputDecoration(
                       hintText: 'Mã sản phẩm, tên sản phẩm',
                       hintStyle: GoogleFonts.robotoCondensed(
@@ -395,24 +388,50 @@ class _ProductreportpageState extends State<Productreportpage> {
                         ),
                         borderSide: BorderSide.none,
                       ),
-                      suffixIcon: GestureDetector(
-                        onTap: () {
-                          _searchProducts(_searchController.text);
-                        },
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            VerticalDivider(
-                              width: 20,
-                              thickness: 1,
-                              color: Colors.black38,
+                      suffixIcon: StatefulBuilder(
+                        builder: (context, setState) {
+                          bool isPressed = false;
+
+                          return GestureDetector(
+                            onTapDown: (_) {
+                              setState(() {
+                                isPressed = true;
+                              });
+                            },
+                            onTapUp: (_) {
+                              setState(() {
+                                isPressed = false;
+                              });
+                              _searchProducts(_searchController.text);
+                            },
+                            onTapCancel: () {
+                              setState(() {
+                                isPressed = false;
+                              });
+                            },
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const VerticalDivider(
+                                  width: 20,
+                                  thickness: 1,
+                                  color: Colors.black38,
+                                ),
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: isPressed
+                                        ? Colors.grey[200]
+                                        : Colors.transparent,
+                                    shape: BoxShape.circle, // Làm nút tròn
+                                  ),
+                                  child: const Icon(Icons.search_outlined),
+                                ),
+                              ],
                             ),
-                            Icon(
-                              Icons.search_outlined,
-                              color: Colors.black54,
-                            )
-                          ],
-                        ),
+                          );
+                        },
                       ),
                       contentPadding: const EdgeInsets.all(5),
                     ),
@@ -502,7 +521,7 @@ class _ProductreportpageState extends State<Productreportpage> {
                           setState(() {
                             currentPage -= 1;
                           });
-                          fetchInitialProducts();
+                          fetchInitialProductsResPort();
                         }
                       : null,
                   icon: const Icon(
@@ -528,7 +547,7 @@ class _ProductreportpageState extends State<Productreportpage> {
                           setState(() {
                             currentPage += 1;
                           });
-                          fetchInitialProducts();
+                          fetchInitialProductsResPort();
                         }
                       : null,
                   icon: const Icon(
@@ -557,7 +576,7 @@ class _ProductreportpageState extends State<Productreportpage> {
                           itemsPerPage = newValue;
                           currentPage = 1;
                         });
-                        fetchInitialProducts();
+                        fetchInitialProductsResPort();
                       }
                     },
                   ),

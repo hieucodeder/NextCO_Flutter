@@ -73,9 +73,11 @@ class _ForgotpasswordState extends State<Forgotpassword> {
             ),
           ),
         ),
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          constraints: const BoxConstraints.expand(),
+          margin: const EdgeInsets.fromLTRB(0, 70, 0, 0),
+          child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,7 +100,7 @@ class _ForgotpasswordState extends State<Forgotpassword> {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.robotoCondensed(
                     fontSize: 14,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w500,
                     color: const Color(0xFF064265),
                   ),
                 ),
@@ -148,12 +150,18 @@ class _ForgotpasswordState extends State<Forgotpassword> {
                                     },
                                     style: const TextStyle(color: Colors.black),
                                     decoration: InputDecoration(
+                                        filled: true,
+                                        fillColor: const Color.fromARGB(
+                                            237, 250, 248, 248),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
                                         hintText: 'Tài khoản',
                                         hintStyle: GoogleFonts.robotoCondensed(
                                           fontSize: 14,
                                           color: const Color(0xFF064265),
                                         ),
-                                        border: const OutlineInputBorder(),
                                         prefixIcon: const Icon(
                                           Icons.account_circle_outlined,
                                           size: 24,
@@ -207,14 +215,19 @@ class _ForgotpasswordState extends State<Forgotpassword> {
                                 style: const TextStyle(color: Colors.black),
                                 obscureText: true,
                                 decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: const Color.fromARGB(
+                                        237, 250, 248, 248),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                     hintText: 'Email',
                                     hintStyle: GoogleFonts.robotoCondensed(
                                       fontSize: 14,
                                       color: const Color(0xFF064265),
                                     ),
-                                    border: const OutlineInputBorder(),
                                     prefixIcon: const Icon(
-                                      Icons.email,
+                                      Icons.email_outlined,
                                       size: 24,
                                       color: const Color(0xFF064265),
                                     )),

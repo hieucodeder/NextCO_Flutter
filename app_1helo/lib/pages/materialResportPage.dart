@@ -1,6 +1,5 @@
 import 'package:app_1helo/model/dropdownCustomer.dart';
 import 'package:app_1helo/model/materialReportModel.dart';
-import 'package:app_1helo/model/materialReportModel.dart';
 import 'package:app_1helo/provider/providerColor.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:app_1helo/service/materialResportService.dart';
@@ -75,19 +74,19 @@ class _MaterreportpageState extends State<Materialresportpage> {
     }
   }
 
-  Future<void> _loadMoreMaterial() async {
+  Future<void> _loadMoreMaterialResport() async {
     if (isLoading || !hasMoreData) return;
 
     setState(() => isLoading = true);
     currentPage++;
 
-    List<Data> moreProducts = await _materialresportservice
+    List<Data> moreMaterialResport = await _materialresportservice
         .fetchMaterialsReport(search, customerid, currentPage, pageSize);
 
     if (mounted) {
       setState(() {
-        allMaterialsResport.addAll(moreProducts);
-        if (moreProducts.length < pageSize) {
+        allMaterialsResport.addAll(moreMaterialResport);
+        if (moreMaterialResport.length < pageSize) {
           hasMoreData = false;
         }
       });
@@ -116,37 +115,26 @@ class _MaterreportpageState extends State<Materialresportpage> {
     if (_scrollController.position.pixels ==
             _scrollController.position.maxScrollExtent &&
         !isLoading) {
-      _loadMoreMaterial();
+      _loadMoreMaterialResport();
     }
   }
 
-  Future<void> _searchMaterial(String searchQuery) async {
+  Future<void> _searchMaterialResPort(String searchQuery) async {
     if (searchQuery.isEmpty) {
       setState(() {
         isSearching = false;
-        _searchResults.clear();
-        allMaterialsResport = allMaterialsResport;
       });
       return;
-    }
-    if (mounted) {
-      setState(() {
-        isSearching = true;
-        _searchResults.clear();
-        currentPage = 1;
-        hasMoreData = true;
-      });
     }
 
     List<Data> results = await _materialresportservice.fetchMaterialsReport(
         searchQuery, customerid, currentPage, pageSize);
-    if (mounted) {
-      setState(() {
-        _searchResults = results;
-        allMaterialsResport = _searchResults;
-        hasMoreData = results.length == pageSize;
-      });
-    }
+    if (!mounted) return;
+
+    setState(() {
+      _searchResults = results;
+      isSearching = true;
+    });
   }
 
   void _fetchMaterialsReport(String? customerId) async {
@@ -345,20 +333,21 @@ class _MaterreportpageState extends State<Materialresportpage> {
                       onTap: () {
                         _clearDateRange();
                       },
-                      child: Icon(
+                      child: const Icon(
                         Icons.close_sharp,
                         color: Colors.black54,
                         size: 20,
                       ),
                     ),
-                  VerticalDivider(
+                  const VerticalDivider(
                     width: 20,
                     thickness: 1,
                     color: Colors.black38,
                   ),
                   GestureDetector(
                     onTap: _selectDateRange,
-                    child: Icon(Icons.calendar_today, color: Colors.black54),
+                    child:
+                        const Icon(Icons.calendar_today, color: Colors.black54),
                   ),
                 ],
               ),
@@ -393,21 +382,50 @@ class _MaterreportpageState extends State<Materialresportpage> {
                         ),
                         borderSide: BorderSide.none,
                       ),
-                      suffixIcon: GestureDetector(
-                        onTap: () {
-                          _searchMaterial(_searchController.text);
-                        },
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            VerticalDivider(
-                              width: 20,
-                              thickness: 1,
-                              color: Colors.black38,
+                      suffixIcon: StatefulBuilder(
+                        builder: (context, setState) {
+                          bool isPressed = false;
+
+                          return GestureDetector(
+                            onTapDown: (_) {
+                              setState(() {
+                                isPressed = true;
+                              });
+                            },
+                            onTapUp: (_) {
+                              setState(() {
+                                isPressed = false;
+                              });
+                              _searchMaterialResPort(_searchController.text);
+                            },
+                            onTapCancel: () {
+                              setState(() {
+                                isPressed = false;
+                              });
+                            },
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const VerticalDivider(
+                                  width: 20,
+                                  thickness: 1,
+                                  color: Colors.black38,
+                                ),
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: isPressed
+                                        ? Colors.grey[200]
+                                        : Colors.transparent,
+                                    shape: BoxShape.circle, // Làm nút tròn
+                                  ),
+                                  child: const Icon(Icons.search_outlined),
+                                ),
+                              ],
                             ),
-                            Icon(Icons.search_outlined)
-                          ],
-                        ),
+                          );
+                        },
                       ),
                       contentPadding: const EdgeInsets.all(5),
                     ),

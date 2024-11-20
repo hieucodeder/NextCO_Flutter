@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class Bodysearchpiechar {
   final String? customerId;
   final String? employeeId;
@@ -9,8 +11,12 @@ class Bodysearchpiechar {
     this.employeeId,
     DateTime? frCreatedDate,
     DateTime? toCreatedDate,
-  })  : frCreatedDate = frCreatedDate?.toIso8601String(),
-        toCreatedDate = toCreatedDate?.toIso8601String();
+  })  : frCreatedDate = frCreatedDate != null
+             ? DateFormat('yyyy-MM-ddTHH:mm:ss').format(frCreatedDate)
+            : null,
+        toCreatedDate = toCreatedDate != null
+            ? DateFormat('yyyy-MM-ddTHH:mm:ss').format(toCreatedDate)
+            : null;
 
   Map<String, dynamic> toJson() {
     return {

@@ -7,6 +7,7 @@ import 'package:app_1helo/pages/PayPage.dart';
 import 'package:app_1helo/pages/customerPage.dart';
 import 'package:app_1helo/pages/DSHoSoCO.dart';
 import 'package:app_1helo/navigation/Drawer.dart';
+import 'package:app_1helo/pages/facebookPage.dart';
 import 'package:app_1helo/pages/funtionsPage.dart';
 import 'package:app_1helo/pages/PersonalInfo.dart';
 import 'package:app_1helo/pages/home_page.dart';
@@ -192,7 +193,10 @@ class _AppScreenState extends State<AppScreen> {
                 child: FloatingActionButton(
                   heroTag: 'uniqueTagForButton3',
                   onPressed: () {
-                    print('Button 3 Pressed');
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const FacebookPage()));
                   },
                   tooltip: 'Button 3',
                   backgroundColor:
