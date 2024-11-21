@@ -2,6 +2,7 @@ import 'package:app_1helo/model/account.dart';
 import 'package:app_1helo/provider/providerColor.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -149,8 +150,8 @@ class _DrawerCustomState extends State<DrawerCustom> {
             iconSize: 23,
             onPressed: () => _onTileTap(0),
           ),
-          Image.asset(
-            'resources/Layer_1.png',
+          SvgPicture.asset(
+            'resources/logo.svg',
             width: 80,
             height: 30,
             fit: BoxFit.contain,
@@ -235,7 +236,7 @@ class _DrawerCustomState extends State<DrawerCustom> {
         } else if (snapshot.hasData && snapshot.data != null) {
           final account = snapshot.data!;
           return ListTile(
-            leading: Image.asset('resources/icon.png',
+            leading: SvgPicture.asset('resources/name.svg',
                 height: 45, width: 40, fit: BoxFit.contain),
             title: Text(
               account.fullName ?? 'Không có tên đầy đủ',
