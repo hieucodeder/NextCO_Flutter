@@ -63,7 +63,7 @@ class _DrawerCustomState extends State<DrawerCustom> {
                       children: [
                         _buildListTile(
                           icon: Icons.description_outlined,
-                          title: 'Nguyên Liệu',
+                          title: 'Nguyên liệu',
                           onTap: () => _onTileTap(8),
                         ),
                       ],
@@ -182,16 +182,23 @@ class _DrawerCustomState extends State<DrawerCustom> {
   }) {
     return ExpansionTile(
       leading: Icon(icon, color: Colors.white),
-      title: Text(title,
-          style:
-              GoogleFonts.robotoCondensed(fontSize: 14, color: Colors.white)),
+      title: Text(
+        title,
+        style: GoogleFonts.robotoCondensed(fontSize: 14, color: Colors.white),
+      ),
       childrenPadding: const EdgeInsets.only(left: 20.0),
+      iconColor: Colors.white,
+      collapsedIconColor: Colors.grey,
       children: children,
     );
   }
 
   Widget _buildColorSelector(BuildContext context) {
-    final colors = [Color(0xff042E4D), Color(0xff004225), Color(0xff6b240c)];
+    final colors = [
+      const Color(0xff042E4D),
+      const Color(0xff004225),
+      const Color(0xff6b240c)
+    ];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Row(

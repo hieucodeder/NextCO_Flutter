@@ -116,7 +116,10 @@ class _ClientpageState extends State<Clientpage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Data> displayList = _isSearching ? _searchResults : customerList;
+    // List<Data> displayList = _isSearching ? _searchResults : customerList;
+
+    List<Data> displayList = (_isSearching ? _searchResults : customerList)
+      ..sort((a, b) => (a.rowNumber ?? 0).compareTo(b.rowNumber ?? 0));
     return Container(
         constraints: const BoxConstraints.expand(),
         padding: const EdgeInsets.all(10),
@@ -215,25 +218,59 @@ class _ClientpageState extends State<Clientpage> {
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.vertical,
                                   child: DataTable(
-                                    columns: const [
+                                    columns: [
                                       DataColumn(
-                                          label: Text('STT',
-                                              textAlign: TextAlign.center)),
+                                          label: Text(
+                                        'STT',
+                                        style: GoogleFonts.robotoCondensed(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500),
+                                        textAlign: TextAlign.center,
+                                      )),
                                       DataColumn(
                                           label: Text('Mã khách hàng',
+                                              style:
+                                                  GoogleFonts.robotoCondensed(
+                                                      color: Colors.black,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500),
                                               textAlign: TextAlign.center)),
                                       DataColumn(
                                           label: Text('Tên khách hàng',
+                                              style:
+                                                  GoogleFonts.robotoCondensed(
+                                                      color: Colors.black,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500),
                                               textAlign: TextAlign.center)),
                                       DataColumn(
                                         label: Text('Số điện thoại',
+                                            style: GoogleFonts.robotoCondensed(
+                                                color: Colors.black,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500),
                                             textAlign: TextAlign.center),
                                       ),
                                       DataColumn(
                                           label: Text('Mã số thuế',
+                                              style:
+                                                  GoogleFonts.robotoCondensed(
+                                                      color: Colors.black,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500),
                                               textAlign: TextAlign.center)),
                                       DataColumn(
                                           label: Text('Địa chỉ',
+                                              style:
+                                                  GoogleFonts.robotoCondensed(
+                                                      color: Colors.black,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500),
                                               textAlign: TextAlign.center)),
                                     ],
                                     rows: displayList.map((doc) {
@@ -382,136 +419,139 @@ void showCustomerDetailsDialog(BuildContext context, String customerName,
             'Chi tiết khách hàng',
           ),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Column(
-              children: [
-                const Row(
-                  children: [
-                    Text(
-                      '*',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text('Tên khách hàng'),
-                  ],
-                ),
-                TextField(
-                  controller: customerNameController,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+        content: Container(
+          width: 500,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Column(
+                children: [
+                  const Row(
+                    children: [
+                      Text(
+                        '*',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text('Tên khách hàng'),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Column(
-              children: [
-                const Row(
-                  children: [
-                    Text(
-                      '*',
-                      style: TextStyle(color: Colors.red),
+                  TextField(
+                    controller: customerNameController,
+                    readOnly: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
                     ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text('Số điện thoại'),
-                  ],
-                ),
-                TextField(
-                  controller: phoneController,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Column(
-              children: [
-                const Row(
-                  children: [
-                    Text(
-                      '*',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text('Mã số thuế'),
-                  ],
-                ),
-                TextField(
-                  controller: taxIdController,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Column(
+                children: [
+                  const Row(
+                    children: [
+                      Text(
+                        '*',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text('Số điện thoại'),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Column(
-              children: [
-                const Row(
-                  children: [
-                    Text(
-                      '*',
-                      style: const TextStyle(color: Colors.red),
+                  TextField(
+                    controller: phoneController,
+                    readOnly: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
                     ),
-                    SizedBox(
-                      width: 5,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Column(
+                children: [
+                  const Row(
+                    children: [
+                      Text(
+                        '*',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text('Mã số thuế'),
+                    ],
+                  ),
+                  TextField(
+                    controller: taxIdController,
+                    readOnly: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
                     ),
-                    Text('Địa chỉ'),
-                  ],
-                ),
-                TextField(
-                  controller: addressController,
-                  readOnly: true,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                        width: 2,
-                        color:
-                            Provider.of<Providercolor>(context).selectedColor),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Column(
+                children: [
+                  const Row(
+                    children: [
+                      Text(
+                        '*',
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text('Địa chỉ'),
+                    ],
                   ),
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      'Đóng',
-                      style: GoogleFonts.robotoCondensed(
+                  TextField(
+                    controller: addressController,
+                    readOnly: true,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                          width: 2,
                           color: Provider.of<Providercolor>(context)
                               .selectedColor),
                     ),
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(
+                        'Đóng',
+                        style: GoogleFonts.robotoCondensed(
+                            color: Provider.of<Providercolor>(context)
+                                .selectedColor),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(
+                    width: 5,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       );
     },

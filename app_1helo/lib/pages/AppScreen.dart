@@ -51,7 +51,7 @@ class _AppScreenState extends State<AppScreen> {
         _appBarTitle = "CÁ NHÂN";
         break;
       case 3:
-        _appBarTitle = "DANH SÁCH HỒ SƠ NEXTCO";
+        _appBarTitle = "DANH SÁCH HỒ SƠ C/O";
         break;
       case 4:
         _appBarTitle = "THÔNG TIN CÁ NHÂN";
@@ -139,42 +139,41 @@ class _AppScreenState extends State<AppScreen> {
         title: Text(
           _appBarTitle,
           style: GoogleFonts.robotoCondensed(
-            textStyle: const TextStyle(
-              fontSize: 16,
-              color: Color(0xfff064265),
-            ),
+            fontSize: 16,
+            color: Colors.white,
+            // color: const Color(0xfff064265),
+            fontWeight: FontWeight.bold,
           ),
         ),
         actions: [
           IconButton(
-            onPressed: () {
-              showMenu(
-                context: context,
-                position: const RelativeRect.fromLTRB(100, 100, 0, 0),
-                items: [
-                  const PopupMenuItem(
-                    value: 'all',
-                    child: Text('Tất cả'),
-                  ),
-                  const PopupMenuItem(
-                    value: 'unread',
-                    child: Text('Chưa đọc'),
-                  ),
-                ],
-              ).then((value) {
-                if (value == 'all') {
-                } else if (value == 'unread') {}
-              });
-            },
-            icon: const Icon(Icons.notifications_none_outlined, size: 24),
-            color: const Color(0xFF064265),
-          ),
+              onPressed: () {
+                showMenu(
+                  context: context,
+                  position: const RelativeRect.fromLTRB(100, 100, 0, 0),
+                  items: [
+                    const PopupMenuItem(
+                      value: 'all',
+                      child: Text('Tất cả'),
+                    ),
+                    const PopupMenuItem(
+                      value: 'unread',
+                      child: Text('Chưa đọc'),
+                    ),
+                  ],
+                ).then((value) {
+                  if (value == 'all') {
+                  } else if (value == 'unread') {}
+                });
+              },
+              icon: const Icon(Icons.notifications_none_outlined, size: 24),
+              color: Colors.white),
         ],
         iconTheme: const IconThemeData(
-          color: Color(0xFF064265),
+          color: Colors.white,
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: Provider.of<Providercolor>(context).selectedColor,
       ),
       body: _getPage(_currenIndex),
       bottomNavigationBar: BottomNavigation(

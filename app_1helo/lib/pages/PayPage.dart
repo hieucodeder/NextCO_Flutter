@@ -65,7 +65,7 @@ class _PaypageState extends State<Paypage> {
                 ),
                 Container(
                   margin: const EdgeInsets.fromLTRB(0, 90, 0, 0),
-                  padding: const EdgeInsets.symmetric(horizontal: 70),
+                  padding: const EdgeInsets.symmetric(horizontal: 77),
                   child: Column(
                     children: [
                       Text(
@@ -107,6 +107,14 @@ class _PaypageState extends State<Paypage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Text('Số tài khoản:',
+                    style: GoogleFonts.robotoCondensed(
+                        fontSize: 18,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold)),
+                const SizedBox(
+                  width: 5,
+                ),
                 Text(
                   bankAccountNumber,
                   style: GoogleFonts.robotoCondensed(
@@ -123,7 +131,8 @@ class _PaypageState extends State<Paypage> {
             ),
             Text(
               'Vietcombank-chi nhánh Thăng Long',
-              style: GoogleFonts.robotoCondensed(fontSize: 16),
+              style: GoogleFonts.robotoCondensed(
+                  fontSize: 18, color: Colors.black),
             ),
             const SizedBox(
               height: 30,

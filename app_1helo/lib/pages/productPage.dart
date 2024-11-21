@@ -28,7 +28,7 @@ class _ProductPageState extends State<ProductPage> {
   bool _isSearching = false;
   bool isLoading = false;
   bool hasMoreData = true;
-  
+
   Future<void> _searchProducts(String searchQuery) async {
     if (searchQuery.isEmpty) {
       setState(() {
@@ -143,7 +143,8 @@ class _ProductPageState extends State<ProductPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Data> displayList = _isSearching ? _searchResults : productList;
+    List<Data> displayList = (_isSearching ? _searchResults : productList)
+      ..sort((a, b) => (a.rowNumber ?? 0).compareTo(b.rowNumber ?? 0));
     return Container(
       constraints: const BoxConstraints.expand(),
       padding: const EdgeInsets.all(10),
@@ -163,7 +164,7 @@ class _ProductPageState extends State<ProductPage> {
               // autofocus: true,
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Mã sản phẩm',
+                hintText: 'Mã sản phẩm, mã HS',
                 hintStyle: GoogleFonts.robotoCondensed(
                     fontSize: 14, color: Colors.black38),
                 border: OutlineInputBorder(
@@ -228,17 +229,71 @@ class _ProductPageState extends State<ProductPage> {
                             child: SingleChildScrollView(
                               scrollDirection: Axis.vertical,
                               child: DataTable(
-                                columns: const [
-                                  DataColumn(label: Text('STT')),
-                                  DataColumn(label: Text('Mã HS')),
-                                  DataColumn(label: Text('Mã sản phẩm')),
-                                  DataColumn(label: Text('Thông tin sản phẩm')),
-                                  DataColumn(label: Text('Định mức')),
+                                columns: [
                                   DataColumn(
-                                      label: Text('Thông số trong QTSX')),
+                                      label: Text(
+                                    'STT',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
                                   DataColumn(
-                                      label: Text('Tổng SP chưa làm C/O')),
-                                  DataColumn(label: Text('Đơn vị tính')),
+                                      label: Text(
+                                    'Mã HS',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Mã sản phẩm',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Thông tin sản phẩm',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Định mức',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Thông số trong QTSX',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Tổng SP chưa làm C/O',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Đơn vị tính',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
                                   // DataColumn(label: Text('Action')),
                                 ],
                                 rows: displayList.map((doc) {
@@ -377,152 +432,138 @@ void showProductDetailsDialog(BuildContext context, String productsName,
             'Chi tiết sản phẩm',
           ),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Column(
-              children: [
-                const Row(
-                  children: [
-                    Text(
-                      '*',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text('Tên sản phẩm'),
-                  ],
-                ),
-                TextField(
-                  controller: productsnameController,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+        content: Container(
+          width: 500,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Column(
+                children: [
+                  const Row(
+                    children: [
+                      Text(
+                        '*',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text('Tên sản phẩm'),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Column(
-              children: [
-                const Row(
-                  children: [
-                    Text(
-                      '*',
-                      style: TextStyle(color: Colors.red),
+                  TextField(
+                    controller: productsnameController,
+                    readOnly: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
                     ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text('Mã HS'),
-                  ],
-                ),
-                TextField(
-                  controller: CodeHSController,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Column(
-              children: [
-                const Row(
-                  children: [
-                    Text(
-                      '*',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text('Mã sản phẩm'),
-                  ],
-                ),
-                TextField(
-                  controller: productsController,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Column(
+                children: [
+                  const Row(
+                    children: [
+                      Text(
+                        '*',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text('Mã HS'),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Column(
-              children: [
-                const Row(
-                  children: [
-                    Text(
-                      '*',
-                      style: const TextStyle(color: Colors.red),
+                  TextField(
+                    controller: CodeHSController,
+                    readOnly: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
                     ),
-                    const SizedBox(
-                      width: 5,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Column(
+                children: [
+                  const Row(
+                    children: [
+                      Text(
+                        '*',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text('Mã sản phẩm'),
+                    ],
+                  ),
+                  TextField(
+                    controller: productsController,
+                    readOnly: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
                     ),
-                    Text('Đơn vị tính'),
-                  ],
-                ),
-                TextField(
-                  controller: unitController,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                        width: 2,
-                        color:
-                            Provider.of<Providercolor>(context).selectedColor),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Column(
+                children: [
+                  const Row(
+                    children: [
+                      Text(
+                        '*',
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text('Đơn vị tính'),
+                    ],
                   ),
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      'Đóng',
-                      style: GoogleFonts.robotoCondensed(
+                  TextField(
+                    controller: unitController,
+                    readOnly: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                          width: 2,
                           color: Provider.of<Providercolor>(context)
                               .selectedColor),
                     ),
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(
+                        'Đóng',
+                        style: GoogleFonts.robotoCondensed(
+                            color: Provider.of<Providercolor>(context)
+                                .selectedColor),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                // ElevatedButton(
-                //   onPressed: () {
-                //     // Thêm logic lưu khách hàng
-                //     Navigator.of(context).pop();
-                //   },
-                //   style: ElevatedButton.styleFrom(
-                //     backgroundColor:
-                //         Provider.of<Providercolor>(context).selectedColor,
-                //     shape: RoundedRectangleBorder(
-                //         borderRadius: BorderRadius.circular(10),
-                //         side: BorderSide.none),
-                //   ),
-                //   child: Text(
-                //     'Lưu',
-                //     style: GoogleFonts.robotoCondensed(color: Colors.white),
-                //   ),
-                // ),
-              ],
-            ),
-          ],
+                  const SizedBox(
+                    width: 5,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       );
     },

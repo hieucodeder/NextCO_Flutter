@@ -164,7 +164,8 @@ class _DshosocoState extends State<Dshosoco> {
 
   @override
   Widget build(BuildContext context) {
-    List<Data> displayList = _isSearching ? _searchResults : documentLits;
+    List<Data> displayList = (_isSearching ? _searchResults : documentLits)
+      ..sort((a, b) => (a.rowNumber ?? 0).compareTo(b.rowNumber ?? 0));
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -418,7 +419,10 @@ class _DshosocoState extends State<Dshosoco> {
 
     return columnTitles.map((title) {
       return DataColumn(
-        label: Text(title, textAlign: TextAlign.center),
+        label: Text(title,
+            style: GoogleFonts.robotoCondensed(
+                color: Colors.black, fontSize: 16, fontWeight: FontWeight.w500),
+            textAlign: TextAlign.center),
       );
     }).toList();
   }
@@ -463,11 +467,34 @@ class _DshosocoState extends State<Dshosoco> {
         Text(
           doc.statusName ?? '',
           style: GoogleFonts.robotoCondensed(
-            color: Colors.orange,
+            color: _getStatusColor(doc.statusName), // Áp dụng màu trạng thái
             fontWeight: FontWeight.w600,
           ),
         ),
       ),
     ]);
+  }
+}
+
+Color _getStatusColor(String? statusName) {
+  switch (statusName) {
+    case 'Chờ hủy':
+      return Colors.orange;
+    case 'Chờ duyệt':
+      return Colors.orange;
+    case 'Hoàn thành':
+      return Colors.green;
+    case 'Đang thực hiện':
+      return Colors.black;
+    case 'Đang sửa':
+      return Colors.black;
+    case 'Chờ sửa':
+      return Colors.black;
+    case 'Từ chối xét duyệt':
+      return Colors.red;
+    case 'Đã hủy':
+      return Colors.red;
+    default:
+      return Colors.grey;
   }
 }

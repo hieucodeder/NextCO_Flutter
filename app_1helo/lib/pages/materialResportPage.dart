@@ -221,7 +221,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
     required String? selectedItem,
     required String hint,
     required Function(String?) onChanged,
-    double width = 150,
+    double width = 170,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -290,8 +290,10 @@ class _MaterreportpageState extends State<Materialresportpage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Data> displayList = isSearching ? _searchResults : allMaterialsResport;
-
+    List<Data> displayList = (isSearching
+        ? _searchResults
+        : allMaterialsResport)
+      ..sort((a, b) => (a.rowNumber ?? 0).compareTo(b.rowNumber ?? 0));
     return Container(
       width: double.infinity,
       color: Colors.grey[200],
@@ -318,7 +320,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
                       readOnly: true,
                       textAlign: TextAlign.center,
                       decoration: InputDecoration(
-                        hintText: 'Chọn Ngày Bắt Đầu và Kết Thúc',
+                        hintText: 'Chọn ngày bắt đầu và kết thúc',
                         hintStyle: GoogleFonts.robotoCondensed(
                           fontSize: 14,
                           color: Colors.black38,
@@ -356,6 +358,8 @@ class _MaterreportpageState extends State<Materialresportpage> {
           const SizedBox(height: 10),
           Row(
             children: [
+              renderCustomerDrop(),
+              const SizedBox(width: 10),
               Expanded(
                 child: Container(
                   height: 40,
@@ -432,8 +436,6 @@ class _MaterreportpageState extends State<Materialresportpage> {
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
-              renderCustomerDrop(),
             ],
           ),
           const SizedBox(
@@ -475,15 +477,71 @@ class _MaterreportpageState extends State<Materialresportpage> {
                             child: SingleChildScrollView(
                               scrollDirection: Axis.vertical,
                               child: DataTable(
-                                columns: const [
-                                  DataColumn(label: Text('STT')),
-                                  DataColumn(label: Text('Mã NVL')),
-                                  DataColumn(label: Text('Tên NVL')),
-                                  DataColumn(label: Text('Số TKN/VAT')),
-                                  DataColumn(label: Text('STT TKN/VAT')),
-                                  DataColumn(label: Text('SL đã làm C/O')),
-                                  DataColumn(label: Text('Khả dụng')),
-                                  DataColumn(label: Text('Số lượng tồn')),
+                                columns: [
+                                  DataColumn(
+                                      label: Text(
+                                    'STT',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Mã NVL',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Tên NVL',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Số TKN/VAT',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'STT TKN/VAT',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'SL đã làm C/O',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Khả dụng',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Số lượng tồn',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
                                 ],
                                 rows: displayList.map((doc) {
                                   return DataRow(cells: [

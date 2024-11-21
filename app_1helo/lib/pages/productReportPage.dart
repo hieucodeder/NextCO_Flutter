@@ -228,7 +228,7 @@ class _ProductreportpageState extends State<Productreportpage> {
     required String? selectedItem,
     required String hint,
     required Function(String?) onChanged,
-    double width = 150,
+    double width = 170,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -367,6 +367,8 @@ class _ProductreportpageState extends State<Productreportpage> {
           const SizedBox(height: 10),
           Row(
             children: [
+              renderCustomerDrop(),
+              const SizedBox(width: 10),
               Expanded(
                 child: Container(
                   height: 40,
@@ -438,8 +440,6 @@ class _ProductreportpageState extends State<Productreportpage> {
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
-              renderCustomerDrop(),
             ],
           ),
           const SizedBox(height: 10),
@@ -479,14 +479,63 @@ class _ProductreportpageState extends State<Productreportpage> {
                             child: SingleChildScrollView(
                               scrollDirection: Axis.vertical,
                               child: DataTable(
-                                columns: const [
-                                  DataColumn(label: Text('STT')),
-                                  DataColumn(label: Text('Mã sản phẩm')),
-                                  DataColumn(label: Text('Tên sản phẩm')),
-                                  DataColumn(label: Text('Mã HS')),
-                                  DataColumn(label: Text('Số TKX')),
-                                  DataColumn(label: Text('Số lượng đã làm')),
-                                  DataColumn(label: Text('Số lượng tồn')),
+                                columns: [
+                                  DataColumn(
+                                      label: Text(
+                                    'STT',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Mã sản phẩm',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Tên sản phẩm',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Mã HS',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Số TKX',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Số lượng đã làm',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Số lượng tồn',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
                                 ],
                                 rows: displayList.map((doc) {
                                   return DataRow(cells: [

@@ -247,7 +247,8 @@ class _StaffpageState extends State<Staffpage> {
 
   @override
   Widget build(BuildContext context) {
-    List<DataUser> displayList = _isSearching ? _searchResults : _staffList;
+    List<DataUser> displayList = (_isSearching ? _searchResults : _staffList)
+      ..sort((a, b) => (a.rowNumber ?? 0).compareTo(b.rowNumber ?? 0));
     return Container(
       padding: const EdgeInsets.all(10),
       width: MediaQuery.of(context).size.width,
@@ -353,16 +354,79 @@ class _StaffpageState extends State<Staffpage> {
                             child: SingleChildScrollView(
                               scrollDirection: Axis.vertical,
                               child: DataTable(
-                                columns: const [
-                                  DataColumn(label: Text('STT')),
-                                  DataColumn(label: Text('Tài khoản')),
-                                  DataColumn(label: Text('Họ và tên')),
-                                  DataColumn(label: Text('Số điện thoại')),
-                                  DataColumn(label: Text('Email')),
-                                  DataColumn(label: Text('Chức vụ')),
-                                  DataColumn(label: Text('Chi nhánh')),
-                                  DataColumn(label: Text('Phòng ban')),
-                                  DataColumn(label: Text('Phân quyền')),
+                                columns: [
+                                  DataColumn(
+                                      label: Text(
+                                    'STT',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Tài khoản',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Họ và tên',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Số điện thoại',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Email',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Chức vụ',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Chi nhánh',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Phòng ban',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Phân quyền',
+                                    style: GoogleFonts.robotoCondensed(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  )),
                                   // DataColumn(label: Text('Action')),
                                 ],
                                 rows: displayList.map((doc) {

@@ -326,7 +326,7 @@ class _LinecharpageState extends State<Linecharpage> {
     required String? selectedItem,
     required String hint,
     required ValueChanged<String?> onChanged,
-    double width = 150,
+    double width = 170,
   }) {
     return Container(
       decoration: BoxDecoration(

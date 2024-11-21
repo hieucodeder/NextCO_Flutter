@@ -228,7 +228,7 @@ class _PiechartpageState extends State<Piechartpage> {
     required String? selectedItem,
     required String hint,
     required ValueChanged<String?> onChanged,
-    double width = 150,
+    double width = 170,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -452,7 +452,7 @@ class _PiechartpageState extends State<Piechartpage> {
                         readOnly: true,
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
-                          hintText: 'Chọn Ngày Bắt Đầu và Kết Thúc',
+                          hintText: 'Chọn ngày bắt đầu và kết thúc ',
                           hintStyle: GoogleFonts.robotoCondensed(
                             fontSize: 14,
                             color: Colors.black38,
@@ -478,7 +478,8 @@ class _PiechartpageState extends State<Piechartpage> {
                     ),
                     GestureDetector(
                       onTap: _selectDateRange,
-                      child: const Icon(Icons.calendar_today, color: Colors.black54),
+                      child: const Icon(Icons.calendar_today,
+                          color: Colors.black54),
                     ),
                   ],
                 ),
@@ -487,11 +488,11 @@ class _PiechartpageState extends State<Piechartpage> {
             const SizedBox(height: 15),
             Center(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   renderCustomerDropdown(),
                   const SizedBox(width: 6.0),
-                  Expanded(child: renderUserDropdown()),
+                  renderUserDropdown(),
                 ],
               ),
             ),
