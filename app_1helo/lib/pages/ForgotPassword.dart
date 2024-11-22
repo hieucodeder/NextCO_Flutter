@@ -77,7 +77,6 @@ class _ForgotpasswordState extends State<Forgotpassword> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             constraints: const BoxConstraints.expand(),
-            margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

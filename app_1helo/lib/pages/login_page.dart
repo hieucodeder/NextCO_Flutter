@@ -123,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               constraints: const BoxConstraints.expand(),
-              margin: const EdgeInsets.fromLTRB(0, 150, 0, 0),
+              margin: const EdgeInsets.fromLTRB(0, 130, 0, 0),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
