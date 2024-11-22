@@ -152,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 40),
                     SizedBox(
                       width: (MediaQuery.of(context).size.width),
-                      height: 230,
+                      height: 200,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -317,43 +317,6 @@ class _LoginPageState extends State<LoginPage> {
                                           ),
                                         ),
                                       ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          const SizedBox(
-                                            width: 230,
-                                          ),
-                                          Container(
-                                            width: 130,
-                                            height: 40,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                TextButton(
-                                                  onPressed: _forgotPassword,
-                                                  child: Text(
-                                                    'Quên mật khẩu',
-                                                    style: GoogleFonts
-                                                        .robotoCondensed(
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            color: const Color(
-                                                                0xFF064265),
-                                                            decoration:
-                                                                TextDecoration
-                                                                    .underline,
-                                                            decorationColor:
-                                                                const Color(
-                                                                    0xFF064265)),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
                                     ],
                                   )
                                 ],
@@ -399,7 +362,35 @@ class _LoginPageState extends State<LoginPage> {
                           ],
                         ),
                       ),
-                    )
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const SizedBox(
+                          width: 230,
+                        ),
+                        Container(
+                          width: 130,
+                          height: 40,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              TextButton(
+                                onPressed: _forgotPassword,
+                                child: Text(
+                                  'Quên mật khẩu?',
+                                  style: GoogleFonts.robotoCondensed(
+                                      fontWeight: FontWeight.w400,
+                                      color: const Color(0xFF064265),
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: const Color(0xFF064265)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
