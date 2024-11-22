@@ -123,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               constraints: const BoxConstraints.expand(),
-              margin: const EdgeInsets.fromLTRB(0, 130, 0, 0),
+              margin: const EdgeInsets.fromLTRB(0, 150, 0, 0),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -152,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 40),
                     SizedBox(
                       width: (MediaQuery.of(context).size.width),
-                      height: 250,
+                      height: 235,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -297,7 +297,7 @@ class _LoginPageState extends State<LoginPage> {
                                           ),
                                           contentPadding:
                                               const EdgeInsets.symmetric(
-                                                  vertical: 10, horizontal: 12),
+                                                  horizontal: 12),
                                           errorBorder: OutlineInputBorder(
                                             borderSide: const BorderSide(
                                               color: Colors.red,

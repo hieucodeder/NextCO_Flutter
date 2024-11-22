@@ -133,11 +133,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Text renderNumberResult(int? result, Color color) {
-    return _customText(
-      isLoading ? randomNumber : _formatNumber(result),
-      color,
-      19,
-      FontWeight.w700,
+    return Text(
+      isLoading ? randomNumber : _formatNumber(result), // Nội dung văn bản
+      style: TextStyle(
+        color: color,
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+      ),
+      maxLines: 1, // Giới hạn chỉ hiển thị 1 dòng
+      overflow: TextOverflow.ellipsis, // Hiển thị dấu ba chấm nếu quá dài
     );
   }
 
@@ -393,7 +397,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           SizedBox(
-                            width: 90,
+                            width: 97,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -403,6 +407,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   const Color.fromARGB(255, 255, 82, 82),
                                 ),
                                 Text('Sản phẩm tồn',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.robotoCondensed(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
