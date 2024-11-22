@@ -220,14 +220,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        color: const Color(0xffECFCFE),
+                        color: const Color.fromARGB(255, 253, 253, 218),
                         boxShadow: [
                           BoxShadow(
                             color: const Color(0x005c6566).withOpacity(0.3),
                             blurRadius: 8,
                           )
                         ]),
-                    // width: 190,
                     width: (MediaQuery.of(context).size.width - 50) / 2,
                     height: 64,
                     child: Row(
@@ -240,30 +239,45 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               renderNumberResult(
-                                totalCoDocument,
-                                const Color(0xff064265),
+                                totalEmployee,
+                                const Color.fromARGB(255, 131, 129, 11),
                               ),
-                              Text(
-                                'Hồ sơ C/O',
-                                style: GoogleFonts.robotoCondensed(
-                                    color: const Color(0xff064265),
+                              Text('Nhân viên',
+                                  style: GoogleFonts.robotoCondensed(
                                     fontSize: 14,
-                                    fontWeight: FontWeight.w500),
-                              )
+                                    fontWeight: FontWeight.w500,
+                                    color:
+                                        const Color.fromARGB(255, 131, 129, 11),
+                                  ))
                             ],
                           ),
                         ),
                         Center(
-                          child: SvgPicture.asset(
-                            'resources/hoso.svg',
-                            fit: BoxFit.contain,
-                            height: 56,
+                          child: Container(
                             width: 56,
+                            height: 56,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color.fromARGB(255, 250, 248, 160),
+                            ),
+                            child: ClipOval(
+                              child: Transform.scale(
+                                scale: 0.7,
+                                child: SvgPicture.asset(
+                                  'resources/emloyee.svg',
+                                  color:
+                                      const Color.fromARGB(255, 131, 129, 11),
+                                  fit: BoxFit.contain,
+                                  width: 56,
+                                  height: 2,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -329,13 +343,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        color: const Color(0xffFAFAFA),
+                        color: const Color(0xffECFCFE),
                         boxShadow: [
                           BoxShadow(
                             color: const Color(0x005c6566).withOpacity(0.3),
                             blurRadius: 8,
                           )
                         ]),
+                    // width: 190,
                     width: (MediaQuery.of(context).size.width - 50) / 2,
                     height: 64,
                     child: Row(
@@ -348,20 +363,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               renderNumberResult(
-                                totalMaterial,
-                                const Color(0xffFA8C16),
+                                totalCoDocument,
+                                const Color(0xff064265),
                               ),
-                              Text('Nguyên vật liệu',
-                                  style: GoogleFonts.robotoCondensed(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: const Color(0xffFA8C16)))
+                              Text(
+                                'Hồ sơ C/O',
+                                style: GoogleFonts.robotoCondensed(
+                                    color: const Color(0xff064265),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500),
+                              )
                             ],
                           ),
                         ),
                         Center(
                           child: SvgPicture.asset(
-                            'resources/Material.svg',
+                            'resources/hoso.svg',
                             fit: BoxFit.contain,
                             height: 56,
                             width: 56,
@@ -436,7 +453,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          color: const Color.fromARGB(255, 253, 253, 218),
+                          color: const Color(0xffFAFAFA),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(0x005c6566).withOpacity(0.3),
@@ -455,45 +472,28 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 renderNumberResult(
-                                  totalEmployee,
-                                  const Color.fromARGB(255, 172, 169, 0),
+                                  totalMaterial,
+                                  const Color(0xffFA8C16),
                                 ),
-                                Text('Nhân viên',
+                                Text('Nguyên vật liệu',
                                     style: GoogleFonts.robotoCondensed(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: const Color.fromARGB(
-                                          255, 172, 169, 0),
-                                    ))
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: const Color(0xffFA8C16)))
                               ],
                             ),
                           ),
                           Center(
-                            child: Container(
-                              width: 56,
+                            child: SvgPicture.asset(
+                              'resources/Material.svg',
+                              fit: BoxFit.contain,
                               height: 56,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color.fromARGB(255, 250, 248, 160),
-                              ),
-                              child: ClipOval(
-                                child: Transform.scale(
-                                  scale: 0.7,
-                                  child: SvgPicture.asset(
-                                    'resources/emloyee.svg',
-                                    color:
-                                        const Color.fromARGB(255, 211, 207, 4),
-                                    fit: BoxFit.contain,
-                                    width: 56,
-                                    height: 2,
-                                  ),
-                                ),
-                              ),
+                              width: 56,
                             ),
                           ),
                         ],
                       ),
-                    ),
+                    )
                   ]),
             ),
             const SizedBox(height: 20),

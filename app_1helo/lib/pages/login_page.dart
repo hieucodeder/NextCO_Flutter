@@ -113,17 +113,17 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             Container(
-              margin: const EdgeInsets.symmetric(vertical: 60),
+              margin: const EdgeInsets.symmetric(vertical: 80),
               child: Align(
                 alignment: Alignment.topCenter,
                 child: SvgPicture.asset('resources/logonextco.svg',
-                    width: 100, height: 35),
+                    width: 100, height: 48),
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               constraints: const BoxConstraints.expand(),
-              margin: const EdgeInsets.fromLTRB(0, 150, 0, 0),
+              margin: const EdgeInsets.fromLTRB(0, 130, 0, 0),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -152,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 40),
                     SizedBox(
                       width: (MediaQuery.of(context).size.width),
-                      height: 235,
+                      height: 250,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -357,7 +357,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(
                       width: MediaQuery.of(context).size.width,
-                      height: 40,
+                      height: 48,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF064265),
