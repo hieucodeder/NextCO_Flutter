@@ -429,7 +429,11 @@ class _DshosocoState extends State<Dshosoco> {
 
   DataRow _buildDataRow(Data doc) {
     return DataRow(cells: [
-      DataCell(Text(doc.rowNumber?.toString() ?? '')),
+      DataCell(
+        Text(doc.rowNumber?.toString() ?? ''),
+        placeholder: false,
+        showEditIcon: false,
+      ),
       DataCell(
         Text(
           doc.coDocumentId?.toString() ?? '',

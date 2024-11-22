@@ -358,81 +358,80 @@ class _MaterreportpageState extends State<Materialresportpage> {
           const SizedBox(height: 10),
           Row(
             children: [
-              renderCustomerDrop(),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(width: 1, color: Colors.black38),
-                    color: Colors.white,
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        // Trigger a rebuild on search input change
-                      });
-                    },
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Số hồ sơ, tờ khai xuất, tình trạng',
-                      hintStyle: GoogleFonts.robotoCondensed(
-                          fontSize: 14, color: Colors.black38),
-                      border: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10),
-                        ),
-                        borderSide: BorderSide.none,
+              Expanded(child: renderCustomerDrop()),
+              const SizedBox(width: 6),
+              Container(
+                width: 140,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(width: 1, color: Colors.black38),
+                  color: Colors.white,
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      // Trigger a rebuild on search input change
+                    });
+                  },
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Số hồ sơ, tờ khai xuất, tình trạng',
+                    hintStyle: GoogleFonts.robotoCondensed(
+                        fontSize: 14, color: Colors.black38),
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10),
                       ),
-                      suffixIcon: StatefulBuilder(
-                        builder: (context, setState) {
-                          bool isPressed = false;
-
-                          return GestureDetector(
-                            onTapDown: (_) {
-                              setState(() {
-                                isPressed = true;
-                              });
-                            },
-                            onTapUp: (_) {
-                              setState(() {
-                                isPressed = false;
-                              });
-                              _searchMaterialResPort(_searchController.text);
-                            },
-                            onTapCancel: () {
-                              setState(() {
-                                isPressed = false;
-                              });
-                            },
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const VerticalDivider(
-                                  width: 20,
-                                  thickness: 1,
-                                  color: Colors.black38,
-                                ),
-                                AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: isPressed
-                                        ? Colors.grey[200]
-                                        : Colors.transparent,
-                                    shape: BoxShape.circle, // Làm nút tròn
-                                  ),
-                                  child: const Icon(Icons.search_outlined),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                      contentPadding: const EdgeInsets.all(5),
+                      borderSide: BorderSide.none,
                     ),
+                    suffixIcon: StatefulBuilder(
+                      builder: (context, setState) {
+                        bool isPressed = false;
+
+                        return GestureDetector(
+                          onTapDown: (_) {
+                            setState(() {
+                              isPressed = true;
+                            });
+                          },
+                          onTapUp: (_) {
+                            setState(() {
+                              isPressed = false;
+                            });
+                            _searchMaterialResPort(_searchController.text);
+                          },
+                          onTapCancel: () {
+                            setState(() {
+                              isPressed = false;
+                            });
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const VerticalDivider(
+                                width: 20,
+                                thickness: 1,
+                                color: Colors.black38,
+                              ),
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: isPressed
+                                      ? Colors.grey[200]
+                                      : Colors.transparent,
+                                  shape: BoxShape.circle, // Làm nút tròn
+                                ),
+                                child: const Icon(Icons.search_outlined),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    contentPadding: const EdgeInsets.all(5),
                   ),
                 ),
               ),

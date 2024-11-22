@@ -17,10 +17,6 @@ import 'package:app_1helo/model/dropdownCustomer.dart';
 class Piechartpage extends StatefulWidget {
   const Piechartpage({Key? key}) : super(key: key);
 
-  Future<void> fetchPieChartData() async {
-    await Future.delayed(const Duration(seconds: 2));
-  }
-
   @override
   _PiechartpageState createState() => _PiechartpageState();
 }
@@ -228,7 +224,7 @@ class _PiechartpageState extends State<Piechartpage> {
     required String? selectedItem,
     required String hint,
     required ValueChanged<String?> onChanged,
-    double width = 170,
+    double width = 200,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -283,7 +279,7 @@ class _PiechartpageState extends State<Piechartpage> {
                   orElse: () => _filtereddropdownCustomer[0],
                 );
         });
-        fetchData();
+        fetchDataCustomer();
       },
     );
   }
@@ -312,7 +308,7 @@ class _PiechartpageState extends State<Piechartpage> {
               orElse: () => _filtereddropdownEmployee[0],
             );
           }
-          fetchDataCustomer();
+          fetchData();
         });
       },
     );
@@ -487,13 +483,15 @@ class _PiechartpageState extends State<Piechartpage> {
             ),
             const SizedBox(height: 15),
             Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  renderCustomerDropdown(),
-                  const SizedBox(width: 6.0),
-                  renderUserDropdown(),
-                ],
+              child: Container(
+                width: double.infinity,
+                child: Row(
+                  children: [
+                    Expanded(child: renderCustomerDropdown()),
+                    const SizedBox(width: 6.0),
+                    SizedBox(width: 130, child: renderUserDropdown()),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 15),

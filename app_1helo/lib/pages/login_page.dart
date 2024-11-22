@@ -5,6 +5,7 @@ import 'package:app_1helo/service/authService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:keyboard_avoider/keyboard_avoider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -72,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
       ),
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: Container(
         constraints: const BoxConstraints.expand(),
         color: Colors.white,
@@ -122,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               constraints: const BoxConstraints.expand(),
-              margin: const EdgeInsets.fromLTRB(0, 200, 0, 0),
+              margin: const EdgeInsets.fromLTRB(0, 150, 0, 0),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -132,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                     Text(
                       'ĐĂNG NHẬP',
                       style: GoogleFonts.robotoCondensed(
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w700,
                         color: const Color(0xFF064265),
                         fontSize: 20,
                       ),

@@ -17,7 +17,6 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   Timer? _timer;
   final List<String> _images = [
-    'resources/FTA.png',
     'resources/xuatxu3.jpg',
     'resources/quytrinhthutuc.jpg',
     'resources/quoctichhanghoa.jpg',
@@ -94,7 +93,7 @@ class _NotificationPageState extends State<NotificationPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
+                Container(
                   width: MediaQuery.of(context).size.width,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -107,7 +106,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 100,
+                              width: 110,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -153,7 +152,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         ),
                       ),
                       const SizedBox(
-                        width: 10,
+                        width: 15,
                       ),
                       GestureDetector(
                         onTap: () {
@@ -163,7 +162,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 100,
+                              width: 110,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -209,7 +208,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         ),
                       ),
                       const SizedBox(
-                        width: 10,
+                        width: 15,
                       ),
                       GestureDetector(
                         onTap: () {
@@ -219,7 +218,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 100,
+                              width: 110,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -329,7 +328,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         ),
                       ),
                       const SizedBox(
-                        width: 10,
+                        width: 15,
                       ),
                       GestureDetector(
                         onTap: () {
@@ -339,7 +338,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 100,
+                              width: 110,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -385,7 +384,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         ),
                       ),
                       const SizedBox(
-                        width: 10,
+                        width: 15,
                       ),
                       GestureDetector(
                         onTap: () {
@@ -395,7 +394,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 100,
+                              width: 110,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -504,7 +503,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         ),
                       ),
                       const SizedBox(
-                        width: 10,
+                        width: 15,
                       ),
                       GestureDetector(
                         onTap: () {
@@ -514,7 +513,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 100,
+                              width: 110,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -560,7 +559,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         ),
                       ),
                       const SizedBox(
-                        width: 10,
+                        width: 15,
                       ),
                       GestureDetector(
                         onTap: () {
@@ -570,7 +569,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 100,
+                              width: 110,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,

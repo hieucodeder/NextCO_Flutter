@@ -13,10 +13,6 @@ import 'package:app_1helo/Cusstom/LegendItem.dart';
 class Linecharpage extends StatefulWidget {
   const Linecharpage({Key? key}) : super(key: key);
 
-  Future<void> fetchLineChartData() async {
-    await Future.delayed(Duration(seconds: 2));
-  }
-
   @override
   _LinecharpageState createState() => _LinecharpageState();
 }
@@ -102,7 +98,7 @@ class _LinecharpageState extends State<Linecharpage> {
 
       List<dropdownEmployee>? employees =
           await _athServiceService.getEmployeeInfo();
-      if (employees != null) {
+      if (employees != null && mounted) {
         setState(() {
           _filtereddropdownEmployee = employees;
         });
@@ -164,6 +160,16 @@ class _LinecharpageState extends State<Linecharpage> {
       final String? customerId = selectedemployeeCustomer?.customerId;
       final String? employeeId = selectedDropdownEmployee?.value;
 
+      LinecharModel? lineChartResponse =
+          await _lineChartService.fetchLineChartData(employeeId, customerId);
+
+      List<EmployeeCustomer>? customers =
+          await _athServiceService.getEmployeeCustomerInfo();
+      if (customers != null) {
+        setState(() {
+          _filteredEmployeeCustomer = customers;
+        });
+      }
       if (employeeId == null && customerId == null) {
         setState(() {
           _completeCoSpots.clear();
@@ -176,17 +182,6 @@ class _LinecharpageState extends State<Linecharpage> {
           _isLoading = false;
         });
         return;
-      }
-
-      LinecharModel? lineChartResponse =
-          await _lineChartService.fetchLineChartData(employeeId, customerId);
-
-      List<EmployeeCustomer>? employees =
-          await _athServiceService.getEmployeeCustomerInfo();
-      if (employees != null) {
-        setState(() {
-          _filteredEmployeeCustomer = employees;
-        });
       }
 
       if (mounted) {
@@ -243,7 +238,6 @@ class _LinecharpageState extends State<Linecharpage> {
     DateTime? minDate;
     DateTime? maxDate;
 
-    // First loop to collect quantities and determine the min/max dates
     for (var entry in dataList) {
       Map<String, dynamic> value = entry.toJson();
 
@@ -259,7 +253,6 @@ class _LinecharpageState extends State<Linecharpage> {
             monthKey, (existingQty) => existingQty + quantity,
             ifAbsent: () => quantity);
 
-        // Track the min and max dates for the range
         if (minDate == null || createdDate.isBefore(minDate))
           minDate = createdDate;
         if (maxDate == null || createdDate.isAfter(maxDate))
@@ -269,10 +262,8 @@ class _LinecharpageState extends State<Linecharpage> {
       }
     }
 
-    // If no data is available, return an empty list
     if (monthQuantityMap.isEmpty) return [];
 
-    // Generate all month keys between minDate and maxDate
     List<String> allMonths = [];
     DateTime currentDate = minDate!;
     while (currentDate.isBefore(maxDate!)) {
@@ -283,15 +274,12 @@ class _LinecharpageState extends State<Linecharpage> {
     allMonths
         .add("${maxDate.year}-${maxDate.month.toString().padLeft(2, '0')}");
 
-    // Ensure all months are represented in the monthQuantityMap
     for (var month in allMonths) {
       monthQuantityMap.putIfAbsent(month, () => 0);
     }
 
-    // Sort the months in ascending order
     monthLabels = monthQuantityMap.keys.toList()..sort();
 
-    // Convert the map data to FlSpot
     List<FlSpot> flSpotList = [];
     for (int xIndex = 0; xIndex < monthLabels.length; xIndex++) {
       final month = monthLabels[xIndex];
@@ -326,7 +314,7 @@ class _LinecharpageState extends State<Linecharpage> {
     required String? selectedItem,
     required String hint,
     required ValueChanged<String?> onChanged,
-    double width = 170,
+    double width = 200,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -371,19 +359,17 @@ class _LinecharpageState extends State<Linecharpage> {
       items: userNames,
       selectedItem: selectedemployeeCustomer?.customerName,
       hint: 'Tất cả khách hàng',
-      width: 160,
+      width: 180,
       onChanged: (String? newValue) {
         setState(() {
-          if (newValue == 'Tất cả khách hàng') {
-            selectedemployeeCustomer = null;
-          } else {
-            selectedemployeeCustomer = _filteredEmployeeCustomer.firstWhere(
-              (u) => u.customerName == newValue,
-              orElse: () => _filteredEmployeeCustomer[0],
-            );
-          }
-          _fetchDataAccountCustomer();
+          selectedemployeeCustomer = newValue == 'Tất cả khách hàng'
+              ? null
+              : _filteredEmployeeCustomer.firstWhere(
+                  (c) => c.customerName == newValue,
+                  orElse: () => _filteredEmployeeCustomer[0],
+                );
         });
+        _fetchDataAccountCustomer();
       },
     );
   }
@@ -428,9 +414,9 @@ class _LinecharpageState extends State<Linecharpage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                renderCustomerDropdown(),
-                const SizedBox(width: 2),
-                renderUserDropdown(),
+                Expanded(child: renderCustomerDropdown()),
+                const SizedBox(width: 6),
+                SizedBox(width: 130, child: renderUserDropdown()),
               ],
             ),
             const SizedBox(height: 10),

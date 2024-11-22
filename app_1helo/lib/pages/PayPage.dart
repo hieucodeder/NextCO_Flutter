@@ -65,11 +65,19 @@ class _PaypageState extends State<Paypage> {
                 ),
                 Container(
                   margin: const EdgeInsets.fromLTRB(0, 90, 0, 0),
-                  padding: const EdgeInsets.symmetric(horizontal: 77),
+                  padding: const EdgeInsets.symmetric(horizontal: 70),
                   child: Column(
                     children: [
                       Text(
-                        'CÔNG TY CỔ PHẦN CÔNG NGHỆ AI-TEKWORKS VIETNAM',
+                        'CÔNG TY CỔ PHẦN CÔNG NGHỆ',
+                        style: GoogleFonts.robotoCondensed(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        'AI-TEKWORKS VIETNAM',
                         style: GoogleFonts.robotoCondensed(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -130,7 +138,7 @@ class _PaypageState extends State<Paypage> {
               ],
             ),
             Text(
-              'Vietcombank-chi nhánh Thăng Long',
+              'Vietcombank chi nhánh Thăng Long',
               style: GoogleFonts.robotoCondensed(
                   fontSize: 18, color: Colors.black),
             ),

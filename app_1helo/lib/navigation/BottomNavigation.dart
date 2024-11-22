@@ -31,77 +31,94 @@ class _BottomNavigationState extends State<BottomNavigation> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: 30,
-                child: IconButton(
-                  iconSize: 25,
-                  padding: EdgeInsets.zero,
-                  icon: Icon(
-                    Icons.home_outlined,
-                    color: _currentIndex == 0 ? Colors.orange : Colors.white,
+          GestureDetector(
+            onTap: () {
+              _onTabTapped(0);
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 30,
+                  child: IconButton(
+                    iconSize: 25,
+                    padding: EdgeInsets.zero,
+                    icon: Icon(
+                      Icons.home_outlined,
+                      color: _currentIndex == 0 ? Colors.orange : Colors.white,
+                    ),
+                    onPressed: () {
+                      _onTabTapped(0);
+                    },
                   ),
-                  onPressed: () {
-                    _onTabTapped(0);
-                  },
                 ),
-              ),
-              Text('Trang chủ',
-                  style: GoogleFonts.robotoCondensed(
-                      textStyle: TextStyle(
-                          fontSize: 12,
-                          color: _currentIndex == 0
-                              ? Colors.orange
-                              : Colors.white)))
-            ],
+                Text('Trang chủ',
+                    style: GoogleFonts.robotoCondensed(
+                        textStyle: TextStyle(
+                            fontSize: 12,
+                            color: _currentIndex == 0
+                                ? Colors.orange
+                                : Colors.white)))
+              ],
+            ),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: 30,
-                child: IconButton(
-                  iconSize: 25,
-                  padding: EdgeInsets.zero,
-                  icon: Icon(
-                    Icons.dashboard_outlined,
-                    color: _currentIndex == 1 ? Colors.orange : Colors.white,
+          GestureDetector(
+            onTap: () {
+              _onTabTapped(1);
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 30,
+                  child: IconButton(
+                    iconSize: 25,
+                    padding: EdgeInsets.zero,
+                    icon: Icon(
+                      Icons.dashboard_outlined,
+                      color: _currentIndex == 1 ? Colors.orange : Colors.white,
+                    ),
+                    onPressed: () {
+                      _onTabTapped(1);
+                    },
                   ),
-                  onPressed: () {
-                    _onTabTapped(1);
-                  },
                 ),
-              ),
-              Text('Chức năng',
-                  style: GoogleFonts.robotoCondensed(
-                      fontSize: 12,
-                      color: _currentIndex == 1 ? Colors.orange : Colors.white))
-            ],
+                Text('Chức năng',
+                    style: GoogleFonts.robotoCondensed(
+                        fontSize: 12,
+                        color:
+                            _currentIndex == 1 ? Colors.orange : Colors.white))
+              ],
+            ),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: 30,
-                child: IconButton(
-                  iconSize: 25,
-                  padding: EdgeInsets.zero,
-                  icon: Icon(
-                    Icons.account_box_rounded,
-                    color: _currentIndex == 2 ? Colors.orange : Colors.white,
+          GestureDetector(
+            onTap: () {
+              _onTabTapped(2);
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 30,
+                  child: IconButton(
+                    iconSize: 25,
+                    padding: EdgeInsets.zero,
+                    icon: Icon(
+                      Icons.account_box_rounded,
+                      color: _currentIndex == 2 ? Colors.orange : Colors.white,
+                    ),
+                    onPressed: () {
+                      _onTabTapped(2);
+                    },
                   ),
-                  onPressed: () {
-                    _onTabTapped(2);
-                  },
                 ),
-              ),
-              Text('Cá nhân',
-                  style: GoogleFonts.robotoCondensed(
-                      fontSize: 12,
-                      color: _currentIndex == 2 ? Colors.orange : Colors.white))
-            ],
+                Text('Cá nhân',
+                    style: GoogleFonts.robotoCondensed(
+                        fontSize: 12,
+                        color:
+                            _currentIndex == 2 ? Colors.orange : Colors.white))
+              ],
+            ),
           ),
         ],
       ),

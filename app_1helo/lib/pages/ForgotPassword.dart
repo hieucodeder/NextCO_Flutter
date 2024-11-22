@@ -29,7 +29,7 @@ class _ForgotpasswordState extends State<Forgotpassword> {
           '',
         ),
       ),
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: Container(
         constraints: const BoxConstraints.expand(),
         color: Colors.white,
@@ -77,7 +77,7 @@ class _ForgotpasswordState extends State<Forgotpassword> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             constraints: const BoxConstraints.expand(),
-            margin: const EdgeInsets.fromLTRB(0, 70, 0, 0),
+            margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -89,7 +89,7 @@ class _ForgotpasswordState extends State<Forgotpassword> {
                   Text(
                     'QUÊN MẬT KHẨU',
                     style: GoogleFonts.robotoCondensed(
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w700,
                       color: const Color(0xFF064265),
                       fontSize: 20,
                     ),

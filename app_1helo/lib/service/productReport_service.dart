@@ -9,6 +9,54 @@ import 'api_config.dart';
 class ProductReportService {
   final String apiUrl = '${ApiConfig.baseUrl}/products/report';
 
+  Future<int?> fetchTotalItems() async {
+    try {
+      final url = Uri.parse(apiUrl);
+      final headers = await ApiConfig.getHeaders();
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
+
+      // Log the userId for debugging
+      print('User ID: $userId');
+
+      if (userId == null) {
+        print('No user ID found. User might not be logged in.');
+        return null;
+      }
+
+      Bodyreport requestBody = Bodyreport(
+        customerId: null,
+        frCreatedDate: null,
+        pageIndex: 1,
+        pageSize: 10,
+        searchContent: "",
+        toCreatedDate: null,
+        typeSearch: 1,
+        userId: userId,
+      );
+
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode(requestBody.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
+
+        final Prodcutreportmodel productsReportData =
+            Prodcutreportmodel.fromJson(jsonResponse);
+
+        return productsReportData.totalItems;
+      } else {
+        throw Exception('Failed to fetch total items');
+      }
+    } catch (error) {
+      print('Error fetching total items: $error');
+      return null;
+    }
+  }
+
   Future<List<Data>> fetchProductsReport(
       int page, int pageSize, String? search, String? customerid) async {
     try {

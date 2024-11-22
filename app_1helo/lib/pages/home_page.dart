@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:app_1helo/charPage/LineCharPage.dart';
 import 'package:app_1helo/charPage/PieChartPage.dart';
 import 'package:app_1helo/model/totalModel.dart';
+import 'package:app_1helo/service/productReport_service.dart';
 import 'package:app_1helo/service/total_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -20,26 +21,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late Future<List<void>> loadData;
-// Xử lý bất đồng bộ
-  Future<List<void>> loadAllData() {
-    return Future.wait([
-      _fetchTotalData(),
-      Linecharpage().fetchLineChartData(),
-      Piechartpage().fetchPieChartData(),
-    ]);
-  }
 
+  int? totalProductsResport;
   int? totalItems, totalDocuments, totalUser;
   int? totalCustomer,
       totalProduct,
       totalMaterial,
       totalCoDocument,
-      totalEmployee;
+      totalEmployee,
+      totalProductsreport;
   bool isLoading = true, isDropDownVisible = false;
   String randomNumber = '';
 
   Timer? timer;
   final totalService = TotalService();
+  final productReportService = ProductReportService();
 
   @override
   void initState() {
@@ -47,7 +43,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _resetState();
     _startRandomNumberGenerator();
     _fetchAllData();
-    loadData = loadAllData();
   }
 
   @override
@@ -59,7 +54,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void _resetState() {
     totalItems =
         totalDocuments = totalProduct = totalMaterial = totalUser = null;
-    totalCustomer = totalCoDocument = totalEmployee = null;
+    totalCustomer =
+        totalCoDocument = totalEmployee = totalProductsreport = null;
     isDropDownVisible = false;
   }
 
@@ -77,9 +73,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() => isLoading = true);
 
     try {
-      await Future.wait([
-        _fetchTotalData(),
-      ]);
+      await _fetchTotalData();
+      await _fetchTotalDataProductsReport();
     } catch (e) {
       print("Error fetching data: $e");
     } finally {
@@ -92,8 +87,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
+  Future<void> _fetchTotalDataProductsReport() async {
+    try {
+      final int? fetchedTotalItems =
+          await productReportService.fetchTotalItems();
+
+      if (mounted) {
+        setState(() {
+          totalProductsResport = fetchedTotalItems ?? 0;
+        });
+      }
+    } catch (e) {
+      print("Error fetching total data for products report: $e");
+    }
+  }
+
   Future<void> _fetchTotalData() async {
-    await Future.delayed(Duration(seconds: 2));
     try {
       final Data? data = await totalService.fetchTotalItemsUsers();
       if (mounted) {
@@ -120,27 +129,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   String _formatNumber(int? number) {
-    return number == null ? '-' : NumberFormat('#,##0', 'en_US').format(number);
+    return number == null ? '_' : NumberFormat('#,##0', 'en_US').format(number);
   }
 
   Text renderNumberResult(int? result, Color color) {
     return _customText(
       isLoading ? randomNumber : _formatNumber(result),
       color,
-      20,
+      19,
       FontWeight.w700,
     );
   }
-
-  final TextStyle styleText = GoogleFonts.robotoCondensed(
-    textStyle: const TextStyle(
-        fontSize: 14, color: Colors.black, fontWeight: FontWeight.w400),
-  );
-
-  final TextStyle stylesNumber = GoogleFonts.robotoCondensed(
-    textStyle: const TextStyle(
-        fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -290,7 +289,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         SizedBox(
-                          width: 90,
+                          width: 100,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -300,7 +299,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 const Color(0xff389E0D),
                               ),
                               Text(
-                                'Sản phẩm',
+                                'Sản phẩm C/O',
                                 style: GoogleFonts.robotoCondensed(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -371,51 +370,125 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
             ),
             const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: const Color(0xffE6FFFB),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0x005c6566).withOpacity(0.3),
-                      blurRadius: 8,
-                    )
-                  ]),
-              width: (MediaQuery.of(context).size.width - 50) / 2,
-              height: 64,
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  SizedBox(
-                    width: 90,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        renderNumberResult(
-                          totalEmployee,
-                          const Color.fromARGB(255, 17, 167, 167),
-                        ),
-                        Text('Nhân viên',
-                            style: GoogleFonts.robotoCondensed(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: const Color(0xff13C2C2)))
-                      ],
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: const Color(0xffFFEEED),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0x005c6566).withOpacity(0.3),
+                              blurRadius: 8,
+                            )
+                          ]),
+                      width: (MediaQuery.of(context).size.width - 50) / 2,
+                      height: 64,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SizedBox(
+                            width: 90,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                renderNumberResult(
+                                  totalProductsResport,
+                                  const Color.fromARGB(255, 255, 82, 82),
+                                ),
+                                Text('Sản phẩm tồn',
+                                    style: GoogleFonts.robotoCondensed(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: const Color.fromARGB(
+                                          255, 255, 82, 82),
+                                    ))
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Center(
+                            child: SvgPicture.asset(
+                              'resources/ProductsResport.svg',
+                              fit: BoxFit.contain,
+                              height: 56,
+                              width: 5,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(width: 10),
-                  Center(
-                    child: SvgPicture.asset(
-                      'resources/Employed.svg',
-                      fit: BoxFit.contain,
-                      height: 56,
-                      width: 5,
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: const Color.fromARGB(255, 253, 253, 218),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0x005c6566).withOpacity(0.3),
+                              blurRadius: 8,
+                            )
+                          ]),
+                      width: (MediaQuery.of(context).size.width - 50) / 2,
+                      height: 64,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SizedBox(
+                            width: 90,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                renderNumberResult(
+                                  totalEmployee,
+                                  const Color.fromARGB(255, 172, 169, 0),
+                                ),
+                                Text('Nhân viên',
+                                    style: GoogleFonts.robotoCondensed(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: const Color.fromARGB(
+                                          255, 172, 169, 0),
+                                    ))
+                              ],
+                            ),
+                          ),
+                          Center(
+                            child: Container(
+                              width: 56,
+                              height: 56,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Color.fromARGB(255, 250, 248, 160),
+                              ),
+                              child: ClipOval(
+                                child: Transform.scale(
+                                  scale: 0.7,
+                                  child: SvgPicture.asset(
+                                    'resources/emloyee.svg',
+                                    color:
+                                        const Color.fromARGB(255, 211, 207, 4),
+                                    fit: BoxFit.contain,
+                                    width: 56,
+                                    height: 2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ]),
             ),
             const SizedBox(height: 20),
             SingleChildScrollView(
@@ -493,7 +566,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                       const Divider(color: Color(0xffC4C9CA)),
-                      Piechartpage(),
+                      const Piechartpage(),
                     ],
                   ),
                 ),

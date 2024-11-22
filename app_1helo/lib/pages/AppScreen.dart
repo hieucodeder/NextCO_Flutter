@@ -45,7 +45,7 @@ class _AppScreenState extends State<AppScreen> {
         _appBarTitle = "BÁO CÁO HOẠT ĐỘNG NEXTCO";
         break;
       case 1:
-        _appBarTitle = "CHỨC NĂNG NEXT NEXTCO";
+        _appBarTitle = "CHỨC NĂNG NEXTCO";
         break;
       case 2:
         _appBarTitle = "CÁ NHÂN";
