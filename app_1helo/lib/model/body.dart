@@ -5,7 +5,7 @@ class Body {
   DateTime? frCreatedDate;
   DateTime? toCreatedDate;
   String? employeeId;
-  Null customerId;
+  String? customerId;
   String? userId;
 
   Body(

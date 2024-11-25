@@ -31,7 +31,7 @@ class _ProductreportpageState extends State<Productreportpage> {
   List<EmployeeCustomer> _filteredEmployeeCustomer = [];
   EmployeeCustomer? selectedEmployeeCustomer;
 
-  String? customerid;
+  String? _customerid;
   String? search;
   String? startDate1;
   String? endDate1;
@@ -47,7 +47,7 @@ class _ProductreportpageState extends State<Productreportpage> {
     super.initState();
     fetchInitialProductsResPort();
     _scrollController.addListener(_onScroll);
-    _fetchCustomerData();
+    _fetchData();
   }
 
   Future<void> fetchInitialProductsResPort() async {
@@ -56,7 +56,7 @@ class _ProductreportpageState extends State<Productreportpage> {
     }
 
     List<Data> initialProducts = await _productreportService
-        .fetchProductsReport(currentPage, itemsPerPage, search, customerid);
+        .fetchProductsReport(currentPage, itemsPerPage, search, _customerid);
 
     if (mounted) {
       setState(() {
@@ -78,7 +78,7 @@ class _ProductreportpageState extends State<Productreportpage> {
     }
 
     List<Data> results = await _productreportService.fetchProductsReport(
-        currentPage, pageSize, searchQuery, customerid);
+        currentPage, pageSize, searchQuery, _customerid);
     if (mounted) {
       setState(() {
         _searchResults = results;
@@ -96,41 +96,50 @@ class _ProductreportpageState extends State<Productreportpage> {
     }
   }
 
-  Future<void> _fetchCustomerData() async {
-    setState(() => isLoading = true);
+  Future<void> _fetchData({
+    String? customerId,
+  }) async {
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+        productReportList.clear();
+        currentPage = 1;
+        hasMoreData = true;
+      });
+    }
 
     try {
-      List<EmployeeCustomer>? employees =
+      List<EmployeeCustomer>? customers =
           await _authService.getEmployeeCustomerInfo();
       if (mounted) {
         setState(() {
-          _filteredEmployeeCustomer = employees ?? [];
+          _filteredEmployeeCustomer = customers ?? [];
+        });
+      }
+
+      List<Data> reportData = await _productreportService.fetchProductsReport(
+          currentPage, pageSize, search, customerId);
+      if (mounted) {
+        setState(() {
+          productReportList = reportData;
+          if (reportData.length < itemsPerPage) {
+            hasMoreData = false;
+          }
         });
       }
     } catch (e) {
-      print('Error fetching customer data: $e');
+      print("Error fetching data: $e");
+      if (mounted) {
+        setState(() {
+          hasMoreData = false;
+        });
+      }
     } finally {
-      if (mounted) setState(() => isLoading = false);
-    }
-  }
-
-  void _fetchMaterialsReport(String? customerId) async {
-    if (customerId == null) return;
-
-    setState(() {
-      productReportList.clear();
-      currentPage = 1;
-      hasMoreData = true;
-    });
-
-    List<Data> reportData = await _productreportService.fetchProductsReport(
-        currentPage, pageSize, search, customerId);
-
-    if (mounted) {
-      setState(() {
-        productReportList = reportData;
-        hasMoreData = reportData.length == pageSize;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -141,7 +150,7 @@ class _ProductreportpageState extends State<Productreportpage> {
     currentPage++;
 
     List<Data> moreProductsResPort = await _productreportService
-        .fetchProductsReport(currentPage, pageSize, search, customerid);
+        .fetchProductsReport(currentPage, pageSize, search, _customerid);
 
     if (mounted) {
       setState(() {
@@ -262,27 +271,29 @@ class _ProductreportpageState extends State<Productreportpage> {
     );
   }
 
-  Widget renderCustomerDrop() {
-    List<String> customerName = _filteredEmployeeCustomer
+  Widget renderCustomerDropdown() {
+    List<String> customerNames = _filteredEmployeeCustomer
         .map((u) => u.customerName ?? '')
         .toSet()
         .toList();
+    customerNames.insert(0, 'Tất cả khách hàng');
 
     return buildDropdown(
-      items: customerName,
+      items: customerNames,
       selectedItem: selectedEmployeeCustomer?.customerName,
-      hint: 'Chọn khách hàng',
-      onChanged: (String? newvalue) {
+      hint: 'Tất cả khách hàng',
+      onChanged: (String? newValue) {
         setState(() {
-          selectedEmployeeCustomer = newvalue == 'Chọn khách hàng'
+          selectedEmployeeCustomer = newValue == 'Tất cả khách hàng'
               ? null
               : _filteredEmployeeCustomer.firstWhere(
-                  (u) => u.customerName == newvalue,
+                  (u) => u.customerName == newValue,
                   orElse: () => _filteredEmployeeCustomer[0],
                 );
-          customerid = selectedEmployeeCustomer?.customerId;
-          _fetchMaterialsReport(customerid);
+
+          _customerid = selectedEmployeeCustomer?.customerId;
         });
+        _fetchData(customerId: _customerid);
       },
     );
   }
@@ -367,10 +378,10 @@ class _ProductreportpageState extends State<Productreportpage> {
           const SizedBox(height: 10),
           Row(
             children: [
-              Expanded(child: renderCustomerDrop()),
-              const SizedBox(width: 6),
+              Expanded(child: renderCustomerDropdown()),
+              const SizedBox(width: 10),
               Container(
-                width: 140,
+                width: 160,
                 height: 40,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),

@@ -8,7 +8,8 @@ import 'api_config.dart';
 class ProductService {
   final String apiUrl = '${ApiConfig.baseUrl}/products/search';
 
-  Future<List<Data>> fetchProducts(int page, int pageSize) async {
+  Future<List<Data>> fetchProducts(
+      int page, int pageSize, String? customerId) async {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
@@ -27,7 +28,7 @@ class ProductService {
         frCreatedDate: null,
         toCreatedDate: null,
         employeeId: null,
-        customerId: null,
+        customerId: customerId,
         userId: userId,
       );
 

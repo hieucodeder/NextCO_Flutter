@@ -36,7 +36,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
   List<EmployeeCustomer> _filteredEmployeeCustomer = [];
   EmployeeCustomer? selectedemployeeCustomer;
 
-  String? customerid;
+  String? _customerid;
   String? search;
   String? startDate1;
   String? endDate1;
@@ -50,27 +50,33 @@ class _MaterreportpageState extends State<Materialresportpage> {
     super.initState();
     fetchInitialMaterials();
     _scrollController.addListener(_onScroll);
-    _fetchCustomerData();
+    _fetchData();
   }
 
   Future<void> fetchInitialMaterials() async {
-    if (!mounted) return;
-    setState(() => isLoading = true);
-
-    List<Data> initialMaterials =
-        await _materialresportservice.fetchMaterialsReport(
-      search,
-      customerid,
-      currentPage,
-      itemsPerPage,
-    );
-
     if (mounted) {
-      setState(() {
-        allMaterialsResport = initialMaterials;
-        isLoading = false;
-        hasMoreData = initialMaterials.length == itemsPerPage;
-      });
+      setState(() => isLoading = true);
+    }
+
+    try {
+      List<Data> initialMaterialResPort = await _materialresportservice
+          .fetchMateriaDataAlllsReport(currentPage, itemsPerPage);
+
+      if (mounted) {
+        setState(() {
+          allMaterialsResport = initialMaterialResPort;
+          isLoading = false;
+          if (initialMaterialResPort.length < itemsPerPage) {
+            hasMoreData = false;
+          }
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -81,7 +87,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
     currentPage++;
 
     List<Data> moreMaterialResport = await _materialresportservice
-        .fetchMaterialsReport(search, customerid, currentPage, pageSize);
+        .fetchMaterialsReport(search, _customerid, currentPage, pageSize);
 
     if (mounted) {
       setState(() {
@@ -90,24 +96,6 @@ class _MaterreportpageState extends State<Materialresportpage> {
           hasMoreData = false;
         }
       });
-    }
-  }
-
-  Future<void> _fetchCustomerData() async {
-    setState(() => isLoading = true);
-
-    try {
-      List<EmployeeCustomer>? employees =
-          await _authService.getEmployeeCustomerInfo();
-      if (mounted) {
-        setState(() {
-          _filteredEmployeeCustomer = employees ?? [];
-        });
-      }
-    } catch (e) {
-      print('Error fetching customer data: $e');
-    } finally {
-      if (mounted) setState(() => isLoading = false);
     }
   }
 
@@ -128,7 +116,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
     }
 
     List<Data> results = await _materialresportservice.fetchMaterialsReport(
-        searchQuery, customerid, currentPage, pageSize);
+        searchQuery, _customerid, currentPage, pageSize);
     if (!mounted) return;
 
     setState(() {
@@ -137,22 +125,50 @@ class _MaterreportpageState extends State<Materialresportpage> {
     });
   }
 
-  void _fetchMaterialsReport(String? customerId) async {
-    if (customerId == null) return;
-
-    setState(() {
-      allMaterialsResport.clear();
-      currentPage = 1;
-      hasMoreData = true;
-    });
-
-    List<Data> reportData = await _materialresportservice.fetchMaterialsReport(
-        search, customerId, currentPage, pageSize);
+  Future<void> _fetchData({
+    String? customerId,
+  }) async {
     if (mounted) {
       setState(() {
-        allMaterialsResport = reportData;
-        hasMoreData = reportData.length == pageSize;
+        isLoading = true;
+        allMaterialsResport.clear();
+        currentPage = 1;
+        hasMoreData = true;
       });
+    }
+
+    try {
+      List<EmployeeCustomer>? customers =
+          await _authService.getEmployeeCustomerInfo();
+      if (mounted) {
+        setState(() {
+          _filteredEmployeeCustomer = customers ?? [];
+        });
+      }
+
+      List<Data> reportData = await _materialresportservice
+          .fetchMaterialsReport(search, customerId, pageSize, currentPage);
+      if (mounted) {
+        setState(() {
+          allMaterialsResport = reportData;
+          if (reportData.length < itemsPerPage) {
+            hasMoreData = false;
+          }
+        });
+      }
+    } catch (e) {
+      print("Error fetching data: $e");
+      if (mounted) {
+        setState(() {
+          hasMoreData = false;
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -273,9 +289,9 @@ class _MaterreportpageState extends State<Materialresportpage> {
                   (u) => u.customerName == newvalue,
                   orElse: () => _filteredEmployeeCustomer[0],
                 );
-          customerid = selectedemployeeCustomer?.customerId;
-          _fetchMaterialsReport(customerid);
+          _customerid = selectedemployeeCustomer?.customerId;
         });
+        _fetchData(customerId: _customerid);
       },
     );
   }
@@ -359,7 +375,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
           Row(
             children: [
               Expanded(child: renderCustomerDrop()),
-              const SizedBox(width: 6),
+              const SizedBox(width: 10),
               Container(
                 width: 140,
                 height: 40,
@@ -441,7 +457,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
             height: 10,
           ),
           Expanded(
-            child: displayList.isEmpty && isLoading
+            child: isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : displayList.isEmpty
                     ? Center(

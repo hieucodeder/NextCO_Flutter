@@ -1,5 +1,7 @@
+import 'package:app_1helo/model/dropdownCustomer.dart';
 import 'package:app_1helo/model/materials.dart';
 import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/service/authService.dart';
 import 'package:app_1helo/service/material_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,12 +23,16 @@ class _MaterialspageState extends State<Materialspage> {
   bool isLoading = false;
   int currentPage = 1;
   final int pageSize = 10;
+  final _authService = AuthService();
   MaterialService materialService = MaterialService();
   bool hasMoreData = true;
   final TextEditingController _searchController = TextEditingController();
   List<Data> _searchResults = [];
   bool _isSearching = false;
+  String? _customerId;
 
+  EmployeeCustomer? selectedDropdownCustomer;
+  List<EmployeeCustomer> _filtereddropdownCustomer = [];
   Future<void> _searchMaterials(String searchQuery) async {
     if (searchQuery.isEmpty) {
       setState(() {
@@ -50,14 +56,15 @@ class _MaterialspageState extends State<Materialspage> {
     super.initState();
     fetchInitialMaterials();
     _scrollController.addListener(_onScroll);
+    _fetchData();
   }
 
   Future<void> fetchInitialMaterials() async {
     if (mounted) {
       setState(() => isLoading = true);
     }
-    List<Data> initialMaterial =
-        await materialService.fetchMaterials(currentPage, itemsPerPage);
+    List<Data> initialMaterial = await materialService.fetchMaterials(
+        currentPage, itemsPerPage, _customerId);
 
     if (!mounted) return;
 
@@ -75,8 +82,8 @@ class _MaterialspageState extends State<Materialspage> {
 
     setState(() => isLoading = true);
     currentPage++;
-    List<Data> moreMaterial =
-        await materialService.fetchMaterials(currentPage, pageSize);
+    List<Data> moreMaterial = await materialService.fetchMaterials(
+        currentPage, pageSize, _customerId);
 
     if (!mounted) return;
 
@@ -97,6 +104,122 @@ class _MaterialspageState extends State<Materialspage> {
     }
   }
 
+  Future<void> _fetchData({
+    String? customerId,
+  }) async {
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+        materialList.clear();
+        currentPage = 1;
+        hasMoreData = true;
+      });
+    }
+
+    try {
+      List<EmployeeCustomer>? customers =
+          await _authService.getEmployeeCustomerInfo();
+      if (mounted) {
+        setState(() {
+          _filtereddropdownCustomer = customers ?? [];
+        });
+      }
+
+      List<Data> reportData = await materialService.fetchMaterials(
+        currentPage,
+        itemsPerPage,
+        customerId,
+      );
+      if (mounted) {
+        setState(() {
+          materialList = reportData;
+          if (reportData.length < itemsPerPage) {
+            hasMoreData = false;
+          }
+        });
+      }
+    } catch (e) {
+      print("Error fetching data: $e");
+      if (mounted) {
+        setState(() {
+          hasMoreData = false;
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  Widget buildDropdown({
+    required List<String> items,
+    required String? selectedItem,
+    required String hint,
+    required Function(String?) onChanged,
+    double width = 150,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+        border: Border.all(width: 1, color: Colors.black38),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      width: width,
+      height: 40,
+      child: DropdownButton<String>(
+        hint: Text(
+          hint,
+          style: const TextStyle(fontSize: 14, color: Colors.black),
+        ),
+        value: selectedItem,
+        isExpanded: true,
+        icon: const Icon(Icons.arrow_drop_down),
+        underline: Container(),
+        onChanged: onChanged,
+        items: items.map<DropdownMenuItem<String>>((item) {
+          return DropdownMenuItem<String>(
+            value: item,
+            child: Text(
+              item,
+              style: const TextStyle(fontSize: 14, color: Colors.black),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget renderCustomerDropdown() {
+    List<String> customerNames = _filtereddropdownCustomer
+        .map((u) => u.customerName ?? '')
+        .toSet()
+        .toList();
+    customerNames.insert(0, 'Tất cả khách hàng');
+
+    return buildDropdown(
+      items: customerNames,
+      selectedItem: selectedDropdownCustomer?.customerName,
+      hint: 'Tất cả khách hàng',
+      onChanged: (String? newValue) {
+        setState(() {
+          selectedDropdownCustomer = newValue == 'Tất cả khách hàng'
+              ? null
+              : _filtereddropdownCustomer.firstWhere(
+                  (u) => u.customerName == newValue,
+                  orElse: () => _filtereddropdownCustomer[0],
+                );
+
+          _customerId = selectedDropdownCustomer?.customerId;
+        });
+        _fetchData(customerId: _customerId);
+      },
+    );
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -114,48 +237,56 @@ class _MaterialspageState extends State<Materialspage> {
       color: Colors.grey[200],
       child: Column(
         children: [
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: 40,
-            padding: const EdgeInsets.symmetric(horizontal: 5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(width: 1, color: Colors.black26),
-              color: Colors.white,
-            ),
-            child: TextField(
-              // autofocus: true,
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Mã NVL, Tên NVL...',
-                hintStyle: GoogleFonts.robotoCondensed(
-                    fontSize: 14, color: Colors.black38),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none),
-                suffixIcon: GestureDetector(
-                  onTap: () {
-                    _searchMaterials(_searchController.text);
-                  },
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      VerticalDivider(
-                        width: 20,
-                        thickness: 1,
-                        color: Colors.black38,
+          Row(
+            children: [
+              Expanded(child: renderCustomerDropdown()),
+              SizedBox(
+                width: 10,
+              ),
+              Container(
+                width: 160,
+                height: 40,
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(width: 1, color: Colors.black26),
+                  color: Colors.white,
+                ),
+                child: TextField(
+                  // autofocus: true,
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Mã NVL, Tên NVL...',
+                    hintStyle: GoogleFonts.robotoCondensed(
+                        fontSize: 14, color: Colors.black38),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none),
+                    suffixIcon: GestureDetector(
+                      onTap: () {
+                        _searchMaterials(_searchController.text);
+                      },
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          VerticalDivider(
+                            width: 20,
+                            thickness: 1,
+                            color: Colors.black38,
+                          ),
+                          Icon(
+                            Icons.search_outlined,
+                            size: 24,
+                            color: Colors.black38,
+                          )
+                        ],
                       ),
-                      Icon(
-                        Icons.search_outlined,
-                        size: 24,
-                        color: Colors.black38,
-                      )
-                    ],
+                    ),
+                    contentPadding: const EdgeInsets.all(5),
                   ),
                 ),
-                contentPadding: const EdgeInsets.all(5),
               ),
-            ),
+            ],
           ),
           const SizedBox(height: 10),
           Expanded(

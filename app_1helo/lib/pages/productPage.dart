@@ -1,5 +1,9 @@
+import 'package:app_1helo/model/dropdownCustomer.dart';
+import 'package:app_1helo/model/dropdownEmployee.dart';
 import 'package:app_1helo/model/productss.dart';
 import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/service/authService.dart';
+import 'package:app_1helo/service/columnChar_service.dart';
 import 'package:app_1helo/service/product_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,6 +25,7 @@ class _ProductPageState extends State<ProductPage> {
   List<Data> productList = [];
   List<Data> _searchResults = [];
 
+  final _authService = AuthService();
   ProductService productService = ProductService();
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -28,6 +33,16 @@ class _ProductPageState extends State<ProductPage> {
   bool _isSearching = false;
   bool isLoading = false;
   bool hasMoreData = true;
+
+  EmployeeCustomer? selectedDropdownCustomer;
+  List<EmployeeCustomer> _filtereddropdownCustomer = [];
+  String? _customerId;
+  @override
+  void initState() {
+    super.initState();
+    fetchInitialProducts();
+    _fetchData();
+  }
 
   Future<void> _searchProducts(String searchQuery) async {
     if (searchQuery.isEmpty) {
@@ -43,19 +58,12 @@ class _ProductPageState extends State<ProductPage> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchInitialProducts();
-    _scrollController.addListener(_onScroll);
-  }
-
   Future<void> fetchInitialProducts() async {
     if (mounted) {
       setState(() => isLoading = true);
     }
-    List<Data> initialProducts =
-        await productService.fetchProducts(currentPage, itemsPerPage);
+    List<Data> initialProducts = await productService.fetchProducts(
+        currentPage, itemsPerPage, _customerId);
 
     if (mounted) {
       setState(() {
@@ -74,7 +82,7 @@ class _ProductPageState extends State<ProductPage> {
     setState(() => isLoading = true);
     currentPage++;
     List<Data> moreProducts =
-        await productService.fetchProducts(currentPage, pageSize);
+        await productService.fetchProducts(currentPage, pageSize, _customerId);
 
     if (mounted) {
       setState(() {
@@ -100,6 +108,56 @@ class _ProductPageState extends State<ProductPage> {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchData({
+    String? customerId,
+  }) async {
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+        productList.clear();
+        currentPage = 1;
+        hasMoreData = true;
+      });
+    }
+
+    try {
+      List<EmployeeCustomer>? customers =
+          await _authService.getEmployeeCustomerInfo();
+      if (mounted) {
+        setState(() {
+          _filtereddropdownCustomer = customers ?? [];
+        });
+      }
+
+      List<Data> reportData = await productService.fetchProducts(
+        currentPage,
+        itemsPerPage,
+        customerId,
+      );
+      if (mounted) {
+        setState(() {
+          productList = reportData;
+          if (reportData.length < itemsPerPage) {
+            hasMoreData = false;
+          }
+        });
+      }
+    } catch (e) {
+      print("Error fetching data: $e");
+      if (mounted) {
+        setState(() {
+          hasMoreData = false;
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   Widget buildDropdown({
@@ -141,6 +199,33 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
+  Widget renderCustomerDropdown() {
+    List<String> customerNames = _filtereddropdownCustomer
+        .map((u) => u.customerName ?? '')
+        .toSet()
+        .toList();
+    customerNames.insert(0, 'Tất cả khách hàng');
+
+    return buildDropdown(
+      items: customerNames,
+      selectedItem: selectedDropdownCustomer?.customerName,
+      hint: 'Tất cả khách hàng',
+      onChanged: (String? newValue) {
+        setState(() {
+          selectedDropdownCustomer = newValue == 'Tất cả khách hàng'
+              ? null
+              : _filtereddropdownCustomer.firstWhere(
+                  (u) => u.customerName == newValue,
+                  orElse: () => _filtereddropdownCustomer[0],
+                );
+
+          _customerId = selectedDropdownCustomer?.customerId;
+        });
+        _fetchData(customerId: _customerId);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Data> displayList = (_isSearching ? _searchResults : productList)
@@ -151,52 +236,60 @@ class _ProductPageState extends State<ProductPage> {
       color: Colors.grey[200],
       child: Column(
         children: [
-          Container(
-            width: double.infinity,
-            height: 40,
-            padding: const EdgeInsets.symmetric(horizontal: 5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(width: 1, color: Colors.black38),
-              color: Colors.white,
-            ),
-            child: TextField(
-              // autofocus: true,
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Mã sản phẩm, mã HS',
-                hintStyle: GoogleFonts.robotoCondensed(
-                    fontSize: 14, color: Colors.black38),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none),
-                suffixIcon: GestureDetector(
-                  onTap: () {
-                    _searchProducts(_searchController.text);
-                  },
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      VerticalDivider(
-                        width: 20,
-                        color: Colors.black38,
-                        thickness: 1,
+          Row(
+            children: [
+              Expanded(child: renderCustomerDropdown()),
+              const SizedBox(
+                width: 10,
+              ),
+              Container(
+                width: 160,
+                height: 40,
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(width: 1, color: Colors.black38),
+                  color: Colors.white,
+                ),
+                child: TextField(
+                  // autofocus: true,
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Mã sản phẩm, mã HS',
+                    hintStyle: GoogleFonts.robotoCondensed(
+                        fontSize: 14, color: Colors.black38),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none),
+                    suffixIcon: GestureDetector(
+                      onTap: () {
+                        _searchProducts(_searchController.text);
+                      },
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          VerticalDivider(
+                            width: 20,
+                            color: Colors.black38,
+                            thickness: 1,
+                          ),
+                          Icon(
+                            Icons.search_outlined,
+                            size: 24,
+                            color: Colors.black38,
+                          ),
+                        ],
                       ),
-                      Icon(
-                        Icons.search_outlined,
-                        size: 24,
-                        color: Colors.black38,
-                      ),
-                    ],
+                    ),
+                    contentPadding: const EdgeInsets.all(5),
                   ),
                 ),
-                contentPadding: const EdgeInsets.all(5),
               ),
-            ),
+            ],
           ),
           const SizedBox(height: 10),
           Expanded(
-            child: displayList.isEmpty && isLoading
+            child: isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : displayList.isEmpty
                     ? Center(

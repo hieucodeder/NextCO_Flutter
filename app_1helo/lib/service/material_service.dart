@@ -8,7 +8,7 @@ import 'api_config.dart';
 class MaterialService {
   final String apiUrl = '${ApiConfig.baseUrl}/materials/search';
 
-  Future<List<Data>> fetchMaterials(int page, int pageSize) async {
+  Future<List<Data>> fetchMaterials(int page, int pageSize, String? customerId) async {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
@@ -22,7 +22,7 @@ class MaterialService {
         frCreatedDate: null,
         toCreatedDate: null,
         employeeId: null,
-        customerId: null,
+        customerId: customerId,
         userId: userId,
       );
 

@@ -8,7 +8,7 @@ import 'api_config.dart';
 class DocumentService {
   final String apiUrl = '${ApiConfig.baseUrl}/co-documents/search';
 
-  Future<List<Data>> fetchDocuments(int page, int pageSize) async {
+  Future<List<Data>> fetchAllDocuments(int page, int pageSize) async {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
@@ -27,6 +27,48 @@ class DocumentService {
         toCreatedDate: null,
         employeeId: null,
         customerId: null,
+        userId: userId,
+      );
+
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode(requestBody.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
+        final Documentss documentData = Documentss.fromJson(jsonResponse);
+        return documentData.data ?? [];
+      } else {
+        throw Exception('Failed to load documents');
+      }
+    } catch (error) {
+      print('Error fetching documents: $error');
+      return [];
+    }
+  }
+
+  Future<List<Data>> fetchDocuments(
+      int page, int pageSize, String? employeeId, String? customerId) async {
+    try {
+      final url = Uri.parse(apiUrl);
+      final headers = await ApiConfig.getHeaders();
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
+
+      if (userId == null) {
+        print('No user ID found. User might not be logged in.');
+        return [];
+      }
+      Body requestBody = Body(
+        searchContent: "",
+        pageIndex: page,
+        pageSize: pageSize,
+        frCreatedDate: null,
+        toCreatedDate: null,
+        employeeId: employeeId,
+        customerId: customerId,
         userId: userId,
       );
 

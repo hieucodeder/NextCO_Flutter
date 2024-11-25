@@ -1,5 +1,8 @@
 import 'package:app_1helo/model/documentss.dart';
+import 'package:app_1helo/model/dropdownCustomer.dart';
+import 'package:app_1helo/model/dropdownEmployee.dart';
 import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/service/authService.dart';
 import 'package:app_1helo/service/document_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,12 +30,33 @@ class _DshosocoState extends State<Dshosoco> {
   int pageSize = 10;
   int currentPage = 1;
   int itemsPerPage = 10;
+  String? _employeedId;
+  String? _customerId;
   final List<int> itemsPerPageOptions = [10, 20, 30];
+
+  dropdownEmployee? selectedDropdownEmployee;
+  List<dropdownEmployee> _filtereddropdownEmployee = [];
+  EmployeeCustomer? selectedDropdownCustomer;
+  List<EmployeeCustomer> _filtereddropdownCustomer = [];
+
+  final _authService = AuthService();
 
   @override
   void initState() {
     super.initState();
-    fetchInitialDocuments();
+    _initializeData();
+    _scrollController.addListener(_onScroll);
+  }
+
+  Future<void> _initializeData() async {
+    try {
+      await Future.wait([
+        fetchInitialDocuments(),
+        _fetchData(),
+      ]);
+    } catch (e) {
+      print('Error during initialization: $e');
+    }
   }
 
   Future<void> _searchDocuments(String searchQuery) async {
@@ -60,7 +84,7 @@ class _DshosocoState extends State<Dshosoco> {
       setState(() => isLoading = true);
     }
     List<Data> initialDocument =
-        await documentService.fetchDocuments(currentPage, itemsPerPage);
+        await documentService.fetchAllDocuments(currentPage, itemsPerPage);
 
     if (mounted) {
       setState(() {
@@ -87,7 +111,7 @@ class _DshosocoState extends State<Dshosoco> {
     setState(() => isLoading = true);
     currentPage++;
     List<Data> moreProducts =
-        await documentService.fetchDocuments(currentPage, pageSize);
+        await documentService.fetchAllDocuments(currentPage, pageSize);
 
     if (mounted) {
       setState(() {
@@ -162,6 +186,157 @@ class _DshosocoState extends State<Dshosoco> {
     }
   }
 
+  Future<void> _fetchData({
+    String? customerId,
+    String? employeedId,
+  }) async {
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+        documentLits.clear();
+        currentPage = 1;
+        hasMoreData = true;
+      });
+    }
+
+    try {
+      List<EmployeeCustomer>? customers =
+          await _authService.getEmployeeCustomerInfo();
+      if (mounted) {
+        setState(() {
+          _filtereddropdownCustomer = customers ?? [];
+        });
+      }
+
+      List<dropdownEmployee>? employees = await _authService.getEmployeeInfo();
+      if (mounted) {
+        setState(() {
+          _filtereddropdownEmployee = employees ?? [];
+        });
+      }
+
+      List<Data> reportData = await documentService.fetchDocuments(
+        currentPage,
+        itemsPerPage,
+        employeedId,
+        customerId,
+      );
+      if (mounted) {
+        setState(() {
+          documentLits = reportData;
+          if (reportData.length < itemsPerPage) {
+            hasMoreData = false;
+          }
+        });
+      }
+    } catch (e) {
+      print("Error fetching data: $e");
+      if (mounted) {
+        setState(() {
+          hasMoreData = false;
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  Widget buildDropdown({
+    required List<String> items,
+    required String? selectedItem,
+    required String hint,
+    required ValueChanged<String?> onChanged,
+    double width = 200,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(width: 1, color: Colors.black38),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      width: width,
+      height: 40,
+      child: DropdownButton<String>(
+        hint: Text(
+          hint,
+          style: const TextStyle(fontSize: 13, color: Colors.black),
+        ),
+        value: selectedItem,
+        isExpanded: true,
+        icon: const Icon(Icons.arrow_drop_down),
+        underline: Container(),
+        onChanged: onChanged,
+        items: items.map<DropdownMenuItem<String>>((item) {
+          return DropdownMenuItem<String>(
+            value: item,
+            child: Text(
+              item,
+              style: const TextStyle(fontSize: 13, color: Colors.black),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget renderCustomerDropdown() {
+    List<String> customerNames = _filtereddropdownCustomer
+        .map((u) => u.customerName ?? '')
+        .toSet()
+        .toList();
+    customerNames.insert(0, 'Tất cả khách hàng');
+
+    return buildDropdown(
+      items: customerNames,
+      selectedItem: selectedDropdownCustomer?.customerName,
+      hint: 'Tất cả khách hàng',
+      onChanged: (String? newValue) {
+        setState(() {
+          selectedDropdownCustomer = newValue == 'Tất cả khách hàng'
+              ? null
+              : _filtereddropdownCustomer.firstWhere(
+                  (u) => u.customerName == newValue,
+                  orElse: () => _filtereddropdownCustomer[0],
+                );
+
+          _customerId = selectedDropdownCustomer?.customerId;
+        });
+
+        _fetchData(customerId: _customerId, employeedId: _employeedId);
+      },
+    );
+  }
+
+  Widget renderUserDropdown() {
+    List<String> userNames =
+        _filtereddropdownEmployee.map((u) => u.label ?? '').toSet().toList();
+    userNames.insert(0, 'Tất cả nhân viên');
+
+    return buildDropdown(
+      items: userNames,
+      selectedItem: selectedDropdownEmployee?.label,
+      hint: 'Tất cả nhân viên',
+      onChanged: (String? newValue) {
+        setState(() {
+          selectedDropdownEmployee = newValue == 'Tất cả nhân viên'
+              ? null
+              : _filtereddropdownEmployee.firstWhere(
+                  (u) => u.label == newValue,
+                  orElse: () => _filtereddropdownEmployee[0],
+                );
+
+          _employeedId = selectedDropdownEmployee?.value;
+        });
+        _fetchData(customerId: _customerId, employeedId: _employeedId);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Data> displayList = (_isSearching ? _searchResults : documentLits)
@@ -172,111 +347,126 @@ class _DshosocoState extends State<Dshosoco> {
       color: Colors.grey[200],
       child: Column(
         children: [
-          GestureDetector(
-            onTap: _selectDateRange,
-            child: Container(
-              width: double.infinity,
-              height: 40,
-              margin: const EdgeInsets.only(top: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 5),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.black38),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      readOnly: true,
-                      textAlign: TextAlign.center,
-                      decoration: InputDecoration(
-                        hintText: 'Chọn Ngày Bắt Đầu và Kết Thúc',
-                        hintStyle: GoogleFonts.robotoCondensed(
-                          fontSize: 14,
-                          color: Colors.black38,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.all(5),
-                      ),
-                    ),
-                  ),
-                  if (_controller.text.isNotEmpty)
-                    GestureDetector(
-                      onTap: _clearDateRange,
-                      child: const Icon(
-                        Icons.close_sharp,
-                        color: Colors.black54,
-                        size: 20,
-                      ),
-                    ),
-                  const VerticalDivider(
-                    width: 20,
-                    thickness: 1,
-                    color: Colors.black38,
-                  ),
-                  GestureDetector(
-                    onTap: _selectDateRange,
-                    child:
-                        const Icon(Icons.calendar_today, color: Colors.black54),
-                  ),
-                ],
-              ),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              children: [
+                Expanded(child: renderCustomerDropdown()),
+                const SizedBox(
+                  width: 10,
+                ),
+                SizedBox(width: 150, child: renderUserDropdown()),
+              ],
             ),
           ),
-          const SizedBox(height: 10),
           Row(
             children: [
               Expanded(
-                child: Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(width: 1, color: Colors.black38),
-                    color: Colors.white,
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: TextField(
-                    controller: _searchControllerDocuments,
-                    onChanged: (value) {
-                      setState(() {
-                        // Trigger a rebuild on search input change
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Số hồ sơ, tờ khai xuất, tình trạng',
-                      hintStyle: GoogleFonts.robotoCondensed(
-                          fontSize: 14, color: Colors.black38),
-                      border: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10),
-                        ),
-                        borderSide: BorderSide.none,
-                      ),
-                      suffixIcon: GestureDetector(
-                        onTap: () {
-                          _searchDocuments(_searchControllerDocuments.text);
-                        },
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            VerticalDivider(
-                              width: 20,
-                              thickness: 1,
-                              color: Colors.black38,
-                            ),
-                            Icon(Icons.search_outlined)
-                          ],
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.all(5),
+                child: GestureDetector(
+                  onTap: _selectDateRange,
+                  child: Container(
+                    width: double.infinity,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.black38),
                     ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _controller,
+                            readOnly: true,
+                            textAlign: TextAlign.center,
+                            decoration: InputDecoration(
+                              hintText: 'Chọn Ngày Bắt Đầu và Kết Thúc',
+                              hintStyle: GoogleFonts.robotoCondensed(
+                                fontSize: 14,
+                                color: Colors.black38,
+                              ),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                        if (_controller.text.isNotEmpty)
+                          GestureDetector(
+                            onTap: _clearDateRange,
+                            child: const Icon(
+                              Icons.close_sharp,
+                              color: Colors.black54,
+                              size: 20,
+                            ),
+                          ),
+                        const VerticalDivider(
+                          width: 15,
+                          thickness: 1,
+                          color: Colors.black38,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: GestureDetector(
+                            onTap: _selectDateRange,
+                            child: const Icon(Icons.calendar_today,
+                                size: 24, color: Colors.black54),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Container(
+                width: 150,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(width: 1, color: Colors.black38),
+                  color: Colors.white,
+                ),
+                child: TextField(
+                  controller: _searchControllerDocuments,
+                  onChanged: (value) {
+                    setState(() {
+                      // Trigger a rebuild on search input change
+                    });
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Số hồ sơ, tờ khai xuất, tình trạng',
+                    hintStyle: GoogleFonts.robotoCondensed(
+                        fontSize: 14, color: Colors.black38),
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10),
+                      ),
+                      borderSide: BorderSide.none,
+                    ),
+                    suffixIcon: GestureDetector(
+                      onTap: () {
+                        _searchDocuments(_searchControllerDocuments.text);
+                      },
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          VerticalDivider(
+                            width: 20,
+                            thickness: 1,
+                            color: Colors.black38,
+                          ),
+                          Icon(Icons.search_outlined)
+                        ],
+                      ),
+                    ),
+                    contentPadding: const EdgeInsets.all(5),
                   ),
                 ),
               ),
             ],
           ),
+          const SizedBox(height: 10),
           const SizedBox(
             height: 10,
           ),
