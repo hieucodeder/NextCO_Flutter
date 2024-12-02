@@ -35,7 +35,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
   Future<void> _fetchAccountInfo() async {
     Account? account = await _authService.getAccountInfo();
 
-    if (account != null) {
+    if (account != null && mounted) {
       nameController.text = account.fullName ?? '';
       accountController.text = account.userName ?? '';
       // Định dạng ngày sinh sang DateTime

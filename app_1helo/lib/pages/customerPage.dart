@@ -38,7 +38,7 @@ class _ClientpageState extends State<Clientpage> {
   void initState() {
     super.initState();
     fetchInitialCustomers();
-    _scrollController.addListener(_onScroll);
+    // _scrollController.addListener(_onScroll);
   }
 
   Future<void> _searchCustomers(String searchQuery) async {
@@ -74,33 +74,6 @@ class _ClientpageState extends State<Clientpage> {
     }
   }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels ==
-            _scrollController.position.maxScrollExtent &&
-        !isLoading) {
-      _loadMoreCustomer();
-    }
-  }
-
-  Future<void> _loadMoreCustomer() async {
-    if (isLoading || !hasMoreData) return;
-
-    setState(() => isLoading = true);
-    currentPage++;
-    List<Data> moreProducts =
-        await customerService.fetchCustomer(currentPage, pageSize);
-
-    if (mounted) {
-      setState(() {
-        customerList.addAll(moreProducts);
-        isLoading = false;
-        if (moreProducts.length < pageSize) {
-          hasMoreData = false;
-        }
-      });
-    }
-  }
-
   @override
   void dispose() {
     nameController.dispose();
@@ -112,12 +85,12 @@ class _ClientpageState extends State<Clientpage> {
     super.dispose();
   }
 
-  final style = const TextStyle(fontWeight: FontWeight.bold);
+  Future<void> _onRefresh() async {
+    await fetchInitialCustomers();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // List<Data> displayList = _isSearching ? _searchResults : customerList;
-
     List<Data> displayList = (_isSearching ? _searchResults : customerList)
       ..sort((a, b) => (a.rowNumber ?? 0).compareTo(b.rowNumber ?? 0));
     return Container(
@@ -248,10 +221,12 @@ class _ClientpageState extends State<Clientpage> {
                                               textAlign: TextAlign.center)),
                                       DataColumn(
                                         label: Text('Số điện thoại',
-                                            style: GoogleFonts.robotoCondensed(
-                                                color: Colors.black,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500),
+                                            style:
+                                                GoogleFonts.robotoCondensed(
+                                                    color: Colors.black,
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.w500),
                                             textAlign: TextAlign.center),
                                       ),
                                       DataColumn(
@@ -323,9 +298,9 @@ class _ClientpageState extends State<Clientpage> {
                             ),
                           )),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 48.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
                     onPressed: currentPage > 1
@@ -367,7 +342,6 @@ class _ClientpageState extends State<Clientpage> {
                       color: Colors.black,
                     ),
                   ),
-                  const SizedBox(width: 8),
                   Container(
                     height: 30,
                     decoration: BoxDecoration(

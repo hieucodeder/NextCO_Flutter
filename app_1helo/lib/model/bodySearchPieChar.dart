@@ -11,13 +11,15 @@ class Bodysearchpiechar {
     this.employeeId,
     DateTime? frCreatedDate,
     DateTime? toCreatedDate,
-  })  : frCreatedDate = frCreatedDate != null
-             ? DateFormat('yyyy-MM-ddTHH:mm:ss').format(frCreatedDate)
-            : null,
-        toCreatedDate = toCreatedDate != null
-            ? DateFormat('yyyy-MM-ddTHH:mm:ss').format(toCreatedDate)
-            : null;
+  })  : frCreatedDate = _formatDate(frCreatedDate),
+        toCreatedDate = _formatDate(toCreatedDate);
 
+  /// Convert DateTime to 'yyyy-MM-dd' format or return null if input is null
+  static String? _formatDate(DateTime? date) {
+    return date != null ? DateFormat('yyyy-MM-dd').format(date) : null;
+  }
+
+  /// Convert the object to JSON
   Map<String, dynamic> toJson() {
     return {
       'customerId': customerId,

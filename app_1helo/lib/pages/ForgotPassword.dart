@@ -67,11 +67,11 @@ class _ForgotpasswordState extends State<Forgotpassword> {
             ),
           ),
           Container(
-            margin: const EdgeInsets.symmetric(vertical: 60),
+            margin: const EdgeInsets.symmetric(vertical: 80),
             child: Align(
               alignment: Alignment.topCenter,
               child: SvgPicture.asset('resources/logonextco.svg',
-                  width: 100, height: 35),
+                  width: 100, height: 46),
             ),
           ),
           Container(

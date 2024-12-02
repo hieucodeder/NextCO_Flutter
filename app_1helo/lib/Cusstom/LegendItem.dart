@@ -18,11 +18,12 @@ class LegendItem extends StatelessWidget {
             color: color,
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 5),
         Text(
           text,
           style: const TextStyle(fontSize: 13, color: Colors.black54),
         ),
+        const SizedBox(width: 12),
       ],
     );
   }

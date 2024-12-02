@@ -252,6 +252,8 @@ class _MaterreportpageState extends State<Materialresportpage> {
         hint: Text(
           hint,
           style: const TextStyle(fontSize: 14, color: Colors.black),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
         value: selectedItem,
         isExpanded: true,
@@ -264,6 +266,8 @@ class _MaterreportpageState extends State<Materialresportpage> {
             child: Text(
               item,
               style: const TextStyle(fontSize: 14, color: Colors.black),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           );
         }).toList(),
@@ -331,18 +335,20 @@ class _MaterreportpageState extends State<Materialresportpage> {
               child: Row(
                 children: [
                   Expanded(
-                    child: TextField(
-                      controller: _controller1,
-                      readOnly: true,
-                      textAlign: TextAlign.center,
-                      decoration: InputDecoration(
-                        hintText: 'Chọn ngày bắt đầu và kết thúc',
-                        hintStyle: GoogleFonts.robotoCondensed(
-                          fontSize: 14,
-                          color: Colors.black38,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        controller: _controller1,
+                        readOnly: true,
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                          hintText: 'Chọn ngày bắt đầu và kết thúc',
+                          hintStyle: GoogleFonts.robotoCondensed(
+                            fontSize: 14,
+                            color: Colors.black38,
+                          ),
+                          border: InputBorder.none,
                         ),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.all(5),
                       ),
                     ),
                   ),
@@ -373,81 +379,85 @@ class _MaterreportpageState extends State<Materialresportpage> {
           ),
           const SizedBox(height: 10),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Expanded(child: renderCustomerDrop()),
+              FittedBox(
+                  child: SizedBox(width: 200, child: renderCustomerDrop())),
               const SizedBox(width: 10),
-              Container(
-                width: 140,
-                height: 40,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(width: 1, color: Colors.black38),
-                  color: Colors.white,
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: TextField(
-                  onChanged: (value) {
-                    setState(() {
-                      // Trigger a rebuild on search input change
-                    });
-                  },
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Số hồ sơ, tờ khai xuất, tình trạng',
-                    hintStyle: GoogleFonts.robotoCondensed(
-                        fontSize: 14, color: Colors.black38),
-                    border: const OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10),
+              FittedBox(
+                child: Container(
+                  width: 160,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(width: 1, color: Colors.black38),
+                    color: Colors.white,
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        // Trigger a rebuild on search input change
+                      });
+                    },
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Số hồ sơ, tờ khai xuất, tình trạng',
+                      hintStyle: GoogleFonts.robotoCondensed(
+                          fontSize: 14, color: Colors.black38),
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                        borderSide: BorderSide.none,
                       ),
-                      borderSide: BorderSide.none,
-                    ),
-                    suffixIcon: StatefulBuilder(
-                      builder: (context, setState) {
-                        bool isPressed = false;
+                      suffixIcon: StatefulBuilder(
+                        builder: (context, setState) {
+                          bool isPressed = false;
 
-                        return GestureDetector(
-                          onTapDown: (_) {
-                            setState(() {
-                              isPressed = true;
-                            });
-                          },
-                          onTapUp: (_) {
-                            setState(() {
-                              isPressed = false;
-                            });
-                            _searchMaterialResPort(_searchController.text);
-                          },
-                          onTapCancel: () {
-                            setState(() {
-                              isPressed = false;
-                            });
-                          },
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const VerticalDivider(
-                                width: 20,
-                                thickness: 1,
-                                color: Colors.black38,
-                              ),
-                              AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: isPressed
-                                      ? Colors.grey[200]
-                                      : Colors.transparent,
-                                  shape: BoxShape.circle, // Làm nút tròn
+                          return GestureDetector(
+                            onTapDown: (_) {
+                              setState(() {
+                                isPressed = true;
+                              });
+                            },
+                            onTapUp: (_) {
+                              setState(() {
+                                isPressed = false;
+                              });
+                              _searchMaterialResPort(_searchController.text);
+                            },
+                            onTapCancel: () {
+                              setState(() {
+                                isPressed = false;
+                              });
+                            },
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const VerticalDivider(
+                                  width: 20,
+                                  thickness: 1,
+                                  color: Colors.black38,
                                 ),
-                                child: const Icon(Icons.search_outlined),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: isPressed
+                                        ? Colors.grey[200]
+                                        : Colors.transparent,
+                                    shape: BoxShape.circle, // Làm nút tròn
+                                  ),
+                                  child: const Icon(Icons.search_outlined),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      contentPadding: const EdgeInsets.all(5),
                     ),
-                    contentPadding: const EdgeInsets.all(5),
                   ),
                 ),
               ),
@@ -560,20 +570,29 @@ class _MaterreportpageState extends State<Materialresportpage> {
                                 ],
                                 rows: displayList.map((doc) {
                                   return DataRow(cells: [
-                                    DataCell(
-                                        Text(doc.rowNumber?.toString() ?? '')),
-                                    DataCell(Text(doc.materialCode ?? '')),
-                                    DataCell(Text(doc.materialName ?? '')),
-                                    DataCell(
-                                        Text(doc.importDeclarationVat ?? '')),
-                                    DataCell(
-                                        Text(doc.sortOrder?.toString() ?? '')),
-                                    DataCell(Text(
-                                        doc.coAvailable?.toString() ?? '')),
-                                    DataCell(
-                                        Text(doc.coUsing?.toString() ?? '')),
-                                    DataCell(
-                                        Text(doc.quantity?.toString() ?? '')),
+                                    DataCell(Center(
+                                        child: Text(
+                                            doc.rowNumber?.toString() ?? ''))),
+                                    DataCell(Center(
+                                        child: Text(doc.materialCode ?? ''))),
+                                    DataCell(Center(
+                                        child: Text(doc.materialName ?? ''))),
+                                    DataCell(Center(
+                                        child: Text(
+                                            doc.importDeclarationVat ?? ''))),
+                                    DataCell(Center(
+                                        child: Text(
+                                            doc.sortOrder?.toString() ?? ''))),
+                                    DataCell(Center(
+                                      child: Text(
+                                          doc.coAvailable?.toString() ?? ''),
+                                    )),
+                                    DataCell(Center(
+                                        child: Text(
+                                            doc.coUsing?.toString() ?? ''))),
+                                    DataCell(Center(
+                                        child: Text(
+                                            doc.quantity?.toString() ?? ''))),
                                   ]);
                                 }).toList(),
                               ),
@@ -583,9 +602,9 @@ class _MaterreportpageState extends State<Materialresportpage> {
                       ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 48.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
                   onPressed: currentPage > 1
@@ -627,7 +646,6 @@ class _MaterreportpageState extends State<Materialresportpage> {
                     color: Colors.black,
                   ),
                 ),
-                const SizedBox(width: 8),
                 Container(
                   height: 30,
                   decoration: BoxDecoration(

@@ -11,16 +11,15 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:app_1helo/Cusstom/LegendItem.dart';
 
 class Linecharpage extends StatefulWidget {
-  const Linecharpage({Key? key}) : super(key: key);
+  const Linecharpage({super.key});
 
   @override
-  _LinecharpageState createState() => _LinecharpageState();
+  LinecharpageState createState() => LinecharpageState();
 }
 
-class _LinecharpageState extends State<Linecharpage> {
-  late Future<String> chartData;
-  TextEditingController _searchControllerCustomer = TextEditingController();
-  TextEditingController _searchControllerUsers = TextEditingController();
+class LinecharpageState extends State<Linecharpage> {
+  final _searchControllerCustomer = TextEditingController();
+  final _searchControllerUsers = TextEditingController();
 
   final LineChartService _lineChartService = LineChartService();
   final AuthService _athServiceService = AuthService();
@@ -49,6 +48,19 @@ class _LinecharpageState extends State<Linecharpage> {
   void initState() {
     super.initState();
     _fetchInitialData();
+  }
+
+//Refres
+  Future<void> refreshChartData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    {
+      setState(() {
+        _fetchData();
+      });
+    }
   }
 
   @override
@@ -117,6 +129,7 @@ class _LinecharpageState extends State<Linecharpage> {
           _legendItems
               .add(const LegendItem(color: Colors.green, text: 'Hoàn thành'));
         }
+
         if (lineChartResponse?.data?.processingCo != null &&
             lineChartResponse!.data!.processingCo!.isNotEmpty) {
           _processingCoSpots =
@@ -329,6 +342,8 @@ class _LinecharpageState extends State<Linecharpage> {
         hint: Text(
           hint,
           style: const TextStyle(fontSize: 13, color: Colors.black),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
         value: selectedItem,
         isExpanded: true,
@@ -341,6 +356,8 @@ class _LinecharpageState extends State<Linecharpage> {
             child: Text(
               item,
               style: const TextStyle(fontSize: 13, color: Colors.black),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           );
         }).toList(),
@@ -412,18 +429,21 @@ class _LinecharpageState extends State<Linecharpage> {
         child: Column(
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Expanded(child: renderCustomerDropdown()),
+                FittedBox(
+                    child:
+                        SizedBox(width: 200, child: renderCustomerDropdown())),
                 const SizedBox(width: 6),
-                SizedBox(width: 130, child: renderUserDropdown()),
+                FittedBox(
+                    child: SizedBox(width: 140, child: renderUserDropdown())),
               ],
             ),
             const SizedBox(height: 10),
             Padding(
-              padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: _legendItems,
               ),
             ),
@@ -487,21 +507,18 @@ class _LinecharpageState extends State<Linecharpage> {
                                   getTitlesWidget: (value, meta) {
                                     int index = value.toInt();
 
-                                    // Check if the index is valid, if not return an empty widget
                                     if (index < 0 ||
                                         index >= monthLabels.length) {
                                       return const SizedBox.shrink();
                                     }
 
-                                    // Get the selected month in 'YYYY-MM' format from monthLabels
                                     final selectedMonth = monthLabels[index];
                                     final parts = selectedMonth.split('-');
                                     final year = parts[0];
                                     final month = parts[1];
 
-                                    // Return the formatted month/year as text
                                     return Text(
-                                      '$month/$year', // Format the month/year as MM/YYYY
+                                      '$month/$year',
                                       style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 12,

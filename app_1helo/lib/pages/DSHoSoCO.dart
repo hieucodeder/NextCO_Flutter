@@ -21,6 +21,7 @@ class _DshosocoState extends State<Dshosoco> {
   final TextEditingController _searchController = TextEditingController();
   DocumentService documentService = DocumentService();
   List<Data> documentLits = [];
+  List<Data> _filteredData = [];
   final TextEditingController _searchControllerDocuments =
       TextEditingController();
   List<Data> _searchResults = [];
@@ -124,6 +125,7 @@ class _DshosocoState extends State<Dshosoco> {
     }
   }
 
+  String? _selectedStatus;
   String? startDate;
   String? endDate;
   final TextEditingController _controller = TextEditingController();
@@ -245,6 +247,40 @@ class _DshosocoState extends State<Dshosoco> {
     }
   }
 
+  Color _getStatusColor(String? statusName) {
+    switch (statusName) {
+      case 'Chờ hủy':
+        return Colors.orange;
+      case 'Chờ duyệt':
+        return Colors.orange;
+      case 'Hoàn thành':
+        return Colors.green;
+      case 'Đang thực hiện':
+        return Colors.black;
+      case 'Đang sửa':
+        return Colors.black;
+      case 'Chờ sửa':
+        return Colors.black;
+      case 'Từ chối xét duyệt':
+        return Colors.red;
+      case 'Đã hủy':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  // List of status options
+  final List<String> _statusList = [
+    'Chờ hủy',
+    'Chờ duyệt',
+    'Hoàn thành',
+    'Đang thực hiện',
+    'Đang sửa',
+    'Chờ sửa',
+    'Từ chối xét duyệt',
+    'Đã hủy',
+  ];
   Widget buildDropdown({
     required List<String> items,
     required String? selectedItem,
@@ -265,6 +301,8 @@ class _DshosocoState extends State<Dshosoco> {
         hint: Text(
           hint,
           style: const TextStyle(fontSize: 13, color: Colors.black),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
         value: selectedItem,
         isExpanded: true,
@@ -277,6 +315,8 @@ class _DshosocoState extends State<Dshosoco> {
             child: Text(
               item,
               style: const TextStyle(fontSize: 13, color: Colors.black),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           );
         }).toList(),
@@ -343,29 +383,33 @@ class _DshosocoState extends State<Dshosoco> {
       ..sort((a, b) => (a.rowNumber ?? 0).compareTo(b.rowNumber ?? 0));
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.all(10.0),
       color: Colors.grey[200],
       child: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              children: [
-                Expanded(child: renderCustomerDropdown()),
-                const SizedBox(
-                  width: 10,
-                ),
-                SizedBox(width: 150, child: renderUserDropdown()),
-              ],
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              FittedBox(
+                  child: SizedBox(width: 200, child: renderCustomerDropdown())),
+              const SizedBox(
+                width: 10,
+              ),
+              FittedBox(
+                  child: SizedBox(width: 160, child: renderUserDropdown())),
+            ],
+          ),
+          const SizedBox(
+            height: 8,
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Expanded(
+              FittedBox(
                 child: GestureDetector(
                   onTap: _selectDateRange,
                   child: Container(
-                    width: double.infinity,
+                    width: 200,
                     height: 40,
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -375,17 +419,20 @@ class _DshosocoState extends State<Dshosoco> {
                     child: Row(
                       children: [
                         Expanded(
-                          child: TextField(
-                            controller: _controller,
-                            readOnly: true,
-                            textAlign: TextAlign.center,
-                            decoration: InputDecoration(
-                              hintText: 'Chọn Ngày Bắt Đầu và Kết Thúc',
-                              hintStyle: GoogleFonts.robotoCondensed(
-                                fontSize: 14,
-                                color: Colors.black38,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2.0),
+                            child: TextField(
+                              controller: _controller,
+                              readOnly: true,
+                              textAlign: TextAlign.center,
+                              decoration: InputDecoration(
+                                hintText: 'Chọn ngày bắt đầu và kết thúc',
+                                hintStyle: GoogleFonts.robotoCondensed(
+                                  fontSize: 14,
+                                  color: Colors.black38,
+                                ),
+                                border: InputBorder.none,
                               ),
-                              border: InputBorder.none,
                             ),
                           ),
                         ),
@@ -419,54 +466,55 @@ class _DshosocoState extends State<Dshosoco> {
               const SizedBox(
                 width: 10,
               ),
-              Container(
-                width: 150,
-                height: 40,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(width: 1, color: Colors.black38),
-                  color: Colors.white,
-                ),
-                child: TextField(
-                  controller: _searchControllerDocuments,
-                  onChanged: (value) {
-                    setState(() {
-                      // Trigger a rebuild on search input change
-                    });
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Số hồ sơ, tờ khai xuất, tình trạng',
-                    hintStyle: GoogleFonts.robotoCondensed(
-                        fontSize: 14, color: Colors.black38),
-                    border: const OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10),
+              FittedBox(
+                child: Container(
+                  width: 160,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(width: 1, color: Colors.black38),
+                    color: Colors.white,
+                  ),
+                  child: TextField(
+                    controller: _searchControllerDocuments,
+                    onChanged: (value) {
+                      setState(() {
+                        // Trigger a rebuild on search input change
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Số hồ sơ, tờ khai xuất, tình trạng',
+                      hintStyle: GoogleFonts.robotoCondensed(
+                          fontSize: 14, color: Colors.black38),
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                        borderSide: BorderSide.none,
                       ),
-                      borderSide: BorderSide.none,
-                    ),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        _searchDocuments(_searchControllerDocuments.text);
-                      },
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          VerticalDivider(
-                            width: 20,
-                            thickness: 1,
-                            color: Colors.black38,
-                          ),
-                          Icon(Icons.search_outlined)
-                        ],
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          _searchDocuments(_searchControllerDocuments.text);
+                        },
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            VerticalDivider(
+                              width: 20,
+                              thickness: 1,
+                              color: Colors.black38,
+                            ),
+                            Icon(Icons.search_outlined)
+                          ],
+                        ),
                       ),
+                      contentPadding: const EdgeInsets.all(5),
                     ),
-                    contentPadding: const EdgeInsets.all(5),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
           const SizedBox(
             height: 10,
           ),
@@ -516,9 +564,9 @@ class _DshosocoState extends State<Dshosoco> {
                           ),
                         )),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 48.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
                   onPressed: currentPage > 1
@@ -560,7 +608,6 @@ class _DshosocoState extends State<Dshosoco> {
                     color: Colors.black,
                   ),
                 ),
-                const SizedBox(width: 8),
                 Container(
                   height: 30,
                   decoration: BoxDecoration(
@@ -607,88 +654,147 @@ class _DshosocoState extends State<Dshosoco> {
       'Trạng thái',
     ];
 
-    return columnTitles.map((title) {
-      return DataColumn(
-        label: Text(title,
-            style: GoogleFonts.robotoCondensed(
-                color: Colors.black, fontSize: 16, fontWeight: FontWeight.w500),
-            textAlign: TextAlign.center),
-      );
+    return columnTitles.asMap().entries.map((entry) {
+      final index = entry.key;
+      final title = entry.value;
+
+      if (title == 'Trạng thái') {
+        // Thêm DropdownButton cho cột "Trạng thái"
+        return DataColumn(
+          label: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.robotoCondensed(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                DropdownButton<String>(
+                  hint: const Text('Lọc'),
+                  value: _selectedStatus,
+                  icon: const Icon(Icons.filter_list, color: Colors.black),
+                  underline: const SizedBox(),
+                  items: _statusList.map((status) {
+                    return DropdownMenuItem<String>(
+                      value: status,
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: _getStatusColor(status),
+                            radius: 5,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(status),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedStatus = value; // Cập nhật trạng thái đã chọn
+                      // Apply filter logic to show only matching data rows
+                      _filterDataByStatus();
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      } else {
+        // Các cột khác không thay đổi
+        return DataColumn(
+          label: Center(
+            child: Text(
+              title,
+              style: GoogleFonts.robotoCondensed(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        );
+      }
     }).toList();
+  }
+
+  void _filterDataByStatus() {
+    setState(() {
+      if (_selectedStatus != null) {
+        _filteredData = documentLits.where((item) {
+          return item.statusName == _selectedStatus;
+        }).toList();
+      } else {
+        _filteredData = List.from(documentLits); // If no filter, show all data
+      }
+    });
   }
 
   DataRow _buildDataRow(Data doc) {
     return DataRow(cells: [
       DataCell(
-        Text(doc.rowNumber?.toString() ?? ''),
+        Center(child: Text(doc.rowNumber?.toString() ?? '')),
         placeholder: false,
         showEditIcon: false,
       ),
       DataCell(
-        Text(
-          doc.coDocumentId?.toString() ?? '',
-          style: GoogleFonts.robotoCondensed(
-            fontWeight: FontWeight.w700,
-            color: Colors.blue,
+        Center(
+          child: Text(
+            doc.coDocumentId?.toString() ?? '',
+            style: GoogleFonts.robotoCondensed(
+              fontWeight: FontWeight.w700,
+              color: Colors.blue,
+            ),
           ),
         ),
       ),
-      DataCell(Text(doc.coFormId ?? '')),
+      DataCell(Center(child: Center(child: Text(doc.coFormId ?? '')))),
       DataCell(
-        Text(
-          doc.createdDate != null
-              ? DateFormat('dd/MM/yyyy')
-                  .format(DateTime.parse(doc.createdDate!))
-              : 'N/A',
-        ),
-      ),
-      DataCell(
-        Text(
-          doc.numberTkx?.join(', ') ?? '',
-          style: GoogleFonts.robotoCondensed(
-            color: Colors.blue,
-            fontWeight: FontWeight.w600,
+        Center(
+          child: Text(
+            doc.createdDate != null
+                ? DateFormat('dd/MM/yyyy')
+                    .format(DateTime.parse(doc.createdDate!))
+                : 'N/A',
           ),
         ),
       ),
-      DataCell(Text(doc.numberTkxWithShippingTerms
-              ?.map((e) => e.invoiceNumber ?? '')
-              .join(', ') ??
-          '')),
-      DataCell(Text(doc.customerName ?? '')),
-      DataCell(Text(doc.employeeName ?? '')),
       DataCell(
-        Text(
-          doc.statusName ?? '',
-          style: GoogleFonts.robotoCondensed(
-            color: _getStatusColor(doc.statusName), // Áp dụng màu trạng thái
-            fontWeight: FontWeight.w600,
+        Center(
+          child: Text(
+            doc.numberTkx?.join(', ') ?? '',
+            style: GoogleFonts.robotoCondensed(
+              color: Colors.blue,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+      DataCell(Center(
+        child: Text(doc.numberTkxWithShippingTerms
+                ?.map((e) => e.invoiceNumber ?? '')
+                .join(', ') ??
+            ''),
+      )),
+      DataCell(Center(child: Text(doc.customerName ?? ''))),
+      DataCell(Center(child: Text(doc.employeeName ?? ''))),
+      DataCell(
+        Center(
+          child: Text(
+            doc.statusName ?? '',
+            style: GoogleFonts.robotoCondensed(
+              color: _getStatusColor(doc.statusName), // Áp dụng màu trạng thái
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ),
     ]);
-  }
-}
-
-Color _getStatusColor(String? statusName) {
-  switch (statusName) {
-    case 'Chờ hủy':
-      return Colors.orange;
-    case 'Chờ duyệt':
-      return Colors.orange;
-    case 'Hoàn thành':
-      return Colors.green;
-    case 'Đang thực hiện':
-      return Colors.black;
-    case 'Đang sửa':
-      return Colors.black;
-    case 'Chờ sửa':
-      return Colors.black;
-    case 'Từ chối xét duyệt':
-      return Colors.red;
-    case 'Đã hủy':
-      return Colors.red;
-    default:
-      return Colors.grey;
   }
 }

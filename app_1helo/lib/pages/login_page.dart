@@ -117,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Align(
                 alignment: Alignment.topCenter,
                 child: SvgPicture.asset('resources/logonextco.svg',
-                    width: 100, height: 48),
+                    width: 80, height: 46),
               ),
             ),
             Container(

@@ -1,53 +1,70 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:app_1helo/charPage/LineCharPage.dart';
 import 'package:app_1helo/charPage/PieChartPage.dart';
+import 'package:app_1helo/charPage/tableEmployeedPage.dart';
+import 'package:app_1helo/model/prodcutReportModel.dart';
 import 'package:app_1helo/model/totalModel.dart';
 import 'package:app_1helo/service/productReport_service.dart';
+
 import 'package:app_1helo/service/total_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-class HomePage extends StatefulWidget {
-  final Function(int) onSelectPage;
+import '../charPage/LineCharPage.dart';
 
-  const HomePage({super.key, required this.onSelectPage});
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  late Future<List<void>> loadData;
+  final GlobalKey<LinecharpageState> _lineChartKey =
+      GlobalKey<LinecharpageState>();
 
+  final GlobalKey<PiechartpageState> _pieChartKey =
+      GlobalKey<PiechartpageState>();
+
+  final GlobalKey<TableemployeedpageState> _tableEmployeedPageKey =
+      GlobalKey<TableemployeedpageState>();
   int? totalProductsResport;
   int? totalItems, totalDocuments, totalUser;
-  int? totalCustomer,
-      totalProduct,
-      totalMaterial,
-      totalCoDocument,
-      totalEmployee,
-      totalProductsreport;
-  bool isLoading = true, isDropDownVisible = false;
+  int? totalCustomer, totalProduct, totalMaterial;
+  int? totalCoDocument, totalEmployee, totalProductsreport;
+
+  bool _isLoading = true;
+  bool isDropDownVisible = false;
   String randomNumber = '';
 
   Timer? timer;
   final totalService = TotalService();
   final productReportService = ProductReportService();
+  final _scrollController = ScrollController();
+  List<DataModel> items = [];
 
+  int currentPage = 1;
   @override
   void initState() {
     super.initState();
     _resetState();
     _startRandomNumberGenerator();
     _fetchAllData();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        _fetchAllData();
+      }
+    });
   }
 
   @override
   void dispose() {
     timer?.cancel();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -70,7 +87,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Future<void> _fetchAllData() async {
-    setState(() => isLoading = true);
+    setState(() => _isLoading = true);
 
     try {
       await _fetchTotalData();
@@ -80,7 +97,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     } finally {
       if (mounted) {
         setState(() {
-          isLoading = false;
+          _isLoading = false;
           timer?.cancel();
         });
       }
@@ -89,12 +106,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Future<void> _fetchTotalDataProductsReport() async {
     try {
-      final int? fetchedTotalItems =
-          await productReportService.fetchTotalItems();
+      const int pageSize = 100;
+      int page = 1;
+      bool hasMoreData = true;
+      int totalQuantity = 0;
+
+      while (hasMoreData) {
+        final List<DataModel> dataList =
+            await productReportService.fetchProductsReportQuantity();
+
+        totalQuantity += dataList.fold<int>(
+          0,
+          (sum, item) => sum + (item.quantity ?? 0),
+        );
+
+        hasMoreData = dataList.length == pageSize;
+        page++;
+      }
 
       if (mounted) {
         setState(() {
-          totalProductsResport = fetchedTotalItems ?? 0;
+          totalProductsResport = totalQuantity;
         });
       }
     } catch (e) {
@@ -119,281 +151,52 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
-  Text _customText(
-      String text, Color color, double fontSize, FontWeight fontWeight) {
-    return Text(
-      text,
-      style:
-          TextStyle(fontSize: fontSize, color: color, fontWeight: fontWeight),
-    );
-  }
-
   String _formatNumber(int? number) {
     return number == null ? '_' : NumberFormat('#,##0', 'en_US').format(number);
   }
 
   Text renderNumberResult(int? result, Color color) {
     return Text(
-      isLoading ? randomNumber : _formatNumber(result), // Nội dung văn bản
+      _isLoading ? randomNumber : _formatNumber(result),
       style: TextStyle(
         color: color,
-        fontSize: 18,
+        fontSize: 19,
         fontWeight: FontWeight.w700,
       ),
-      maxLines: 1, // Giới hạn chỉ hiển thị 1 dòng
-      overflow: TextOverflow.ellipsis, // Hiển thị dấu ba chấm nếu quá dài
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
+  }
+
+  Future<void> _onRefresh() async {
+    _startRandomNumberGenerator();
+
+    await Future.wait([
+      _fetchAllData(),
+      _lineChartKey.currentState?.refreshChartData() ?? Future.value(),
+      _pieChartKey.currentState?.refreshChartData() ?? Future.value()
+    ]);
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        color: Colors.white,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: const Color(0xfff9f0ff),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0x005c6566).withOpacity(0.3),
-                            blurRadius: 8,
-                          )
-                        ]),
-                    width: (MediaQuery.of(context).size.width - 50) / 2,
-                    height: 64,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        SizedBox(
-                          width: 90,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              renderNumberResult(
-                                totalCustomer,
-                                const Color.fromARGB(255, 108, 55, 172),
-                              ),
-                              Text(
-                                'Khách hàng',
-                                style: GoogleFonts.robotoCondensed(
-                                    textStyle: const TextStyle(
-                                        fontSize: 14,
-                                        color: Color(0xff9254DE),
-                                        fontWeight: FontWeight.w500)),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Center(
-                          child: SvgPicture.asset(
-                            'resources/khachhang.svg',
-                            fit: BoxFit.contain,
-                            width: 56,
-                            height: 56,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: const Color.fromARGB(255, 253, 253, 218),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0x005c6566).withOpacity(0.3),
-                            blurRadius: 8,
-                          )
-                        ]),
-                    width: (MediaQuery.of(context).size.width - 50) / 2,
-                    height: 64,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        SizedBox(
-                          width: 90,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              renderNumberResult(
-                                totalEmployee,
-                                const Color.fromARGB(255, 131, 129, 11),
-                              ),
-                              Text('Nhân viên',
-                                  style: GoogleFonts.robotoCondensed(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color:
-                                        const Color.fromARGB(255, 131, 129, 11),
-                                  ))
-                            ],
-                          ),
-                        ),
-                        Center(
-                          child: Container(
-                            width: 56,
-                            height: 56,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color.fromARGB(255, 250, 248, 160),
-                            ),
-                            child: ClipOval(
-                              child: Transform.scale(
-                                scale: 0.7,
-                                child: SvgPicture.asset(
-                                  'resources/emloyee.svg',
-                                  color:
-                                      const Color.fromARGB(255, 131, 129, 11),
-                                  fit: BoxFit.contain,
-                                  width: 56,
-                                  height: 2,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+    return RefreshIndicator(
+      onRefresh: _onRefresh,
+      child: SingleChildScrollView(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          color: Colors.white,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 10,
               ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: const Color(0xffF6FFED),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0x005c6566).withOpacity(0.3),
-                            blurRadius: 8,
-                          )
-                        ]),
-                    width: (MediaQuery.of(context).size.width - 50) / 2,
-                    height: 64,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        SizedBox(
-                          width: 100,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              renderNumberResult(
-                                totalProduct,
-                                const Color(0xff389E0D),
-                              ),
-                              Text(
-                                'Sản phẩm C/O',
-                                style: GoogleFonts.robotoCondensed(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: const Color(0xff389E0D),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        Center(
-                          child: SvgPicture.asset(
-                            'resources/Product.svg',
-                            fit: BoxFit.contain,
-                            width: 56,
-                            height: 56,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: const Color(0xffECFCFE),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0x005c6566).withOpacity(0.3),
-                            blurRadius: 8,
-                          )
-                        ]),
-                    // width: 190,
-                    width: (MediaQuery.of(context).size.width - 50) / 2,
-                    height: 64,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        SizedBox(
-                          width: 90,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              renderNumberResult(
-                                totalCoDocument,
-                                const Color(0xff064265),
-                              ),
-                              Text(
-                                'Hồ sơ C/O',
-                                style: GoogleFonts.robotoCondensed(
-                                    color: const Color(0xff064265),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500),
-                              )
-                            ],
-                          ),
-                        ),
-                        Center(
-                          child: SvgPicture.asset(
-                            'resources/hoso.svg',
-                            fit: BoxFit.contain,
-                            height: 56,
-                            width: 56,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: Row(
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -401,7 +204,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          color: const Color(0xffFFEEED),
+                          color: const Color(0xfff9f0ff),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(0x005c6566).withOpacity(0.3),
@@ -411,49 +214,48 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       width: (MediaQuery.of(context).size.width - 50) / 2,
                       height: 64,
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           SizedBox(
-                            width: 97,
+                            width: 90,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 renderNumberResult(
-                                  totalProductsResport,
-                                  const Color.fromARGB(255, 255, 82, 82),
+                                  totalCustomer,
+                                  const Color.fromARGB(255, 108, 55, 172),
                                 ),
-                                Text('Sản phẩm tồn',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.robotoCondensed(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: const Color.fromARGB(
-                                          255, 255, 82, 82),
-                                    ))
+                                Text(
+                                  'Khách hàng',
+                                  style: GoogleFonts.robotoCondensed(
+                                      textStyle: const TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xff9254DE),
+                                          fontWeight: FontWeight.w500)),
+                                ),
                               ],
                             ),
                           ),
-                          const SizedBox(
-                            width: 10,
-                          ),
                           Center(
                             child: SvgPicture.asset(
-                              'resources/ProductsResport.svg',
+                              'resources/khachhang.svg',
                               fit: BoxFit.contain,
+                              width: 56,
                               height: 56,
-                              width: 5,
                             ),
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(
+                      width: 10,
+                    ),
                     Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          color: const Color(0xffFAFAFA),
+                          color: const Color.fromARGB(255, 253, 253, 218),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(0x005c6566).withOpacity(0.3),
@@ -472,20 +274,146 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 renderNumberResult(
-                                  totalMaterial,
-                                  const Color(0xffFA8C16),
+                                  totalEmployee,
+                                  const Color.fromARGB(255, 131, 129, 11),
                                 ),
-                                Text('Nguyên vật liệu',
+                                Text('Nhân viên',
                                     style: GoogleFonts.robotoCondensed(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: const Color(0xffFA8C16)))
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: const Color.fromARGB(
+                                          255, 131, 129, 11),
+                                    ))
+                              ],
+                            ),
+                          ),
+                          Center(
+                            child: Container(
+                              width: 56,
+                              height: 56,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Color.fromARGB(255, 250, 248, 160),
+                              ),
+                              child: ClipOval(
+                                child: Transform.scale(
+                                  scale: 0.7,
+                                  child: SvgPicture.asset(
+                                    'resources/emloyee.svg',
+                                    color:
+                                        const Color.fromARGB(255, 131, 129, 11),
+                                    fit: BoxFit.contain,
+                                    width: 56,
+                                    height: 2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: const Color(0xffF6FFED),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0x005c6566).withOpacity(0.3),
+                              blurRadius: 8,
+                            )
+                          ]),
+                      width: (MediaQuery.of(context).size.width - 50) / 2,
+                      height: 64,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          SizedBox(
+                            width: 100,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                renderNumberResult(
+                                  totalProduct,
+                                  const Color(0xff389E0D),
+                                ),
+                                Text(
+                                  'Sản phẩm C/O',
+                                  style: GoogleFonts.robotoCondensed(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: const Color(0xff389E0D),
+                                  ),
+                                )
                               ],
                             ),
                           ),
                           Center(
                             child: SvgPicture.asset(
-                              'resources/Material.svg',
+                              'resources/Product.svg',
+                              fit: BoxFit.contain,
+                              width: 56,
+                              height: 56,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: const Color(0xffECFCFE),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0x005c6566).withOpacity(0.3),
+                              blurRadius: 8,
+                            )
+                          ]),
+                      // width: 190,
+                      width: (MediaQuery.of(context).size.width - 50) / 2,
+                      height: 64,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SizedBox(
+                            width: 90,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                renderNumberResult(
+                                  totalCoDocument,
+                                  const Color(0xff064265),
+                                ),
+                                Text(
+                                  'Hồ sơ C/O',
+                                  style: GoogleFonts.robotoCondensed(
+                                      color: const Color(0xff064265),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500),
+                                )
+                              ],
+                            ),
+                          ),
+                          Center(
+                            child: SvgPicture.asset(
+                              'resources/hoso.svg',
                               fit: BoxFit.contain,
                               height: 56,
                               width: 56,
@@ -494,91 +422,247 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ],
                       ),
                     )
-                  ]),
-            ),
-            const SizedBox(height: 20),
-            SingleChildScrollView(
-              child: Column(
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: const Color(0xffFFEEED),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0x005c6566).withOpacity(0.3),
+                                blurRadius: 8,
+                              )
+                            ]),
+                        width: (MediaQuery.of(context).size.width - 50) / 2,
+                        height: 64,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            SizedBox(
+                              width: 90,
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  renderNumberResult(
+                                    totalProductsResport,
+                                    const Color.fromARGB(255, 255, 82, 82),
+                                  ),
+                                  Text('Sản phẩm tồn',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.robotoCondensed(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: const Color.fromARGB(
+                                            255, 255, 82, 82),
+                                      ))
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Center(
+                              child: SvgPicture.asset(
+                                'resources/ProductsResport.svg',
+                                fit: BoxFit.contain,
+                                height: 56,
+                                width: 5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: const Color(0xffFAFAFA),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0x005c6566).withOpacity(0.3),
+                                blurRadius: 8,
+                              )
+                            ]),
+                        width: (MediaQuery.of(context).size.width - 50) / 2,
+                        height: 64,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            SizedBox(
+                              width: 90,
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  renderNumberResult(
+                                    totalMaterial,
+                                    const Color(0xffFA8C16),
+                                  ),
+                                  Text('Nguyên vật liệu',
+                                      style: GoogleFonts.robotoCondensed(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: const Color(0xffFA8C16)))
+                                ],
+                              ),
+                            ),
+                            Center(
+                              child: SvgPicture.asset(
+                                'resources/Material.svg',
+                                fit: BoxFit.contain,
+                                height: 56,
+                                width: 56,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ]),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: const Color(0xffFAFAFA),
+                        border: Border.all(
+                            width: 1,
+                            color: const Color(0xffC4C9CA),
+                            style: BorderStyle.solid),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xff2C2E30).withOpacity(0.2),
+                            blurRadius: 8,
+                          )
+                        ],
+                      ),
+                      width: MediaQuery.of(context).size.width,
+                      height: 450,
+                      child: Column(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 40,
+                            padding: const EdgeInsets.all(8),
+                            child: Text('Số lượng hồ sơ C/O theo nhân viên',
+                                style: GoogleFonts.robotoCondensed(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                          ),
+                          const Divider(color: Color(0xffC4C9CA)),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Tableemployeedpage(key: _tableEmployeedPageKey),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: const Color(0xffFAFAFA),
+                        border: Border.all(
+                            width: 1,
+                            color: const Color(0xffC4C9CA),
+                            style: BorderStyle.solid),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xff2C2E30).withOpacity(0.2),
+                            blurRadius: 8,
+                          )
+                        ],
+                      ),
+                      width: MediaQuery.of(context).size.width,
+                      height: 450,
+                      child: Column(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 40,
+                            padding: const EdgeInsets.all(8),
+                            child: Text('Số lượng hồ sơ C/O theo trạng thái',
+                                style: GoogleFonts.robotoCondensed(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                          ),
+                          const Divider(color: Color(0xffC4C9CA)),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Linecharpage(key: _lineChartKey),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: const Color(0xffFAFAFA),
-                      border: Border.all(
-                          width: 1,
-                          color: const Color(0xffC4C9CA),
-                          style: BorderStyle.solid),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xff2C2E30).withOpacity(0.2),
-                          blurRadius: 8,
-                        )
-                      ],
-                    ),
+                        borderRadius: BorderRadius.circular(16),
+                        color: const Color(0xffFAFAFA),
+                        border: Border.all(
+                            width: 1,
+                            color: const Color(0xffC4C9CA),
+                            style: BorderStyle.solid),
+                        boxShadow: [
+                          BoxShadow(
+                              color: const Color(0xff2C2E30).withOpacity(0.2),
+                              blurRadius: 8)
+                        ]),
                     width: MediaQuery.of(context).size.width,
                     height: 450,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
                           width: MediaQuery.of(context).size.width,
                           height: 40,
-                          padding: const EdgeInsets.all(8),
-                          child: Text('Số lượng hồ sơ C/O theo trạng thái',
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          margin: const EdgeInsets.symmetric(horizontal: 5),
+                          child: Text('Tỷ lệ hồ sơ C/O theo trạng thái',
                               style: GoogleFonts.robotoCondensed(
                                   fontSize: 16, fontWeight: FontWeight.bold)),
                         ),
                         const Divider(color: Color(0xffC4C9CA)),
-                        const SizedBox(
-                          height: 8,
+                        Piechartpage(
+                          key: _pieChartKey,
                         ),
-                        const Linecharpage(),
                       ],
                     ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: const Color(0xffFAFAFA),
-                      border: Border.all(
-                          width: 1,
-                          color: const Color(0xffC4C9CA),
-                          style: BorderStyle.solid),
-                      boxShadow: [
-                        BoxShadow(
-                            color: const Color(0xff2C2E30).withOpacity(0.2),
-                            blurRadius: 8)
-                      ]),
-                  width: MediaQuery.of(context).size.width,
-                  height: 450,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 40,
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        margin: const EdgeInsets.symmetric(horizontal: 5),
-                        child: Text('Tỷ lệ hồ sơ C/O theo trạng thái',
-                            style: GoogleFonts.robotoCondensed(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
-                      ),
-                      const Divider(color: Color(0xffC4C9CA)),
-                      const Piechartpage(),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

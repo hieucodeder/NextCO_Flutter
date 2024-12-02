@@ -2,7 +2,7 @@ class Prodcutreportmodel {
   int? totalItems;
   int? page;
   int? pageSize;
-  List<Data>? data;
+  List<DataModel>? data;
   int? pageCount;
 
   Prodcutreportmodel(
@@ -13,9 +13,9 @@ class Prodcutreportmodel {
     page = json['page'] as int?;
     pageSize = json['pageSize'] as int?;
     if (json['data'] != null) {
-      data = <Data>[];
+      data = <DataModel>[];
       json['data'].forEach((v) {
-        data!.add(Data.fromJson(v));
+        data!.add(DataModel.fromJson(v));
       });
     }
     pageCount = json['pageCount'] as int?;
@@ -34,7 +34,7 @@ class Prodcutreportmodel {
   }
 }
 
-class Data {
+class DataModel {
   int? rowNumber;
   String? exportDeclarationNumber;
   String? exportDeclarationId;
@@ -57,7 +57,7 @@ class Data {
   String? listJsonProductNormCoDocuments;
   int? recordCount;
 
-  Data(
+  DataModel(
       {this.rowNumber,
       this.exportDeclarationNumber,
       this.exportDeclarationId,
@@ -80,21 +80,19 @@ class Data {
       this.listJsonProductNormCoDocuments,
       this.recordCount});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  DataModel.fromJson(Map<String, dynamic> json) {
     rowNumber = json['RowNumber'] as int?;
     exportDeclarationNumber = json['export_declaration_number'] as String?;
     exportDeclarationId = json['export_declaration_id'] as String?;
     dateOfDeclaration = json['date_of_declaration'] as String?;
-    usdExchangeRate =
-        (json['usd_exchange_rate'] as num?)?.toDouble(); 
+    usdExchangeRate = (json['usd_exchange_rate'] as num?)?.toDouble();
     sortOrder = json['sort_order'] as int?;
     productCode = json['product_code'] as String?;
     hsCode = json['hs_code'] as String?;
     productName = json['product_name'] as String?;
     originCountry = json['origin_country'] as String?;
-    unitPrice = (json['unit_price'] as num?)?.toDouble(); 
-    taxablePrice =
-        (json['taxable_price'] as num?)?.toDouble();
+    unitPrice = (json['unit_price'] as num?)?.toDouble();
+    taxablePrice = (json['taxable_price'] as num?)?.toDouble();
     unit = json['unit'] as String?;
     quantity = json['quantity'] as int?;
     coAvailable = json['co_available'] as int?;

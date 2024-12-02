@@ -25,8 +25,8 @@ class _ProductreportpageState extends State<Productreportpage> {
   bool hasMoreData = true;
   bool _isSearching = false;
 
-  List<Data> productReportList = [];
-  List<Data> _searchResults = [];
+  List<DataModel> productReportList = [];
+  List<DataModel> _searchResults = [];
 
   List<EmployeeCustomer> _filteredEmployeeCustomer = [];
   EmployeeCustomer? selectedEmployeeCustomer;
@@ -55,7 +55,7 @@ class _ProductreportpageState extends State<Productreportpage> {
       setState(() => isLoading = true);
     }
 
-    List<Data> initialProducts = await _productreportService
+    List<DataModel> initialProducts = await _productreportService
         .fetchProductsReport(currentPage, itemsPerPage, search, _customerid);
 
     if (mounted) {
@@ -77,7 +77,7 @@ class _ProductreportpageState extends State<Productreportpage> {
       return;
     }
 
-    List<Data> results = await _productreportService.fetchProductsReport(
+    List<DataModel> results = await _productreportService.fetchProductsReport(
         currentPage, pageSize, searchQuery, _customerid);
     if (mounted) {
       setState(() {
@@ -117,8 +117,8 @@ class _ProductreportpageState extends State<Productreportpage> {
         });
       }
 
-      List<Data> reportData = await _productreportService.fetchProductsReport(
-          currentPage, pageSize, search, customerId);
+      List<DataModel> reportData = await _productreportService
+          .fetchProductsReport(currentPage, pageSize, search, customerId);
       if (mounted) {
         setState(() {
           productReportList = reportData;
@@ -149,7 +149,7 @@ class _ProductreportpageState extends State<Productreportpage> {
     setState(() => isLoading = true);
     currentPage++;
 
-    List<Data> moreProductsResPort = await _productreportService
+    List<DataModel> moreProductsResPort = await _productreportService
         .fetchProductsReport(currentPage, pageSize, search, _customerid);
 
     if (mounted) {
@@ -197,7 +197,7 @@ class _ProductreportpageState extends State<Productreportpage> {
           DateFormat('yyyy-MM-dd').parse(startDate1!);
       final DateTime parsedEndDate = DateFormat('yyyy-MM-dd').parse(endDate1!);
 
-      List<Data> dateFilteredList =
+      List<DataModel> dateFilteredList =
           await _productreportService.fetchProductsReportDate(
         parsedStartDate,
         parsedEndDate,
@@ -252,6 +252,8 @@ class _ProductreportpageState extends State<Productreportpage> {
         hint: Text(
           hint,
           style: const TextStyle(fontSize: 14, color: Colors.black),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
         value: selectedItem,
         isExpanded: true,
@@ -264,6 +266,8 @@ class _ProductreportpageState extends State<Productreportpage> {
             child: Text(
               item,
               style: const TextStyle(fontSize: 14, color: Colors.black),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           );
         }).toList(),
@@ -300,7 +304,7 @@ class _ProductreportpageState extends State<Productreportpage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Data> displayList = _isSearching
+    List<DataModel> displayList = _isSearching
         ? _searchResults
         : (startDate1 != null && endDate1 != null
             ? productReportList.where((data) {
@@ -335,18 +339,20 @@ class _ProductreportpageState extends State<Productreportpage> {
               child: Row(
                 children: [
                   Expanded(
-                    child: TextField(
-                      controller: _searchDate,
-                      readOnly: true,
-                      textAlign: TextAlign.center,
-                      decoration: InputDecoration(
-                        hintText: 'Chọn ngày bắt đầu và kết thúc',
-                        hintStyle: GoogleFonts.robotoCondensed(
-                          fontSize: 14,
-                          color: Colors.black38,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        controller: _searchDate,
+                        readOnly: true,
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                          hintText: 'Chọn ngày bắt đầu và kết thúc',
+                          hintStyle: GoogleFonts.robotoCondensed(
+                            fontSize: 14,
+                            color: Colors.black38,
+                          ),
+                          border: InputBorder.none,
                         ),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.all(5),
                       ),
                     ),
                   ),
@@ -377,76 +383,80 @@ class _ProductreportpageState extends State<Productreportpage> {
           ),
           const SizedBox(height: 10),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Expanded(child: renderCustomerDropdown()),
+              FittedBox(
+                  child: SizedBox(width: 200, child: renderCustomerDropdown())),
               const SizedBox(width: 10),
-              Container(
-                width: 160,
-                height: 40,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(width: 1, color: Colors.black38),
-                  color: Colors.white,
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Mã sản phẩm, tên sản phẩm',
-                    hintStyle: GoogleFonts.robotoCondensed(
-                        fontSize: 14, color: Colors.black38),
-                    border: const OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10),
+              FittedBox(
+                child: Container(
+                  width: 160,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(width: 1, color: Colors.black38),
+                    color: Colors.white,
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Mã sản phẩm, tên sản phẩm',
+                      hintStyle: GoogleFonts.robotoCondensed(
+                          fontSize: 14, color: Colors.black38),
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                        borderSide: BorderSide.none,
                       ),
-                      borderSide: BorderSide.none,
-                    ),
-                    suffixIcon: StatefulBuilder(
-                      builder: (context, setState) {
-                        bool isPressed = false;
+                      suffixIcon: StatefulBuilder(
+                        builder: (context, setState) {
+                          bool isPressed = false;
 
-                        return GestureDetector(
-                          onTapDown: (_) {
-                            setState(() {
-                              isPressed = true;
-                            });
-                          },
-                          onTapUp: (_) {
-                            setState(() {
-                              isPressed = false;
-                            });
-                            _searchProducts(_searchController.text);
-                          },
-                          onTapCancel: () {
-                            setState(() {
-                              isPressed = false;
-                            });
-                          },
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const VerticalDivider(
-                                width: 20,
-                                thickness: 1,
-                                color: Colors.black38,
-                              ),
-                              AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: isPressed
-                                      ? Colors.grey[200]
-                                      : Colors.transparent,
-                                  shape: BoxShape.circle, // Làm nút tròn
+                          return GestureDetector(
+                            onTapDown: (_) {
+                              setState(() {
+                                isPressed = true;
+                              });
+                            },
+                            onTapUp: (_) {
+                              setState(() {
+                                isPressed = false;
+                              });
+                              _searchProducts(_searchController.text);
+                            },
+                            onTapCancel: () {
+                              setState(() {
+                                isPressed = false;
+                              });
+                            },
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const VerticalDivider(
+                                  width: 20,
+                                  thickness: 1,
+                                  color: Colors.black38,
                                 ),
-                                child: const Icon(Icons.search_outlined),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: isPressed
+                                        ? Colors.grey[200]
+                                        : Colors.transparent,
+                                    shape: BoxShape.circle, // Làm nút tròn
+                                  ),
+                                  child: const Icon(Icons.search_outlined),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      contentPadding: const EdgeInsets.all(5),
                     ),
-                    contentPadding: const EdgeInsets.all(5),
                   ),
                 ),
               ),
@@ -549,18 +559,26 @@ class _ProductreportpageState extends State<Productreportpage> {
                                 ],
                                 rows: displayList.map((doc) {
                                   return DataRow(cells: [
-                                    DataCell(
-                                        Text(doc.rowNumber?.toString() ?? '')),
-                                    DataCell(Text(doc.productCode ?? '')),
+                                    DataCell(Center(
+                                        child: Text(
+                                            doc.rowNumber?.toString() ?? ''))),
+                                    DataCell(Center(
+                                        child: Text(doc.productCode ?? ''))),
                                     DataCell(Text(doc.hsCode ?? '')),
-                                    DataCell(Text(doc.productName ?? '')),
-                                    DataCell(Text(doc.exportDeclarationNumber
-                                            ?.toString() ??
-                                        '')),
-                                    DataCell(
-                                        Text(doc.coUsed?.toString() ?? '')),
-                                    DataCell(Text(
-                                        doc.coAvailable?.toString() ?? '')),
+                                    DataCell(Center(
+                                        child: Text(doc.productName ?? ''))),
+                                    DataCell(Center(
+                                      child: Text(doc.exportDeclarationNumber
+                                              ?.toString() ??
+                                          ''),
+                                    )),
+                                    DataCell(Center(
+                                        child: Text(
+                                            doc.coUsed?.toString() ?? ''))),
+                                    DataCell(Center(
+                                      child: Text(
+                                          doc.coAvailable?.toString() ?? ''),
+                                    )),
                                   ]);
                                 }).toList(),
                               ),
@@ -570,9 +588,9 @@ class _ProductreportpageState extends State<Productreportpage> {
                       ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 48.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
                   onPressed: currentPage > 1
@@ -614,7 +632,6 @@ class _ProductreportpageState extends State<Productreportpage> {
                     color: Colors.black,
                   ),
                 ),
-                const SizedBox(width: 8),
                 Container(
                   height: 30,
                   decoration: BoxDecoration(

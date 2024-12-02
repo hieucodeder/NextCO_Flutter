@@ -91,7 +91,7 @@ class _AppScreenState extends State<AppScreen> {
   Widget _getPage(int index) {
     switch (index) {
       case 0:
-        return HomePage(onSelectPage: _changeCurrentIndex);
+        return const  HomePage();
       case 1:
         return NotificationPage(onSelectPage: _changeCurrentIndex);
       case 2:
@@ -119,7 +119,7 @@ class _AppScreenState extends State<AppScreen> {
       case 13:
         return Materialresportpage(onSelectPage: _changeCurrentIndex);
       default:
-        return HomePage(onSelectPage: _changeCurrentIndex);
+        return const HomePage();
     }
   }
 

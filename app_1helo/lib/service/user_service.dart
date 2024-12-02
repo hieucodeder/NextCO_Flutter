@@ -97,7 +97,7 @@ class UserService {
   }
 
   Future<User?> fetchUserData(int page, int pageSize,
-      String? branchName, String? departmentName) async {
+      String? branchName, String? departmentName,String? customerId) async {
     final url = Uri.parse(apiUrl);
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
@@ -114,7 +114,7 @@ class UserService {
       frCreatedDate: null,
       toCreatedDate: null,
       employeeId: null,
-      customerId: null,
+      customerId: customerId,
       userId: userId,
     );
 

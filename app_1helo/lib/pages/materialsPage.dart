@@ -174,6 +174,8 @@ class _MaterialspageState extends State<Materialspage> {
         hint: Text(
           hint,
           style: const TextStyle(fontSize: 14, color: Colors.black),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
         value: selectedItem,
         isExpanded: true,
@@ -186,6 +188,8 @@ class _MaterialspageState extends State<Materialspage> {
             child: Text(
               item,
               style: const TextStyle(fontSize: 14, color: Colors.black),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           );
         }).toList(),
@@ -238,51 +242,55 @@ class _MaterialspageState extends State<Materialspage> {
       child: Column(
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Expanded(child: renderCustomerDropdown()),
-              SizedBox(
-                width: 10,
+              FittedBox(
+                  child: SizedBox(width: 200, child: renderCustomerDropdown())),
+              const SizedBox(
+                width: 6,
               ),
-              Container(
-                width: 160,
-                height: 40,
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(width: 1, color: Colors.black26),
-                  color: Colors.white,
-                ),
-                child: TextField(
-                  // autofocus: true,
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Mã NVL, Tên NVL...',
-                    hintStyle: GoogleFonts.robotoCondensed(
-                        fontSize: 14, color: Colors.black38),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        _searchMaterials(_searchController.text);
-                      },
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          VerticalDivider(
-                            width: 20,
-                            thickness: 1,
-                            color: Colors.black38,
-                          ),
-                          Icon(
-                            Icons.search_outlined,
-                            size: 24,
-                            color: Colors.black38,
-                          )
-                        ],
+              FittedBox(
+                child: Container(
+                  width: 160,
+                  height: 40,
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(width: 1, color: Colors.black26),
+                    color: Colors.white,
+                  ),
+                  child: TextField(
+                    // autofocus: true,
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Mã NVL, Tên NVL...',
+                      hintStyle: GoogleFonts.robotoCondensed(
+                          fontSize: 14, color: Colors.black38),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none),
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          _searchMaterials(_searchController.text);
+                        },
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            VerticalDivider(
+                              width: 20,
+                              thickness: 1,
+                              color: Colors.black38,
+                            ),
+                            Icon(
+                              Icons.search_outlined,
+                              size: 24,
+                              color: Colors.black38,
+                            )
+                          ],
+                        ),
                       ),
+                      contentPadding: const EdgeInsets.all(5),
                     ),
-                    contentPadding: const EdgeInsets.all(5),
                   ),
                 ),
               ),
@@ -384,22 +392,31 @@ class _MaterialspageState extends State<Materialspage> {
                                 ],
                                 rows: displayList.map((doc) {
                                   return DataRow(cells: [
-                                    DataCell(
-                                        Text(doc.rowNumber?.toString() ?? '')),
-                                    DataCell(Text(
-                                      doc.materialCode ?? '',
-                                      style: GoogleFonts.robotoCondensed(
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.blue),
+                                    DataCell(Center(
+                                        child: Text(
+                                            doc.rowNumber?.toString() ?? ''))),
+                                    DataCell(Center(
+                                      child: Text(
+                                        doc.materialCode ?? '',
+                                        style: GoogleFonts.robotoCondensed(
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.blue),
+                                      ),
                                     )),
                                     DataCell(Text(doc.materialName ?? '')),
-                                    DataCell(Text(doc.unit ?? '')),
-                                    DataCell(Text(
-                                        doc.coAvailable?.toString() ?? '')),
                                     DataCell(
-                                        Text(doc.coUsing?.toString() ?? '')),
-                                    DataCell(Text(
-                                        doc.recordCount?.toString() ?? '')),
+                                        Center(child: Text(doc.unit ?? ''))),
+                                    DataCell(Center(
+                                      child: Text(
+                                          doc.coAvailable?.toString() ?? ''),
+                                    )),
+                                    DataCell(Center(
+                                        child: Text(
+                                            doc.coUsing?.toString() ?? ''))),
+                                    DataCell(Center(
+                                      child: Text(
+                                          doc.recordCount?.toString() ?? ''),
+                                    )),
                                   ]);
                                 }).toList(),
                               ),
@@ -409,9 +426,9 @@ class _MaterialspageState extends State<Materialspage> {
                       ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 48.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
                   onPressed: currentPage > 1
@@ -453,7 +470,6 @@ class _MaterialspageState extends State<Materialspage> {
                     color: Colors.black,
                   ),
                 ),
-                const SizedBox(width: 8),
                 Container(
                   height: 30,
                   decoration: BoxDecoration(

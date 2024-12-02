@@ -76,39 +76,39 @@ class _ProductPageState extends State<ProductPage> {
     }
   }
 
-  Future<void> _loadMoreProducts() async {
-    if (isLoading || !hasMoreData) return;
+  // Future<void> _loadMoreProducts() async {
+  //   if (isLoading || !hasMoreData) return;
 
-    setState(() => isLoading = true);
-    currentPage++;
-    List<Data> moreProducts =
-        await productService.fetchProducts(currentPage, pageSize, _customerId);
+  //   setState(() => isLoading = true);
+  //   currentPage++;
+  //   List<Data> moreProducts =
+  //       await productService.fetchProducts(currentPage, pageSize, _customerId);
 
-    if (mounted) {
-      setState(() {
-        productList.addAll(moreProducts);
-        isLoading = false;
-        if (moreProducts.length < pageSize) {
-          hasMoreData = false;
-        }
-      });
-    }
-  }
+  //   if (mounted) {
+  //     setState(() {
+  //       productList.addAll(moreProducts);
+  //       isLoading = false;
+  //       if (moreProducts.length < pageSize) {
+  //         hasMoreData = false;
+  //       }
+  //     });
+  //   }
+  // }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels ==
-            _scrollController.position.maxScrollExtent &&
-        !isLoading) {
-      _loadMoreProducts();
-    }
-  }
+  // void _onScroll() {
+  //   if (_scrollController.position.pixels ==
+  //           _scrollController.position.maxScrollExtent &&
+  //       !isLoading) {
+  //     _loadMoreProducts();
+  //   }
+  // }
 
-  @override
-  void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _scrollController.removeListener(_onScroll);
+  //   _scrollController.dispose();
+  //   super.dispose();
+  // }
 
   Future<void> _fetchData({
     String? customerId,
@@ -180,6 +180,8 @@ class _ProductPageState extends State<ProductPage> {
         hint: Text(
           hint,
           style: const TextStyle(fontSize: 14, color: Colors.black),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
         value: selectedItem,
         isExpanded: true,
@@ -192,6 +194,8 @@ class _ProductPageState extends State<ProductPage> {
             child: Text(
               item,
               style: const TextStyle(fontSize: 14, color: Colors.black),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           );
         }).toList(),
@@ -237,51 +241,56 @@ class _ProductPageState extends State<ProductPage> {
       child: Column(
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Expanded(child: renderCustomerDropdown()),
+              FittedBox(
+                child: SizedBox(width: 200, child: renderCustomerDropdown()),
+              ),
               const SizedBox(
                 width: 10,
               ),
-              Container(
-                width: 160,
-                height: 40,
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(width: 1, color: Colors.black38),
-                  color: Colors.white,
-                ),
-                child: TextField(
-                  // autofocus: true,
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Mã sản phẩm, mã HS',
-                    hintStyle: GoogleFonts.robotoCondensed(
-                        fontSize: 14, color: Colors.black38),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        _searchProducts(_searchController.text);
-                      },
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          VerticalDivider(
-                            width: 20,
-                            color: Colors.black38,
-                            thickness: 1,
-                          ),
-                          Icon(
-                            Icons.search_outlined,
-                            size: 24,
-                            color: Colors.black38,
-                          ),
-                        ],
+              FittedBox(
+                child: Container(
+                  width: 160,
+                  height: 40,
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(width: 1, color: Colors.black38),
+                    color: Colors.white,
+                  ),
+                  child: TextField(
+                    // autofocus: true,
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Mã sản phẩm, mã HS',
+                      hintStyle: GoogleFonts.robotoCondensed(
+                          fontSize: 14, color: Colors.black38),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none),
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          _searchProducts(_searchController.text);
+                        },
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            VerticalDivider(
+                              width: 20,
+                              color: Colors.black38,
+                              thickness: 1,
+                            ),
+                            Icon(
+                              Icons.search_outlined,
+                              size: 24,
+                              color: Colors.black38,
+                            ),
+                          ],
+                        ),
                       ),
+                      contentPadding: const EdgeInsets.all(5),
                     ),
-                    contentPadding: const EdgeInsets.all(5),
                   ),
                 ),
               ),
@@ -391,8 +400,9 @@ class _ProductPageState extends State<ProductPage> {
                                 ],
                                 rows: displayList.map((doc) {
                                   return DataRow(cells: [
-                                    DataCell(
-                                        Text(doc.rowNumber?.toString() ?? '')),
+                                    DataCell(Center(
+                                        child: Text(
+                                            doc.rowNumber?.toString() ?? ''))),
                                     DataCell(InkWell(
                                       onTap: () {
                                         showProductDetailsDialog(
@@ -402,23 +412,34 @@ class _ProductPageState extends State<ProductPage> {
                                             doc.productCode ?? '',
                                             doc.unit ?? '');
                                       },
-                                      child: Text(
-                                        doc.hsCode ?? '',
-                                        style: GoogleFonts.robotoCondensed(
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.blue),
+                                      child: Center(
+                                        child: Text(
+                                          doc.hsCode ?? '',
+                                          style: GoogleFonts.robotoCondensed(
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.blue),
+                                        ),
                                       ),
                                     )),
-                                    DataCell(Text(doc.productCode ?? '')),
-                                    DataCell(Text(doc.productName ?? '')),
-                                    DataCell(Text(
-                                        doc.productExpenseId?.toString() ??
-                                            '')),
-                                    DataCell(Text(
-                                        doc.productExpenseId?.toString() ??
-                                            '')),
-                                    DataCell(Text(doc.customerName ?? '')),
-                                    DataCell(Text(doc.unit?.toString() ?? '')),
+                                    DataCell(Center(
+                                        child: Text(doc.productCode ?? ''))),
+                                    DataCell(Center(
+                                        child: Text(doc.productName ?? ''))),
+                                    DataCell(Center(
+                                      child: Text(
+                                          doc.productExpenseId?.toString() ??
+                                              ''),
+                                    )),
+                                    DataCell(Center(
+                                      child: Text(
+                                          doc.productExpenseId?.toString() ??
+                                              ''),
+                                    )),
+                                    DataCell(Center(
+                                        child: Text(doc.customerName ?? ''))),
+                                    DataCell(Center(
+                                        child:
+                                            Text(doc.unit?.toString() ?? ''))),
                                   ]);
                                 }).toList(),
                               ),
@@ -428,9 +449,9 @@ class _ProductPageState extends State<ProductPage> {
                       ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 48.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
                   onPressed: currentPage > 1
@@ -472,7 +493,6 @@ class _ProductPageState extends State<ProductPage> {
                     color: Colors.black,
                   ),
                 ),
-                const SizedBox(width: 8),
                 Container(
                   height: 30,
                   decoration: BoxDecoration(
@@ -525,7 +545,7 @@ void showProductDetailsDialog(BuildContext context, String productsName,
             'Chi tiết sản phẩm',
           ),
         ),
-        content: Container(
+        content: SizedBox(
           width: 500,
           child: Column(
             mainAxisSize: MainAxisSize.min,

@@ -93,7 +93,7 @@ class _NotificationPageState extends State<NotificationPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
+                SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -106,7 +106,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 110,
+                              width: 127,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -151,9 +151,6 @@ class _NotificationPageState extends State<NotificationPage> {
                           ],
                         ),
                       ),
-                      const SizedBox(
-                        width: 15,
-                      ),
                       GestureDetector(
                         onTap: () {
                           widget.onSelectPage(3);
@@ -162,7 +159,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 110,
+                              width: 127,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -207,9 +204,6 @@ class _NotificationPageState extends State<NotificationPage> {
                           ],
                         ),
                       ),
-                      const SizedBox(
-                        width: 15,
-                      ),
                       GestureDetector(
                         onTap: () {
                           widget.onSelectPage(7);
@@ -218,7 +212,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 110,
+                              width: 127,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -282,7 +276,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 105,
+                              width: 127,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -327,9 +321,9 @@ class _NotificationPageState extends State<NotificationPage> {
                           ],
                         ),
                       ),
-                      const SizedBox(
-                        width: 15,
-                      ),
+                      // const SizedBox(
+                      //   width: 15,
+                      // ),
                       GestureDetector(
                         onTap: () {
                           widget.onSelectPage(6);
@@ -338,7 +332,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 110,
+                              width: 127,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -383,9 +377,9 @@ class _NotificationPageState extends State<NotificationPage> {
                           ],
                         ),
                       ),
-                      const SizedBox(
-                        width: 15,
-                      ),
+                      // const SizedBox(
+                      //   width: 15,
+                      // ),
                       GestureDetector(
                         onTap: () {
                           widget.onSelectPage(10);
@@ -394,7 +388,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 110,
+                              width: 127,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -458,7 +452,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 110,
+                              width: 127,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -487,13 +481,15 @@ class _NotificationPageState extends State<NotificationPage> {
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      'Vật liệu tồn',
+                                      'Nguyên vật liệu tồn',
                                       style: GoogleFonts.robotoCondensed(
                                           fontSize: 14,
                                           color: Provider.of<Providercolor>(
                                                   context)
                                               .selectedColor,
                                           fontWeight: FontWeight.w500),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
                                     ),
                                   ),
                                 ],
@@ -502,9 +498,9 @@ class _NotificationPageState extends State<NotificationPage> {
                           ],
                         ),
                       ),
-                      const SizedBox(
-                        width: 15,
-                      ),
+                      // const SizedBox(
+                      //   width: 15,
+                      // ),
                       GestureDetector(
                         onTap: () {
                           widget.onSelectPage(12);
@@ -513,7 +509,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 110,
+                              width: 127,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -558,9 +554,9 @@ class _NotificationPageState extends State<NotificationPage> {
                           ],
                         ),
                       ),
-                      const SizedBox(
-                        width: 15,
-                      ),
+                      // const SizedBox(
+                      //   width: 15,
+                      // ),
                       GestureDetector(
                         onTap: () {
                           widget.onSelectPage(11);
@@ -569,7 +565,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 110,
+                              width: 127,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,

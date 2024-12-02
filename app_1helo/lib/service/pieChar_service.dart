@@ -128,10 +128,13 @@ class PiecharService {
 
   Future<List<PieCharModel>> searchByDateRange(DateTime? startDate,
       DateTime? endDate, String? employeeId, String? customerId) async {
+    final url = Uri.parse(apiUrl);
+
     try {
-      final url = Uri.parse(apiUrl);
+      // Prepare headers
       final headers = await ApiConfig.getHeaders();
 
+      // Create request body
       final requestBody = Bodysearchpiechar(
         customerId: customerId,
         employeeId: employeeId,
@@ -139,46 +142,57 @@ class PiecharService {
         toCreatedDate: endDate,
       );
 
-      // Log the request body to ensure it's correctly formed
+      // Log input parameters
+      print('API Input Parameters:');
+      print('Start Date: ${startDate?.toIso8601String()}');
+      print('End Date: ${endDate?.toIso8601String()}');
+      print('Employee ID: $employeeId');
+      print('Customer ID: $customerId');
       print('Request Body: ${jsonEncode(requestBody.toJson())}');
 
+      // Make the POST request
       final response = await http.post(
         url,
         headers: headers,
         body: jsonEncode(requestBody.toJson()),
       );
 
-      // Log the status code and response body for debugging
-      print('Response Status: ${response.statusCode}');
+      // Log response details
+      print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
 
+      // Handle response
       if (response.statusCode == 200) {
-        final jsonResponse = json.decode(response.body);
+        final jsonResponse = jsonDecode(response.body);
 
-        if (jsonResponse is Map) {
-          final message = jsonResponse['message'];
-          if (message == 'Không có kết quả!') {
-            print('API Message: $message');
-            return [];
-          }
+        // Validate response format
+        if (jsonResponse is! Map) {
+          throw Exception('Invalid response format. Expected a JSON object.');
+        }
 
-          if (jsonResponse.containsKey('data')) {
-            List<dynamic> data = jsonResponse['data'];
-            return data
-                .map((jsonItem) => PieCharModel.fromJson(jsonItem))
-                .toList();
-          } else {
-            throw Exception('No data found in the response.');
-          }
+        // Handle message field
+        if (jsonResponse['message'] == 'Không có kết quả!') {
+          print('API Response: No results found');
+          return [];
+        }
+
+        // Parse data if available
+        if (jsonResponse.containsKey('data') && jsonResponse['data'] is List) {
+          return (jsonResponse['data'] as List)
+              .map((item) => PieCharModel.fromJson(item))
+              .toList();
         } else {
-          throw Exception('Unexpected response format.');
+          throw Exception('No data found or unexpected data format.');
         }
       } else {
-        print('Failed to load documents: ${response.body}');
-        throw Exception('Failed to load documents');
+        // Handle non-200 responses
+        throw Exception(
+            'Failed to load data. Status Code: ${response.statusCode}, Response: ${response.body}');
       }
-    } catch (error) {
-      print('Error searching documents by date range: $error');
+    } catch (error, stacktrace) {
+      // Log and handle errors
+      print('Error: $error');
+      print('Stacktrace: $stacktrace');
       return [];
     }
   }

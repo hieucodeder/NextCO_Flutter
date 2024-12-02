@@ -57,7 +57,7 @@ class ProductReportService {
     }
   }
 
-Future<List<Data>> fetchProductsReportAll(
+Future<List<DataModel>> fetchProductsReportAll(
       int page, int pageSize,) async {
     try {
       final url = Uri.parse(apiUrl);
@@ -103,7 +103,7 @@ Future<List<Data>> fetchProductsReportAll(
       return [];
     }
   }
-  Future<List<Data>> fetchProductsReport(
+  Future<List<DataModel>> fetchProductsReport(
       int page, int pageSize, String? search, String? customerid) async {
     try {
       final url = Uri.parse(apiUrl);
@@ -149,7 +149,7 @@ Future<List<Data>> fetchProductsReportAll(
       return [];
     }
   }
-Future<List<Data>> fetchProductsReportQuantity(
+Future<List<DataModel>> fetchProductsReportQuantity(
       ) async {
     try {
       final url = Uri.parse(apiUrl);
@@ -166,7 +166,7 @@ Future<List<Data>> fetchProductsReportQuantity(
         frCreatedDate: null,
         pageIndex: 1,
         pageSize: 50,
-        searchContent: "search",
+        searchContent: "",
         toCreatedDate: null,
         typeSearch: 1,
         userId: userId,
@@ -195,7 +195,7 @@ Future<List<Data>> fetchProductsReportQuantity(
       return [];
     }
   }
-  Future<List<Data>> fetchProductsReportDate(
+  Future<List<DataModel>> fetchProductsReportDate(
       DateTime? frdDate, DateTime? toDate) async {
     try {
       final url = Uri.parse(apiUrl);
@@ -227,9 +227,9 @@ Future<List<Data>> fetchProductsReportQuantity(
       if (response.statusCode == 200) {
         // Parse the JSON response
         final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-        final Prodcutreportmodel _productReportModel =
+        final Prodcutreportmodel productReportModel =
             Prodcutreportmodel.fromJson(jsonResponse);
-        return _productReportModel.data ?? [];
+        return productReportModel.data ?? [];
       } else {
         print(
             'Error: Server responded with status code ${response.statusCode}');
