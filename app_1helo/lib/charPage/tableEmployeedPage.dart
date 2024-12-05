@@ -14,14 +14,12 @@ class Tableemployeedpage extends StatefulWidget {
 }
 
 class TableemployeedpageState extends State<Tableemployeedpage> {
-  EmployeeCustomer? selectedDropdownCustomer;
+  EmployeeCustomer? _selectedDropdownCustomer;
   List<EmployeeCustomer> _filtereddropdownCustomer = [];
-  final TextEditingController _searchController = TextEditingController();
 
-  bool _isSearching = false;
   bool isLoading = false;
   bool hasMoreData = true;
-  List<Data> documentLits = [];
+  final List<Data> _documentLits = [];
   int pageSize = 10;
   int currentPage = 1;
   int itemsPerPage = 10;
@@ -40,15 +38,6 @@ class TableemployeedpageState extends State<Tableemployeedpage> {
     _fetchData();
   }
 
-  Future<void> _searchCustomers(String searchQuery) async {
-    if (searchQuery.isEmpty) {
-      setState(() {
-        _isSearching = false;
-      });
-      return;
-    }
-  }
-
   Future<void> _fetchData({
     String? customerId,
     String? employeedId,
@@ -56,7 +45,7 @@ class TableemployeedpageState extends State<Tableemployeedpage> {
     if (mounted) {
       setState(() {
         isLoading = true;
-        documentLits.clear();
+        _documentLits.clear();
         currentPage = 1;
         hasMoreData = true;
       });
@@ -97,7 +86,8 @@ class TableemployeedpageState extends State<Tableemployeedpage> {
       child: DropdownButton<String>(
         hint: Text(
           hint,
-          style: const TextStyle(fontSize: 13, color: Colors.black),
+          style: GoogleFonts.robotoCondensed(
+              fontSize: 15, color: Colors.black, fontWeight: FontWeight.w500),
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
         ),
@@ -111,7 +101,10 @@ class TableemployeedpageState extends State<Tableemployeedpage> {
             value: item,
             child: Text(
               item,
-              style: const TextStyle(fontSize: 13, color: Colors.black),
+              style: GoogleFonts.robotoCondensed(
+                  fontSize: 15,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
@@ -155,18 +148,18 @@ class TableemployeedpageState extends State<Tableemployeedpage> {
 
     return buildDropdown(
       items: customerNames,
-      selectedItem: selectedDropdownCustomer?.customerName,
+      selectedItem: _selectedDropdownCustomer?.customerName,
       hint: 'Tất khách hàng',
       width: 180,
       onChanged: (String? newValue) {
         setState(() {
-          selectedDropdownCustomer = newValue == 'Tất cả khách hàng'
+          _selectedDropdownCustomer = newValue == 'Tất cả khách hàng'
               ? null
               : _filtereddropdownCustomer.firstWhere(
                   (c) => c.customerName == newValue,
                   orElse: () => _filtereddropdownCustomer[0],
                 );
-          _customerId = selectedDropdownCustomer?.customerId;
+          _customerId = _selectedDropdownCustomer?.customerId;
         });
         _fetchData(customerId: _customerId, employeedId: _employeedId);
       },
@@ -347,20 +340,20 @@ class TableemployeedpageState extends State<Tableemployeedpage> {
                   DataCell(Center(
                       child: Text(data.stt.toString(),
                           style: GoogleFonts.robotoCondensed(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: Colors.black)))),
                   DataCell(Center(
                       child: Text(data.employeeName ?? "",
                           style: GoogleFonts.robotoCondensed(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: Colors.black)))),
                   DataCell(Center(
                     child: Text(
                       data.completed.toString(),
                       style: GoogleFonts.robotoCondensed(
-                          fontSize: 15,
+                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: Colors.green),
                     ),
@@ -368,49 +361,49 @@ class TableemployeedpageState extends State<Tableemployeedpage> {
                   DataCell(Center(
                       child: Text(data.inProgress.toString(),
                           style: GoogleFonts.robotoCondensed(
-                              fontSize: 15,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: Colors.blue)))),
                   DataCell(Center(
                       child: Text(data.underRepair.toString(),
                           style: GoogleFonts.robotoCondensed(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: Colors.black)))),
                   DataCell(Center(
                       child: Text(data.waitingForRepair.toString(),
                           style: GoogleFonts.robotoCondensed(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: Colors.orange)))),
                   DataCell(Center(
                       child: Text(data.waitingForApproval.toString(),
                           style: GoogleFonts.robotoCondensed(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: Colors.orange)))),
                   DataCell(Center(
                       child: Text(data.rejected.toString(),
                           style: GoogleFonts.robotoCondensed(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: Colors.red)))),
                   DataCell(Center(
                       child: Text(data.waitingForCancellation.toString(),
                           style: GoogleFonts.robotoCondensed(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: Colors.orange)))),
                   DataCell(Center(
                       child: Text(data.cancelled.toString(),
                           style: GoogleFonts.robotoCondensed(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: Colors.red)))),
                   DataCell(Center(
                       child: Text(data.totalQuantity.toString(),
                           style: GoogleFonts.robotoCondensed(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: Colors.black)))),
                 ]);

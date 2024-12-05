@@ -22,7 +22,6 @@ class AuthService {
         body: json.encode(loginData.toJson()),
       );
 
-      print('Response Status: ${response.statusCode}');
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
 
@@ -38,11 +37,9 @@ class AuthService {
           'token': account.token,
         };
       } else {
-        print('Error: ${response.statusCode} - ${response.reasonPhrase}');
         return null;
       }
     } catch (e) {
-      print('Exception: $e');
       return null;
     }
   }
@@ -51,7 +48,6 @@ class AuthService {
     final headers = await ApiConfig.getHeaders();
 
     if (!headers.containsKey('Authorization')) {
-      print('No token found. User not logged in.');
       return null;
     }
 
@@ -59,7 +55,6 @@ class AuthService {
     final userId = prefs.getString('userId');
 
     if (userId == null) {
-      print('No user ID found. User might not be logged in.');
       return null;
     }
 
@@ -75,11 +70,9 @@ class AuthService {
 
         return account;
       } else {
-        print('Error: ${response.statusCode} - ${response.reasonPhrase}');
         return null;
       }
     } catch (e) {
-      print('Exception: $e');
       return null;
     }
   }
@@ -88,7 +81,6 @@ class AuthService {
     final headers = await ApiConfig.getHeaders();
 
     if (!headers.containsKey('Authorization')) {
-      print('No token found. User not logged in.');
       return null;
     }
 
@@ -96,7 +88,6 @@ class AuthService {
     final userId = prefs.getString('userId');
 
     if (userId == null) {
-      print('No user ID found. User might not be logged in.');
       return null;
     }
 
@@ -114,11 +105,9 @@ class AuthService {
             .toList();
         return dropdownEmployeeList;
       } else {
-        print('Error: ${response.statusCode} - ${response.reasonPhrase}');
         return null;
       }
     } catch (e) {
-      print('Exception: $e');
       return null;
     }
   }
@@ -133,7 +122,6 @@ class AuthService {
     final userId = prefs.getString('userId');
 
     if (userId == null) {
-      print('No user ID found. User might not be logged in.');
       return null;
     }
     final url = Uri.parse('${ApiConfig.baseUrl1}/users/getbyid/$userId');
@@ -151,7 +139,6 @@ class AuthService {
         return null;
       }
     } catch (e) {
-      print('Exception: $e');
       return null;
     }
   }
@@ -171,12 +158,10 @@ class AuthService {
         final List<dynamic> jsonResponse = json.decode(response.body);
         return jsonResponse.map((item) => Dropdownroom.fromJson(item)).toList();
       } else {
-        print('Error: ${response.statusCode} - ${response.reasonPhrase}');
         return Future.error(
             'Error: ${response.statusCode} - ${response.reasonPhrase}');
       }
     } catch (e) {
-      print('Exception: $e');
       return Future.error('Exception: $e');
     }
   }
@@ -185,34 +170,28 @@ class AuthService {
     final headers = await ApiConfig.getHeaders();
 
     if (!headers.containsKey('Authorization')) {
-      print('Error: No token found. User not logged in.');
       return Future.error('No token found. User not logged in.');
     }
 
     final url = Uri.parse('${ApiConfig.baseUrl}/branchs/dropdown');
-    print('Requesting branch dropdown data from $url with headers: $headers');
 
     try {
       final response = await http.get(url, headers: headers);
-      print('Response status code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonResponse = json.decode(response.body);
-        print('Response body: $jsonResponse'); // Log the entire JSON response
+        // Log the entire JSON response
 
         List<Dropdownbranchs> dropdownBranchList =
             jsonResponse.map((item) => Dropdownbranchs.fromJson(item)).toList();
 
-        print(
-            'Parsed dropdown branch list: $dropdownBranchList'); // Log the parsed list
+        // Log the parsed list
         return dropdownBranchList;
       } else {
-        print('Error: ${response.statusCode} - ${response.reasonPhrase}');
         return Future.error(
             'Error: ${response.statusCode} - ${response.reasonPhrase}');
       }
     } catch (e) {
-      print('Exception caught during branch info fetching: $e');
       return Future.error('Exception: $e');
     }
   }

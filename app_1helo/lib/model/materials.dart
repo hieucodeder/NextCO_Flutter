@@ -58,25 +58,26 @@ class Data {
   });
 
   Data.fromJson(Map<String, dynamic> json) {
-    rowNumber = json['RowNumber'];
+    rowNumber = _parseInt(json['RowNumber']);
     materialId = json['material_id'];
     hsCode = json['hs_code'];
     materialName = json['material_name'];
     materialCode = json['material_code'];
     unit = json['unit'];
+    coAvailable = _parseInt(json['co_available']);
+    coUsing = _parseInt(json['co_using']);
+    recordCount = _parseInt(json['RecordCount']);
+  }
 
-    // Use casting to handle double-to-int conversion
-    coAvailable = (json['co_available'] is int)
-        ? json['co_available']
-        : (json['co_available'] as double?)?.toInt();
-
-    coUsing = (json['co_using'] is int)
-        ? json['co_using']
-        : (json['co_using'] as double?)?.toInt();
-
-    recordCount = (json['RecordCount'] is int)
-        ? json['RecordCount']
-        : (json['RecordCount'] as double?)?.toInt();
+  int? _parseInt(dynamic value) {
+    if (value is int) {
+      return value;
+    } else if (value is double) {
+      return value.toInt();
+    } else if (value is String) {
+      return int.tryParse(value);
+    }
+    return null;
   }
 
   Map<String, dynamic> toJson() {

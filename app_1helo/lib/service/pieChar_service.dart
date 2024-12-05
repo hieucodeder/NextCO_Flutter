@@ -45,19 +45,10 @@ class PiecharService {
                 .map((data) =>
                     PieCharModel.fromJson(data as Map<String, dynamic>))
                 .toList();
-          } else {
-            print('Unexpected format: ${responseBody}');
-          }
-        } else {
-          print('Unexpected response format: ${responseBody}');
-        }
-      } else {
-        print(
-            'Failed to fetch pie chart data. Status code: ${response.statusCode}, body: ${response.body}');
-      }
-    } catch (error) {
-      print('Error fetching pie chart data: $error');
-    }
+          } else {}
+        } else {}
+      } else {}
+    } catch (error) {}
 
     return [];
   }
@@ -69,7 +60,6 @@ class PiecharService {
     final userId = prefs.getString('userId');
 
     if (userId == null) {
-      print('No user ID found. User might not be logged in.');
       return [];
     }
 
@@ -83,20 +73,14 @@ class PiecharService {
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = jsonDecode(response.body);
         return jsonData.map((json) => dropdownEmployee.fromJson(json)).toList();
-      } else {
-        print(
-            'Failed to fetch employee list. Status code: ${response.statusCode}');
-      }
-    } catch (error) {
-      print('Error fetching employees: $error');
-    }
+      } else {}
+      // ignore: empty_catches
+    } catch (error) {}
     return [];
   }
 
   // Fetches data for a specific employee based on full name
   Future<void> fetchDataForUser(String fullName) async {
-    print('Fetching data for user: $fullName');
-
     List<dropdownEmployee> employees = await fetchEmployeeList();
     String employeeId = getEmployeeIdByFullName(fullName, employees);
 
@@ -104,14 +88,8 @@ class PiecharService {
       final List<PieCharModel>? response =
           await fetchPieChartData(null, null, employeeId, null);
       if (response != null && response.isNotEmpty) {
-        print(
-            'Pie chart data fetched successfully for employeeId: $employeeId');
-      } else {
-        print('No pie chart data found for employeeId: $employeeId');
-      }
-    } else {
-      print('Employee ID is empty for full name: $fullName');
-    }
+      } else {}
+    } else {}
   }
 
   // Helper to get employee ID by full name
@@ -122,7 +100,6 @@ class PiecharService {
         return employee.value ?? '';
       }
     }
-    print('No employee found for full name: $fullName');
     return '';
   }
 
@@ -143,12 +120,6 @@ class PiecharService {
       );
 
       // Log input parameters
-      print('API Input Parameters:');
-      print('Start Date: ${startDate?.toIso8601String()}');
-      print('End Date: ${endDate?.toIso8601String()}');
-      print('Employee ID: $employeeId');
-      print('Customer ID: $customerId');
-      print('Request Body: ${jsonEncode(requestBody.toJson())}');
 
       // Make the POST request
       final response = await http.post(
@@ -158,8 +129,6 @@ class PiecharService {
       );
 
       // Log response details
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
 
       // Handle response
       if (response.statusCode == 200) {
@@ -172,7 +141,6 @@ class PiecharService {
 
         // Handle message field
         if (jsonResponse['message'] == 'Không có kết quả!') {
-          print('API Response: No results found');
           return [];
         }
 
@@ -191,8 +159,6 @@ class PiecharService {
       }
     } catch (error, stacktrace) {
       // Log and handle errors
-      print('Error: $error');
-      print('Stacktrace: $stacktrace');
       return [];
     }
   }

@@ -14,8 +14,8 @@ class AcountPage extends StatefulWidget {
 }
 
 class _AcountPageState extends State<AcountPage> {
-  final styleText =
-      GoogleFonts.robotoCondensed(fontSize: 16, color: Colors.black);
+  final styleText = GoogleFonts.robotoCondensed(
+      fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500);
   @override
   Widget build(BuildContext context) {
     return Container(

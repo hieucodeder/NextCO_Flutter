@@ -65,16 +65,24 @@ class Data {
 
   Data.fromJson(Map<String, dynamic> json) {
     productId = json['product_id'];
-    normId = json['norm_id']; // Will accept int values
-    productExpenseId = json['product_expense_id']; // Will accept int values
+    normId = json['norm_id'] is int
+        ? json['norm_id']
+        : int.tryParse(json['norm_id']?.toString() ?? '');
+    productExpenseId = json['product_expense_id'] is int
+        ? json['product_expense_id']
+        : int.tryParse(json['product_expense_id']?.toString() ?? '');
     productCode = json['product_code'];
     hsCode = json['hs_code'];
     productName = json['product_name'];
     unit = json['unit'];
     customerId = json['customer_id'];
     customerName = json['customer_name'];
-    ts = json['ts'];
-    rowNumber = json['RowNumber'];
+    ts = json['ts'] is int
+        ? json['ts']
+        : int.tryParse(json['ts']?.toString() ?? '');
+    rowNumber = json['RowNumber'] is int
+        ? json['RowNumber']
+        : int.tryParse(json['RowNumber']?.toString() ?? '');
     recordCount = json['RecordCount'];
   }
 

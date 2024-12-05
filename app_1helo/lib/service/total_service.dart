@@ -16,7 +16,6 @@ class TotalService {
     final userName = prefs.getString('userName');
 
     if (userId == null) {
-      print('No user ID found. User might not be logged in.');
       return null;
     }
     bodyTotal requestBody = bodyTotal(userId: userId, userName: userName);
@@ -37,16 +36,12 @@ class TotalService {
         if (totalModelsData.success == true) {
           return totalModelsData.data;
         } else {
-          print('Failed to fetch total items: ${totalModelsData.success}');
           return null;
         }
       } else {
-        print(
-            'Error: Response not successful, Status code: ${response.statusCode}');
         return null;
       }
     } catch (error) {
-      print('Error fetching total items: $error');
       return null;
     }
   }

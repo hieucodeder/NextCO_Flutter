@@ -18,22 +18,20 @@ class Dshosoco extends StatefulWidget {
 
 class _DshosocoState extends State<Dshosoco> {
   final ScrollController _scrollController = ScrollController();
-  final TextEditingController _searchController = TextEditingController();
-  DocumentService documentService = DocumentService();
-  List<Data> documentLits = [];
-  List<Data> _filteredData = [];
+  final _documentService = DocumentService();
+  List<Data> _documentLits = [];
   final TextEditingController _searchControllerDocuments =
       TextEditingController();
   List<Data> _searchResults = [];
   bool _isSearching = false;
-  bool isLoading = false;
-  bool hasMoreData = true;
-  int pageSize = 10;
-  int currentPage = 1;
-  int itemsPerPage = 10;
+  bool _isLoading = false;
+  bool _hasMoreData = true;
+  final int _pageSize = 10;
+  int _currentPage = 1;
+  int _itemsPerPage = 10;
   String? _employeedId;
   String? _customerId;
-  final List<int> itemsPerPageOptions = [10, 20, 30];
+  final List<int> _itemsPerPageOptions = [10, 20, 30];
 
   dropdownEmployee? selectedDropdownEmployee;
   List<dropdownEmployee> _filtereddropdownEmployee = [];
@@ -52,7 +50,7 @@ class _DshosocoState extends State<Dshosoco> {
   Future<void> _initializeData() async {
     try {
       await Future.wait([
-        fetchInitialDocuments(),
+        _fetchInitialDocuments(),
         _fetchData(),
       ]);
     } catch (e) {
@@ -67,32 +65,26 @@ class _DshosocoState extends State<Dshosoco> {
       });
       return;
     }
-    List<Data> results = await documentService.searchDocuments(searchQuery);
+    List<Data> results = await _documentService.searchDocuments(searchQuery);
     setState(() {
       _searchResults = results;
       _isSearching = true;
     });
   }
 
-  void _changePage(int pageNumber) {
-    setState(() {
-      currentPage = pageNumber;
-    });
-  }
-
-  Future<void> fetchInitialDocuments() async {
+  Future<void> _fetchInitialDocuments() async {
     if (mounted) {
-      setState(() => isLoading = true);
+      setState(() => _isLoading = true);
     }
     List<Data> initialDocument =
-        await documentService.fetchAllDocuments(currentPage, itemsPerPage);
+        await _documentService.fetchAllDocuments(_currentPage, _itemsPerPage);
 
     if (mounted) {
       setState(() {
-        documentLits = initialDocument;
-        isLoading = false;
-        if (initialDocument.length < itemsPerPage) {
-          hasMoreData = false;
+        _documentLits = initialDocument;
+        _isLoading = false;
+        if (initialDocument.length < _itemsPerPage) {
+          _hasMoreData = false;
         }
       });
     }
@@ -101,31 +93,30 @@ class _DshosocoState extends State<Dshosoco> {
   void _onScroll() {
     if (_scrollController.position.pixels ==
             _scrollController.position.maxScrollExtent &&
-        !isLoading) {
+        !_isLoading) {
       _loadMoreDocuments();
     }
   }
 
   Future<void> _loadMoreDocuments() async {
-    if (isLoading || !hasMoreData) return;
+    if (_isLoading || !_hasMoreData) return;
 
-    setState(() => isLoading = true);
-    currentPage++;
+    setState(() => _isLoading = true);
+    _currentPage++;
     List<Data> moreProducts =
-        await documentService.fetchAllDocuments(currentPage, pageSize);
+        await _documentService.fetchAllDocuments(_currentPage, _pageSize);
 
     if (mounted) {
       setState(() {
-        documentLits.addAll(moreProducts);
-        isLoading = false;
-        if (moreProducts.length < pageSize) {
-          hasMoreData = false;
+        _documentLits.addAll(moreProducts);
+        _isLoading = false;
+        if (moreProducts.length < _pageSize) {
+          _hasMoreData = false;
         }
       });
     }
   }
 
-  String? _selectedStatus;
   String? startDate;
   String? endDate;
   final TextEditingController _controller = TextEditingController();
@@ -165,13 +156,13 @@ class _DshosocoState extends State<Dshosoco> {
       final DateTime parsedEndDate = DateFormat('yyyy-MM-dd').parse(endDate!);
 
       final List<Data> documents =
-          await documentService.searchDocumentsByDateRange(
+          await _documentService.searchDocumentsByDateRange(
         parsedStartDate,
         parsedEndDate,
       );
 
       setState(() {
-        documentLits = documents;
+        _documentLits = documents;
       });
     } catch (error) {
       print('Error searching documents by date range: ${error.toString()}');
@@ -194,10 +185,10 @@ class _DshosocoState extends State<Dshosoco> {
   }) async {
     if (mounted) {
       setState(() {
-        isLoading = true;
-        documentLits.clear();
-        currentPage = 1;
-        hasMoreData = true;
+        _isLoading = true;
+        _documentLits.clear();
+        _currentPage = 1;
+        _hasMoreData = true;
       });
     }
 
@@ -217,17 +208,17 @@ class _DshosocoState extends State<Dshosoco> {
         });
       }
 
-      List<Data> reportData = await documentService.fetchDocuments(
-        currentPage,
-        itemsPerPage,
+      List<Data> reportData = await _documentService.fetchDocuments(
+        _currentPage,
+        _itemsPerPage,
         employeedId,
         customerId,
       );
       if (mounted) {
         setState(() {
-          documentLits = reportData;
-          if (reportData.length < itemsPerPage) {
-            hasMoreData = false;
+          _documentLits = reportData;
+          if (reportData.length < _itemsPerPage) {
+            _hasMoreData = false;
           }
         });
       }
@@ -235,13 +226,13 @@ class _DshosocoState extends State<Dshosoco> {
       print("Error fetching data: $e");
       if (mounted) {
         setState(() {
-          hasMoreData = false;
+          _hasMoreData = false;
         });
       }
     } finally {
       if (mounted) {
         setState(() {
-          isLoading = false;
+          _isLoading = false;
         });
       }
     }
@@ -270,17 +261,6 @@ class _DshosocoState extends State<Dshosoco> {
     }
   }
 
-  // List of status options
-  final List<String> _statusList = [
-    'Chờ hủy',
-    'Chờ duyệt',
-    'Hoàn thành',
-    'Đang thực hiện',
-    'Đang sửa',
-    'Chờ sửa',
-    'Từ chối xét duyệt',
-    'Đã hủy',
-  ];
   Widget buildDropdown({
     required List<String> items,
     required String? selectedItem,
@@ -300,7 +280,8 @@ class _DshosocoState extends State<Dshosoco> {
       child: DropdownButton<String>(
         hint: Text(
           hint,
-          style: const TextStyle(fontSize: 13, color: Colors.black),
+          style: GoogleFonts.robotoCondensed(
+              fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black),
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
         ),
@@ -314,7 +295,10 @@ class _DshosocoState extends State<Dshosoco> {
             value: item,
             child: Text(
               item,
-              style: const TextStyle(fontSize: 13, color: Colors.black),
+              style: GoogleFonts.robotoCondensed(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
@@ -377,9 +361,13 @@ class _DshosocoState extends State<Dshosoco> {
     );
   }
 
+  final _textxData = GoogleFonts.robotoCondensed(
+      fontSize: 15, color: Colors.black, fontWeight: FontWeight.w500);
+  final _textTitile = GoogleFonts.robotoCondensed(
+      fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500);
   @override
   Widget build(BuildContext context) {
-    List<Data> displayList = (_isSearching ? _searchResults : documentLits)
+    List<Data> displayList = (_isSearching ? _searchResults : _documentLits)
       ..sort((a, b) => (a.rowNumber ?? 0).compareTo(b.rowNumber ?? 0));
     return Container(
       width: double.infinity,
@@ -420,7 +408,7 @@ class _DshosocoState extends State<Dshosoco> {
                       children: [
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2.0),
+                            padding: const EdgeInsets.symmetric(vertical: 2),
                             child: TextField(
                               controller: _controller,
                               readOnly: true,
@@ -428,9 +416,9 @@ class _DshosocoState extends State<Dshosoco> {
                               decoration: InputDecoration(
                                 hintText: 'Chọn ngày bắt đầu và kết thúc',
                                 hintStyle: GoogleFonts.robotoCondensed(
-                                  fontSize: 14,
-                                  color: Colors.black38,
-                                ),
+                                    fontSize: 15,
+                                    color: Colors.black38,
+                                    fontWeight: FontWeight.w500),
                                 border: InputBorder.none,
                               ),
                             ),
@@ -446,12 +434,12 @@ class _DshosocoState extends State<Dshosoco> {
                             ),
                           ),
                         const VerticalDivider(
-                          width: 15,
+                          width: 10,
                           thickness: 1,
                           color: Colors.black38,
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(5.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
                           child: GestureDetector(
                             onTap: _selectDateRange,
                             child: const Icon(Icons.calendar_today,
@@ -475,40 +463,45 @@ class _DshosocoState extends State<Dshosoco> {
                     border: Border.all(width: 1, color: Colors.black38),
                     color: Colors.white,
                   ),
-                  child: TextField(
-                    controller: _searchControllerDocuments,
-                    onChanged: (value) {
-                      setState(() {
-                        // Trigger a rebuild on search input change
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Số hồ sơ, tờ khai xuất, tình trạng',
-                      hintStyle: GoogleFonts.robotoCondensed(
-                          fontSize: 14, color: Colors.black38),
-                      border: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 3.0),
+                    child: TextField(
+                      controller: _searchControllerDocuments,
+                      onChanged: (value) {
+                        setState(() {
+                          // Trigger a rebuild on search input change
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Số hồ sơ, tờ khai xuất, tình trạng',
+                        hintStyle: GoogleFonts.robotoCondensed(
+                            fontSize: 15,
+                            color: Colors.black38,
+                            fontWeight: FontWeight.w500),
+                        border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
+                          ),
+                          borderSide: BorderSide.none,
                         ),
-                        borderSide: BorderSide.none,
-                      ),
-                      suffixIcon: GestureDetector(
-                        onTap: () {
-                          _searchDocuments(_searchControllerDocuments.text);
-                        },
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            VerticalDivider(
-                              width: 20,
-                              thickness: 1,
-                              color: Colors.black38,
-                            ),
-                            Icon(Icons.search_outlined)
-                          ],
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+                            _searchDocuments(_searchControllerDocuments.text);
+                          },
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              VerticalDivider(
+                                width: 20,
+                                thickness: 1,
+                                color: Colors.black38,
+                              ),
+                              Icon(Icons.search_outlined)
+                            ],
+                          ),
                         ),
+                        contentPadding: const EdgeInsets.all(5),
                       ),
-                      contentPadding: const EdgeInsets.all(5),
                     ),
                   ),
                 ),
@@ -519,7 +512,7 @@ class _DshosocoState extends State<Dshosoco> {
             height: 10,
           ),
           Expanded(
-              child: displayList.isEmpty && isLoading
+              child: displayList.isEmpty && _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : displayList.isEmpty
                       ? Center(
@@ -569,12 +562,12 @@ class _DshosocoState extends State<Dshosoco> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
-                  onPressed: currentPage > 1
+                  onPressed: _currentPage > 1
                       ? () {
                           setState(() {
-                            currentPage -= 1;
+                            _currentPage -= 1;
                           });
-                          fetchInitialDocuments();
+                          _fetchInitialDocuments();
                         }
                       : null,
                   icon: const Icon(
@@ -589,18 +582,15 @@ class _DshosocoState extends State<Dshosoco> {
                     border: Border.all(color: Colors.black),
                     borderRadius: BorderRadius.circular(4.0),
                   ),
-                  child: Text(
-                    '$currentPage',
-                    style: const TextStyle(color: Colors.black),
-                  ),
+                  child: Text('$_currentPage', style: _textxData),
                 ),
                 IconButton(
-                  onPressed: hasMoreData
+                  onPressed: _hasMoreData
                       ? () {
                           setState(() {
-                            currentPage += 1;
+                            _currentPage += 1;
                           });
-                          fetchInitialDocuments();
+                          _fetchInitialDocuments();
                         }
                       : null,
                   icon: const Icon(
@@ -615,20 +605,26 @@ class _DshosocoState extends State<Dshosoco> {
                     border: Border.all(width: 1, color: Colors.black12),
                   ),
                   child: DropdownButton<int>(
-                    value: itemsPerPage,
-                    items: itemsPerPageOptions.map((int value) {
+                    value: _itemsPerPage,
+                    items: _itemsPerPageOptions.map((int value) {
                       return DropdownMenuItem<int>(
                         value: value,
-                        child: Text('$value/trang'),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2.0),
+                          child: Text(
+                            '$value/trang',
+                            style: _textTitile,
+                          ),
+                        ),
                       );
                     }).toList(),
                     onChanged: (int? newValue) {
                       if (newValue != null) {
                         setState(() {
-                          itemsPerPage = newValue;
-                          currentPage = 1;
+                          _itemsPerPage = newValue;
+                          _currentPage = 1;
                         });
-                        fetchInitialDocuments();
+                        _fetchInitialDocuments();
                       }
                     },
                   ),
@@ -655,91 +651,39 @@ class _DshosocoState extends State<Dshosoco> {
     ];
 
     return columnTitles.asMap().entries.map((entry) {
-      final index = entry.key;
       final title = entry.value;
 
       if (title == 'Trạng thái') {
-        // Thêm DropdownButton cho cột "Trạng thái"
         return DataColumn(
           label: Center(
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  title,
-                  style: GoogleFonts.robotoCondensed(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                DropdownButton<String>(
-                  hint: const Text('Lọc'),
-                  value: _selectedStatus,
-                  icon: const Icon(Icons.filter_list, color: Colors.black),
-                  underline: const SizedBox(),
-                  items: _statusList.map((status) {
-                    return DropdownMenuItem<String>(
-                      value: status,
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: _getStatusColor(status),
-                            radius: 5,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(status),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedStatus = value; // Cập nhật trạng thái đã chọn
-                      // Apply filter logic to show only matching data rows
-                      _filterDataByStatus();
-                    });
-                  },
-                ),
+                Text(title, style: _textTitile),
               ],
             ),
           ),
         );
       } else {
-        // Các cột khác không thay đổi
         return DataColumn(
           label: Center(
-            child: Text(
-              title,
-              style: GoogleFonts.robotoCondensed(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            child: Text(title, style: _textTitile),
           ),
         );
       }
     }).toList();
   }
 
-  void _filterDataByStatus() {
-    setState(() {
-      if (_selectedStatus != null) {
-        _filteredData = documentLits.where((item) {
-          return item.statusName == _selectedStatus;
-        }).toList();
-      } else {
-        _filteredData = List.from(documentLits); // If no filter, show all data
-      }
-    });
-  }
-
   DataRow _buildDataRow(Data doc) {
+    final _textData = GoogleFonts.robotoCondensed(
+        fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black);
     return DataRow(cells: [
       DataCell(
-        Center(child: Text(doc.rowNumber?.toString() ?? '')),
+        Center(
+            child: Text(
+          doc.rowNumber?.toString() ?? '',
+          style: _textData,
+        )),
         placeholder: false,
         showEditIcon: false,
       ),
@@ -754,15 +698,16 @@ class _DshosocoState extends State<Dshosoco> {
           ),
         ),
       ),
-      DataCell(Center(child: Center(child: Text(doc.coFormId ?? '')))),
+      DataCell(Center(
+          child: Center(child: Text(doc.coFormId ?? '', style: _textData)))),
       DataCell(
         Center(
           child: Text(
-            doc.createdDate != null
-                ? DateFormat('dd/MM/yyyy')
-                    .format(DateTime.parse(doc.createdDate!))
-                : 'N/A',
-          ),
+              doc.createdDate != null
+                  ? DateFormat('dd/MM/yyyy')
+                      .format(DateTime.parse(doc.createdDate!))
+                  : 'N/A',
+              style: _textData),
         ),
       ),
       DataCell(
@@ -777,19 +722,22 @@ class _DshosocoState extends State<Dshosoco> {
         ),
       ),
       DataCell(Center(
-        child: Text(doc.numberTkxWithShippingTerms
-                ?.map((e) => e.invoiceNumber ?? '')
-                .join(', ') ??
-            ''),
+        child: Text(
+          doc.numberTkxWithShippingTerms
+                  ?.map((e) => e.invoiceNumber ?? '')
+                  .join(', ') ??
+              '',
+          style: _textData,
+        ),
       )),
-      DataCell(Center(child: Text(doc.customerName ?? ''))),
-      DataCell(Center(child: Text(doc.employeeName ?? ''))),
+      DataCell(Center(child: Text(doc.customerName ?? '', style: _textData))),
+      DataCell(Center(child: Text(doc.employeeName ?? '', style: _textData))),
       DataCell(
         Center(
           child: Text(
             doc.statusName ?? '',
             style: GoogleFonts.robotoCondensed(
-              color: _getStatusColor(doc.statusName), // Áp dụng màu trạng thái
+              color: _getStatusColor(doc.statusName),
               fontWeight: FontWeight.w600,
             ),
           ),

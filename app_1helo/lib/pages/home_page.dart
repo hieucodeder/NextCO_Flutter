@@ -90,8 +90,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() => _isLoading = true);
 
     try {
-      await _fetchTotalData();
-      await _fetchTotalDataProductsReport();
+      await Future.wait([
+        _fetchTotalData(),
+        _fetchTotalDataProductsReport(),
+      ]);
     } catch (e) {
       print("Error fetching data: $e");
     } finally {
@@ -564,7 +566,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             padding: const EdgeInsets.all(8),
                             child: Text('Số lượng hồ sơ C/O theo nhân viên',
                                 style: GoogleFonts.robotoCondensed(
-                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                                    fontSize: 17, fontWeight: FontWeight.bold)),
                           ),
                           const Divider(color: Color(0xffC4C9CA)),
                           const SizedBox(
@@ -606,7 +608,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             padding: const EdgeInsets.all(8),
                             child: Text('Số lượng hồ sơ C/O theo trạng thái',
                                 style: GoogleFonts.robotoCondensed(
-                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                                    fontSize: 17, fontWeight: FontWeight.bold)),
                           ),
                           const Divider(color: Color(0xffC4C9CA)),
                           const SizedBox(
@@ -650,7 +652,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           margin: const EdgeInsets.symmetric(horizontal: 5),
                           child: Text('Tỷ lệ hồ sơ C/O theo trạng thái',
                               style: GoogleFonts.robotoCondensed(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                                  fontSize: 17, fontWeight: FontWeight.bold)),
                         ),
                         const Divider(color: Color(0xffC4C9CA)),
                         Piechartpage(

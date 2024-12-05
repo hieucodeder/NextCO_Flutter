@@ -55,7 +55,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
                 Text('Trang chủ',
                     style: GoogleFonts.robotoCondensed(
                         textStyle: TextStyle(
-                            fontSize: 12,
+                            fontSize: 13,
                             color: _currentIndex == 0
                                 ? Colors.orange
                                 : Colors.white)))
@@ -85,7 +85,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
                 ),
                 Text('Chức năng',
                     style: GoogleFonts.robotoCondensed(
-                        fontSize: 12,
+                        fontSize: 13,
                         color:
                             _currentIndex == 1 ? Colors.orange : Colors.white))
               ],
@@ -114,7 +114,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
                 ),
                 Text('Cá nhân',
                     style: GoogleFonts.robotoCondensed(
-                        fontSize: 12,
+                        fontSize: 13,
                         color:
                             _currentIndex == 2 ? Colors.orange : Colors.white))
               ],

@@ -17,7 +17,6 @@ class ProductService {
       final userId = prefs.getString('userId');
 
       if (userId == null) {
-        print('No user ID found. User might not be logged in.');
         return [];
       }
 
@@ -43,10 +42,9 @@ class ProductService {
         final Productss productsData = Productss.fromJson(jsonResponse);
         return productsData.data ?? [];
       } else {
-        throw Exception('Failed to load documents');
+        throw Exception('Failed to load products');
       }
     } catch (error) {
-      print('Error fetching documents: $error');
       return [];
     }
   }
@@ -59,7 +57,6 @@ class ProductService {
       final userId = prefs.getString('userId');
 
       if (userId == null) {
-        print('No user ID found. User might not be logged in.');
         return [];
       }
 
@@ -89,7 +86,6 @@ class ProductService {
         throw Exception('Failed to load customers');
       }
     } catch (error) {
-      print('Error fetching customers: $error');
       return [];
     }
   }

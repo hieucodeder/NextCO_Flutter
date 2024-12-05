@@ -91,7 +91,7 @@ class _AppScreenState extends State<AppScreen> {
   Widget _getPage(int index) {
     switch (index) {
       case 0:
-        return const  HomePage();
+        return const HomePage();
       case 1:
         return NotificationPage(onSelectPage: _changeCurrentIndex);
       case 2:
@@ -139,7 +139,7 @@ class _AppScreenState extends State<AppScreen> {
         title: Text(
           _appBarTitle,
           style: GoogleFonts.robotoCondensed(
-            fontSize: 16,
+            fontSize: 17,
             color: Colors.white,
             // color: const Color(0xfff064265),
             fontWeight: FontWeight.bold,

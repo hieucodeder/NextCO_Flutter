@@ -1,6 +1,5 @@
 import 'package:app_1helo/model/customers.dart';
 import 'package:app_1helo/provider/providerColor.dart';
-import 'package:app_1helo/service/columnChar_service.dart';
 import 'package:app_1helo/service/customer_service..dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -85,10 +84,10 @@ class _ClientpageState extends State<Clientpage> {
     super.dispose();
   }
 
-  Future<void> _onRefresh() async {
-    await fetchInitialCustomers();
-  }
-
+  final _textxData = GoogleFonts.robotoCondensed(
+      fontSize: 15, color: Colors.black, fontWeight: FontWeight.w500);
+  final _textTitile = GoogleFonts.robotoCondensed(
+      fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500);
   @override
   Widget build(BuildContext context) {
     List<Data> displayList = (_isSearching ? _searchResults : customerList)
@@ -113,13 +112,18 @@ class _ClientpageState extends State<Clientpage> {
                     child: TextField(
                       // autofocus: true,
                       controller: _searchController,
-                      style: const TextStyle(color: Colors.black),
+                      style: GoogleFonts.robotoCondensed(
+                          color: Colors.black,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500),
                       decoration: InputDecoration(
                         hintText: 'Nhập KH, tên KH, mã số thuế ...',
                         hintStyle: GoogleFonts.robotoCondensed(
-                            fontSize: 14, color: Colors.black38),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 10),
+                            fontSize: 15,
+                            color: Colors.black38,
+                            fontWeight: FontWeight.w500),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 10),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide.none,
@@ -195,57 +199,29 @@ class _ClientpageState extends State<Clientpage> {
                                       DataColumn(
                                           label: Text(
                                         'STT',
-                                        style: GoogleFonts.robotoCondensed(
-                                            color: Colors.black,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
+                                        style: _textTitile,
                                         textAlign: TextAlign.center,
                                       )),
                                       DataColumn(
                                           label: Text('Mã khách hàng',
-                                              style:
-                                                  GoogleFonts.robotoCondensed(
-                                                      color: Colors.black,
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w500),
+                                              style: _textTitile,
                                               textAlign: TextAlign.center)),
                                       DataColumn(
                                           label: Text('Tên khách hàng',
-                                              style:
-                                                  GoogleFonts.robotoCondensed(
-                                                      color: Colors.black,
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w500),
+                                              style: _textTitile,
                                               textAlign: TextAlign.center)),
                                       DataColumn(
                                         label: Text('Số điện thoại',
-                                            style:
-                                                GoogleFonts.robotoCondensed(
-                                                    color: Colors.black,
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.w500),
+                                            style: _textTitile,
                                             textAlign: TextAlign.center),
                                       ),
                                       DataColumn(
                                           label: Text('Mã số thuế',
-                                              style:
-                                                  GoogleFonts.robotoCondensed(
-                                                      color: Colors.black,
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w500),
+                                              style: _textTitile,
                                               textAlign: TextAlign.center)),
                                       DataColumn(
                                           label: Text('Địa chỉ',
-                                              style:
-                                                  GoogleFonts.robotoCondensed(
-                                                      color: Colors.black,
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w500),
+                                              style: _textTitile,
                                               textAlign: TextAlign.center)),
                                     ],
                                     rows: displayList.map((doc) {
@@ -254,6 +230,7 @@ class _ClientpageState extends State<Clientpage> {
                                           padding: const EdgeInsets.all(16),
                                           child: Text(
                                             doc.rowNumber?.toString() ?? '',
+                                            style: _textxData,
                                           ),
                                         )),
                                         DataCell(InkWell(
@@ -273,23 +250,33 @@ class _ClientpageState extends State<Clientpage> {
                                                   GoogleFonts.robotoCondensed(
                                                       fontWeight:
                                                           FontWeight.w500,
-                                                      color: Colors.blue),
+                                                      color: Colors.blue,
+                                                      fontSize: 14),
                                             ),
                                           ),
                                         )),
                                         DataCell(Text(
-                                            doc.customerName?.toString() ??
-                                                '')),
+                                          doc.customerName?.toString() ?? '',
+                                          style: _textxData,
+                                        )),
                                         DataCell(Container(
                                             padding: const EdgeInsets.all(8),
-                                            child:
-                                                Text(doc.phoneNumber ?? ''))),
+                                            child: Text(
+                                              doc.phoneNumber ?? '',
+                                              style: _textxData,
+                                            ))),
                                         DataCell(Container(
                                             padding: const EdgeInsets.all(8),
-                                            child: Text(doc.taxCode ?? ''))),
+                                            child: Text(
+                                              doc.taxCode ?? '',
+                                              style: _textxData,
+                                            ))),
                                         DataCell(Container(
                                             padding: const EdgeInsets.all(8),
-                                            child: Text(doc.address ?? ''))),
+                                            child: Text(
+                                              doc.address ?? '',
+                                              style: _textxData,
+                                            ))),
                                       ]);
                                     }).toList(),
                                   ),
@@ -323,10 +310,7 @@ class _ClientpageState extends State<Clientpage> {
                       border: Border.all(color: Colors.black),
                       borderRadius: BorderRadius.circular(4.0),
                     ),
-                    child: Text(
-                      '$currentPage',
-                      style: const TextStyle(color: Colors.black),
-                    ),
+                    child: Text('$currentPage', style: _textxData),
                   ),
                   IconButton(
                     onPressed: hasMoreData
@@ -353,7 +337,13 @@ class _ClientpageState extends State<Clientpage> {
                       items: itemsPerPageOptions.map((int value) {
                         return DropdownMenuItem<int>(
                           value: value,
-                          child: Text('$value/trang'),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2.0),
+                            child: Text(
+                              '$value/trang',
+                              style: _textTitile,
+                            ),
+                          ),
                         );
                       }).toList(),
                       onChanged: (int? newValue) {
@@ -383,7 +373,8 @@ void showCustomerDetailsDialog(BuildContext context, String customerName,
   TextEditingController taxIdController = TextEditingController(text: taxId);
   TextEditingController addressController =
       TextEditingController(text: address);
-
+  final textStyleDiaLog = GoogleFonts.robotoCondensed(
+      fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black);
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -393,23 +384,26 @@ void showCustomerDetailsDialog(BuildContext context, String customerName,
             'Chi tiết khách hàng',
           ),
         ),
-        content: Container(
+        content: SizedBox(
           width: 500,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Column(
                 children: [
-                  const Row(
+                  Row(
                     children: [
                       Text(
                         '*',
-                        style: TextStyle(color: Colors.red),
+                        style: GoogleFonts.robotoCondensed(color: Colors.red),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
-                      Text('Tên khách hàng'),
+                      Text(
+                        'Tên khách hàng',
+                        style: textStyleDiaLog,
+                      ),
                     ],
                   ),
                   TextField(
@@ -424,16 +418,19 @@ void showCustomerDetailsDialog(BuildContext context, String customerName,
               const SizedBox(height: 10),
               Column(
                 children: [
-                  const Row(
+                  Row(
                     children: [
                       Text(
                         '*',
-                        style: TextStyle(color: Colors.red),
+                        style: GoogleFonts.robotoCondensed(color: Colors.red),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
-                      Text('Số điện thoại'),
+                      Text(
+                        'Số điện thoại',
+                        style: textStyleDiaLog,
+                      ),
                     ],
                   ),
                   TextField(
@@ -448,16 +445,19 @@ void showCustomerDetailsDialog(BuildContext context, String customerName,
               const SizedBox(height: 10),
               Column(
                 children: [
-                  const Row(
+                  Row(
                     children: [
                       Text(
                         '*',
-                        style: TextStyle(color: Colors.red),
+                        style: GoogleFonts.robotoCondensed(color: Colors.red),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
-                      Text('Mã số thuế'),
+                      Text(
+                        'Mã số thuế',
+                        style: textStyleDiaLog,
+                      ),
                     ],
                   ),
                   TextField(
@@ -472,16 +472,19 @@ void showCustomerDetailsDialog(BuildContext context, String customerName,
               const SizedBox(height: 10),
               Column(
                 children: [
-                  const Row(
+                  Row(
                     children: [
                       Text(
                         '*',
-                        style: const TextStyle(color: Colors.red),
+                        style: GoogleFonts.robotoCondensed(color: Colors.red),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
-                      Text('Địa chỉ'),
+                      Text(
+                        'Địa chỉ',
+                        style: textStyleDiaLog,
+                      ),
                     ],
                   ),
                   TextField(

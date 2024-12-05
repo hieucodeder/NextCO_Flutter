@@ -1,4 +1,6 @@
+import 'package:app_1helo/model/dropdownBranchs.dart';
 import 'package:app_1helo/model/dropdownCustomer.dart';
+import 'package:app_1helo/model/dropdownRoom.dart';
 import 'package:app_1helo/model/user.dart';
 import 'package:app_1helo/provider/providerColor.dart';
 import 'package:app_1helo/service/authService.dart';
@@ -86,10 +88,6 @@ class _StaffpageState extends State<Staffpage> {
       _searchResults = results;
       _isSearching = true;
     });
-  }
-
-  void _onDropdownChanged() {
-    _fetchData();
   }
 
   Future<void> fetchCustomerInfo() async {
@@ -274,7 +272,7 @@ class _StaffpageState extends State<Staffpage> {
     );
   }
 
-  Widget renderDropdownUser() {
+  Widget renderDropdownRooms() {
     List<String> departmentNames =
         getUniqueNames(_filteredUsersRoom, (user) => user.departmentName ?? '');
     departmentNames.insert(0, 'Tất cả phòng ban');
@@ -293,7 +291,7 @@ class _StaffpageState extends State<Staffpage> {
                   orElse: () => _filteredUsersRoom[0],
                 );
           _searchControllerRoom.text = selectedRoomUser?.departmentName ?? '';
-          _onDropdownChanged();
+          _fetchData();
         });
       },
     );
@@ -325,6 +323,10 @@ class _StaffpageState extends State<Staffpage> {
     );
   }
 
+  final _textxData = GoogleFonts.robotoCondensed(
+      fontSize: 15, color: Colors.black, fontWeight: FontWeight.w500);
+  final _textTitile = GoogleFonts.robotoCondensed(
+      fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500);
   @override
   Widget build(BuildContext context) {
     List<DataUser> displayList = (_isSearching ? _searchResults : _staffList)
@@ -345,7 +347,7 @@ class _StaffpageState extends State<Staffpage> {
               FittedBox(
                 child: SizedBox(
                   width: 180,
-                  child: renderDropdownUser(),
+                  child: renderDropdownRooms(),
                 ),
               ),
             ],
@@ -375,7 +377,7 @@ class _StaffpageState extends State<Staffpage> {
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide.none),
                       hintStyle: GoogleFonts.robotoCondensed(
-                          fontSize: 14, color: Colors.black38),
+                          fontSize: 15, color: Colors.black38),
                       suffixIcon: GestureDetector(
                         onTap: () {
                           _searchUsers(_searchController.text);
@@ -417,12 +419,14 @@ class _StaffpageState extends State<Staffpage> {
             child: displayList.isEmpty && _isSearching
                 ? const Center(child: CircularProgressIndicator())
                 : displayList.isEmpty
-                    ? Text(
-                        "Dữ liệu tìm kiếm không có!!!",
-                        style: GoogleFonts.robotoCondensed(
-                          fontSize: 16,
-                          color:
-                              Provider.of<Providercolor>(context).selectedColor,
+                    ? Center(
+                        child: Text(
+                          "Dữ liệu tìm kiếm không có!!!",
+                          style: GoogleFonts.robotoCondensed(
+                            fontSize: 16,
+                            color: Provider.of<Providercolor>(context)
+                                .selectedColor,
+                          ),
                         ),
                       )
                     : Container(
@@ -450,112 +454,87 @@ class _StaffpageState extends State<Staffpage> {
                               child: DataTable(
                                 columns: [
                                   DataColumn(
-                                      label: Text(
-                                    'STT',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('STT', style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Tài khoản',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Tài khoản',
+                                          style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Họ và tên',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Họ và tên',
+                                          style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Số điện thoại',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Số điện thoại',
+                                          style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Email',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Email', style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Chức vụ',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label:
+                                          Text('Chức vụ', style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Chi nhánh',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Chi nhánh',
+                                          style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Phòng ban',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Phòng ban',
+                                          style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Phân quyền',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Phân quyền',
+                                          style: _textTitile)),
                                   // DataColumn(label: Text('Action')),
                                 ],
                                 rows: displayList.map((doc) {
                                   return DataRow(cells: [
                                     DataCell(Center(
                                         child: Text(
-                                            doc.rowNumber?.toString() ?? ''))),
+                                      doc.rowNumber?.toString() ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Center(
                                       child: Text(
                                         doc.userName?.toString() ?? '',
                                         style: GoogleFonts.robotoCondensed(
                                             fontWeight: FontWeight.w700,
+                                            fontSize: 15,
                                             color: Colors.blue),
                                       ),
                                     )),
                                     DataCell(Center(
-                                        child: Text(doc.fullName ?? ''))),
+                                        child: Text(
+                                      doc.fullName ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Center(
-                                        child: Text(doc.phoneNumber ?? ''))),
+                                        child: Text(
+                                      doc.phoneNumber ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Center(
                                       child: Text(
                                         doc.email ?? '',
                                         style: GoogleFonts.robotoCondensed(
                                             fontWeight: FontWeight.w700,
+                                            fontSize: 15,
                                             color: Colors.blue),
                                       ),
                                     )),
                                     DataCell(Center(
-                                        child: Text(doc.positionName ?? ''))),
+                                        child: Text(
+                                      doc.positionName ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Center(
-                                        child: Text(doc.branchName ?? ''))),
+                                        child: Text(
+                                      doc.branchName ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Center(
-                                        child: Text(doc.departmentName ?? ''))),
+                                        child: Text(
+                                      doc.departmentName ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Center(
-                                        child: Text(doc.roleGroup ?? ''))),
+                                        child: Text(
+                                      doc.roleGroup ?? '',
+                                      style: _textxData,
+                                    ))),
                                   ]);
                                 }).toList(),
                               ),
@@ -592,7 +571,7 @@ class _StaffpageState extends State<Staffpage> {
                   ),
                   child: Text(
                     '$currentPage',
-                    style: const TextStyle(color: Colors.black),
+                    style: _textxData,
                   ),
                 ),
                 IconButton(
@@ -620,7 +599,13 @@ class _StaffpageState extends State<Staffpage> {
                     items: itemsPerPageOptions.map((int value) {
                       return DropdownMenuItem<int>(
                         value: value,
-                        child: Text('$value/trang'),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                          child: Text(
+                            '$value/trang',
+                            style: _textTitile,
+                          ),
+                        ),
                       );
                     }).toList(),
                     onChanged: (int? newValue) {

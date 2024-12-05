@@ -173,7 +173,8 @@ class _MaterialspageState extends State<Materialspage> {
       child: DropdownButton<String>(
         hint: Text(
           hint,
-          style: const TextStyle(fontSize: 14, color: Colors.black),
+          style: GoogleFonts.robotoCondensed(
+              fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black),
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
         ),
@@ -187,7 +188,10 @@ class _MaterialspageState extends State<Materialspage> {
             value: item,
             child: Text(
               item,
-              style: const TextStyle(fontSize: 14, color: Colors.black),
+              style: GoogleFonts.robotoCondensed(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
@@ -231,6 +235,11 @@ class _MaterialspageState extends State<Materialspage> {
     super.dispose();
   }
 
+  final _textxData = GoogleFonts.robotoCondensed(
+      fontSize: 15, color: Colors.black, fontWeight: FontWeight.w500);
+  final _textTitile = GoogleFonts.robotoCondensed(
+      fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500);
+
   @override
   Widget build(BuildContext context) {
     List<Data> displayList = (_isSearching ? _searchResults : materialList)
@@ -265,7 +274,7 @@ class _MaterialspageState extends State<Materialspage> {
                     decoration: InputDecoration(
                       hintText: 'Mã NVL, Tên NVL...',
                       hintStyle: GoogleFonts.robotoCondensed(
-                          fontSize: 14, color: Colors.black38),
+                          fontSize: 15, color: Colors.black38),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide.none),
@@ -334,88 +343,66 @@ class _MaterialspageState extends State<Materialspage> {
                               child: DataTable(
                                 columns: [
                                   DataColumn(
-                                      label: Text(
-                                    'STT',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('STT', style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Mã nguyên vật liệu',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Mã nguyên vật liệu',
+                                          style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Tên nguyên vật liệu',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Tên nguyên vật liệu',
+                                          style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'ĐVT',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('ĐVT', style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Tổng tồn',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label:
+                                          Text('Tổng tồn', style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Tổng chiếm giữ',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Tổng chiếm giữ',
+                                          style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Tổng khả dụng',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Tổng khả dụng',
+                                          style: _textTitile)),
                                 ],
                                 rows: displayList.map((doc) {
                                   return DataRow(cells: [
                                     DataCell(Center(
                                         child: Text(
-                                            doc.rowNumber?.toString() ?? ''))),
+                                      doc.rowNumber?.toString() ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Center(
                                       child: Text(
                                         doc.materialCode ?? '',
                                         style: GoogleFonts.robotoCondensed(
                                             fontWeight: FontWeight.w700,
+                                            fontSize: 15,
                                             color: Colors.blue),
                                       ),
                                     )),
-                                    DataCell(Text(doc.materialName ?? '')),
-                                    DataCell(
-                                        Center(child: Text(doc.unit ?? ''))),
-                                    DataCell(Center(
-                                      child: Text(
-                                          doc.coAvailable?.toString() ?? ''),
+                                    DataCell(Text(
+                                      doc.materialName ?? '',
+                                      style: _textxData,
                                     )),
                                     DataCell(Center(
                                         child: Text(
-                                            doc.coUsing?.toString() ?? ''))),
+                                      doc.unit ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Center(
                                       child: Text(
-                                          doc.recordCount?.toString() ?? ''),
+                                        doc.coAvailable?.toString() ?? '',
+                                        style: _textxData,
+                                      ),
+                                    )),
+                                    DataCell(Center(
+                                        child: Text(
+                                      doc.coUsing?.toString() ?? '',
+                                      style: _textxData,
+                                    ))),
+                                    DataCell(Center(
+                                      child: Text(
+                                        doc.recordCount?.toString() ?? '',
+                                        style: _textxData,
+                                      ),
                                     )),
                                   ]);
                                 }).toList(),
@@ -451,10 +438,7 @@ class _MaterialspageState extends State<Materialspage> {
                     border: Border.all(color: Colors.black),
                     borderRadius: BorderRadius.circular(4.0),
                   ),
-                  child: Text(
-                    '$currentPage',
-                    style: const TextStyle(color: Colors.black),
-                  ),
+                  child: Text('$currentPage', style: _textxData),
                 ),
                 IconButton(
                   onPressed: hasMoreData
@@ -481,7 +465,13 @@ class _MaterialspageState extends State<Materialspage> {
                     items: itemsPerPageOptions.map((int value) {
                       return DropdownMenuItem<int>(
                         value: value,
-                        child: Text('$value/trang'),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                          child: Text(
+                            '$value/trang',
+                            style: _textTitile,
+                          ),
+                        ),
                       );
                     }).toList(),
                     onChanged: (int? newValue) {

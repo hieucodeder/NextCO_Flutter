@@ -59,8 +59,9 @@ class _MaterreportpageState extends State<Materialresportpage> {
     }
 
     try {
-      List<Data> initialMaterialResPort = await _materialresportservice
-          .fetchMateriaDataAlllsReport(currentPage, itemsPerPage);
+      List<Data> initialMaterialResPort =
+          await _materialresportservice.fetchMateriaDataAlllsReport(
+              currentPage, itemsPerPage, search, _customerid);
 
       if (mounted) {
         setState(() {
@@ -132,7 +133,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
       setState(() {
         isLoading = true;
         allMaterialsResport.clear();
-        currentPage = 1;
+        // currentPage = 1;
         hasMoreData = true;
       });
     }
@@ -251,7 +252,8 @@ class _MaterreportpageState extends State<Materialresportpage> {
       child: DropdownButton<String>(
         hint: Text(
           hint,
-          style: const TextStyle(fontSize: 14, color: Colors.black),
+          style: GoogleFonts.robotoCondensed(
+              fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black),
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
         ),
@@ -265,7 +267,10 @@ class _MaterreportpageState extends State<Materialresportpage> {
             value: item,
             child: Text(
               item,
-              style: const TextStyle(fontSize: 14, color: Colors.black),
+              style: GoogleFonts.robotoCondensed(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
@@ -281,13 +286,15 @@ class _MaterreportpageState extends State<Materialresportpage> {
         .toSet()
         .toList();
 
+    customerName.insert(0, 'Tất cả khách hàng');
+
     return buildDropdown(
       items: customerName,
       selectedItem: selectedemployeeCustomer?.customerName,
-      hint: 'Chọn khách hàng',
+      hint: 'Tất cả khách hàng',
       onChanged: (String? newvalue) {
         setState(() {
-          selectedemployeeCustomer = newvalue == 'Chọn khách hàng'
+          selectedemployeeCustomer = newvalue == 'Tất cả khách hàng'
               ? null
               : _filteredEmployeeCustomer.firstWhere(
                   (u) => u.customerName == newvalue,
@@ -308,6 +315,10 @@ class _MaterreportpageState extends State<Materialresportpage> {
     });
   }
 
+  final _textxData = GoogleFonts.robotoCondensed(
+      fontSize: 15, color: Colors.black, fontWeight: FontWeight.w500);
+  final _textTitile = GoogleFonts.robotoCondensed(
+      fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500);
   @override
   Widget build(BuildContext context) {
     List<Data> displayList = (isSearching
@@ -336,7 +347,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.symmetric(vertical: 3.0),
                       child: TextField(
                         controller: _controller1,
                         readOnly: true,
@@ -344,7 +355,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
                         decoration: InputDecoration(
                           hintText: 'Chọn ngày bắt đầu và kết thúc',
                           hintStyle: GoogleFonts.robotoCondensed(
-                            fontSize: 14,
+                            fontSize: 15,
                             color: Colors.black38,
                           ),
                           border: InputBorder.none,
@@ -395,16 +406,16 @@ class _MaterreportpageState extends State<Materialresportpage> {
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 5),
                   child: TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        // Trigger a rebuild on search input change
-                      });
-                    },
+                    // onChanged: (value) {
+                    //   setState(() {
+                    //     // Trigger a rebuild on search input change
+                    //   });
+                    // },
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: 'Số hồ sơ, tờ khai xuất, tình trạng',
                       hintStyle: GoogleFonts.robotoCondensed(
-                          fontSize: 14, color: Colors.black38),
+                          fontSize: 15, color: Colors.black38),
                       border: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(
                           Radius.circular(10),
@@ -504,95 +515,72 @@ class _MaterreportpageState extends State<Materialresportpage> {
                               child: DataTable(
                                 columns: [
                                   DataColumn(
-                                      label: Text(
-                                    'STT',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('STT', style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Mã NVL',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label:
+                                          Text('Mã NVL', style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Tên NVL',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label:
+                                          Text('Tên NVL', style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Số TKN/VAT',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Số TKN/VAT',
+                                          style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'STT TKN/VAT',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('STT TKN/VAT',
+                                          style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'SL đã làm C/O',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('SL đã làm C/O',
+                                          style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Khả dụng',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label:
+                                          Text('Khả dụng', style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Số lượng tồn',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Số lượng tồn',
+                                          style: _textTitile)),
                                 ],
                                 rows: displayList.map((doc) {
                                   return DataRow(cells: [
                                     DataCell(Center(
                                         child: Text(
-                                            doc.rowNumber?.toString() ?? ''))),
-                                    DataCell(Center(
-                                        child: Text(doc.materialCode ?? ''))),
-                                    DataCell(Center(
-                                        child: Text(doc.materialName ?? ''))),
+                                      doc.rowNumber?.toString() ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Center(
                                         child: Text(
-                                            doc.importDeclarationVat ?? ''))),
+                                      doc.materialCode ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Center(
                                         child: Text(
-                                            doc.sortOrder?.toString() ?? ''))),
+                                      doc.materialName ?? '',
+                                      style: _textxData,
+                                    ))),
+                                    DataCell(Center(
+                                        child: Text(
+                                      doc.importDeclarationVat ?? '',
+                                      style: _textxData,
+                                    ))),
+                                    DataCell(Center(
+                                        child: Text(
+                                      doc.sortOrder?.toString() ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Center(
                                       child: Text(
-                                          doc.coAvailable?.toString() ?? ''),
+                                        doc.coAvailable?.toString() ?? '',
+                                        style: _textxData,
+                                      ),
                                     )),
                                     DataCell(Center(
                                         child: Text(
-                                            doc.coUsing?.toString() ?? ''))),
+                                      doc.coUsing?.toString() ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Center(
                                         child: Text(
-                                            doc.quantity?.toString() ?? ''))),
+                                      doc.quantity?.toString() ?? '',
+                                      style: _textxData,
+                                    ))),
                                   ]);
                                 }).toList(),
                               ),
@@ -627,10 +615,7 @@ class _MaterreportpageState extends State<Materialresportpage> {
                     border: Border.all(color: Colors.black),
                     borderRadius: BorderRadius.circular(4.0),
                   ),
-                  child: Text(
-                    '$currentPage',
-                    style: const TextStyle(color: Colors.black),
-                  ),
+                  child: Text('$currentPage', style: _textxData),
                 ),
                 IconButton(
                   onPressed: hasMoreData
@@ -657,7 +642,13 @@ class _MaterreportpageState extends State<Materialresportpage> {
                     items: itemsPerPageOptions.map((int value) {
                       return DropdownMenuItem<int>(
                         value: value,
-                        child: Text('$value/trang'),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                          child: Text(
+                            '$value/trang',
+                            style: _textTitile,
+                          ),
+                        ),
                       );
                     }).toList(),
                     onChanged: (int? newValue) {

@@ -116,10 +116,17 @@ class _NotificationPageState extends State<NotificationPage> {
                                     width: 56,
                                     height: 56,
                                     decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Provider.of<Providercolor>(context)
-                                          .selectedColor,
-                                    ),
+                                        shape: BoxShape.circle,
+                                        color:
+                                            Provider.of<Providercolor>(context)
+                                                .selectedColor,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0x005c6566)
+                                                .withOpacity(0.3),
+                                            blurRadius: 8,
+                                          )
+                                        ]),
                                     child: ClipOval(
                                       child: Transform.scale(
                                         scale: 0.7,
@@ -138,7 +145,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                     child: Text(
                                       'Khách hàng',
                                       style: GoogleFonts.robotoCondensed(
-                                          fontSize: 14,
+                                          fontSize: 15,
                                           color: Provider.of<Providercolor>(
                                                   context)
                                               .selectedColor,
@@ -169,10 +176,17 @@ class _NotificationPageState extends State<NotificationPage> {
                                     width: 56,
                                     height: 56,
                                     decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Provider.of<Providercolor>(context)
-                                          .selectedColor,
-                                    ),
+                                        shape: BoxShape.circle,
+                                        color:
+                                            Provider.of<Providercolor>(context)
+                                                .selectedColor,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0x005c6566)
+                                                .withOpacity(0.3),
+                                            blurRadius: 8,
+                                          )
+                                        ]),
                                     child: ClipOval(
                                       child: Transform.scale(
                                         scale: 0.7,
@@ -194,7 +208,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                           color: Provider.of<Providercolor>(
                                                   context)
                                               .selectedColor,
-                                          fontSize: 14,
+                                          fontSize: 15,
                                           fontWeight: FontWeight.w500),
                                     ),
                                   )
@@ -222,10 +236,17 @@ class _NotificationPageState extends State<NotificationPage> {
                                     width: 56,
                                     height: 56,
                                     decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Provider.of<Providercolor>(context)
-                                          .selectedColor,
-                                    ),
+                                        shape: BoxShape.circle,
+                                        color:
+                                            Provider.of<Providercolor>(context)
+                                                .selectedColor,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0x005c6566)
+                                                .withOpacity(0.3),
+                                            blurRadius: 8,
+                                          )
+                                        ]),
                                     child: ClipOval(
                                       child: Transform.scale(
                                         scale: 0.7,
@@ -247,7 +268,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                           color: Provider.of<Providercolor>(
                                                   context)
                                               .selectedColor,
-                                          fontSize: 14,
+                                          fontSize: 15,
                                           fontWeight: FontWeight.w500),
                                     ),
                                   )
@@ -286,10 +307,17 @@ class _NotificationPageState extends State<NotificationPage> {
                                     width: 56,
                                     height: 56,
                                     decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Provider.of<Providercolor>(context)
-                                          .selectedColor,
-                                    ),
+                                        shape: BoxShape.circle,
+                                        color:
+                                            Provider.of<Providercolor>(context)
+                                                .selectedColor,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0x005c6566)
+                                                .withOpacity(0.3),
+                                            blurRadius: 8,
+                                          )
+                                        ]),
                                     child: ClipOval(
                                       child: Transform.scale(
                                         scale: 0.7,
@@ -308,7 +336,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                     child: Text(
                                       'Nguyên vật liệu',
                                       style: GoogleFonts.robotoCondensed(
-                                          fontSize: 14,
+                                          fontSize: 15,
                                           color: Provider.of<Providercolor>(
                                                   context)
                                               .selectedColor,
@@ -321,9 +349,6 @@ class _NotificationPageState extends State<NotificationPage> {
                           ],
                         ),
                       ),
-                      // const SizedBox(
-                      //   width: 15,
-                      // ),
                       GestureDetector(
                         onTap: () {
                           widget.onSelectPage(6);
@@ -342,10 +367,17 @@ class _NotificationPageState extends State<NotificationPage> {
                                     width: 56,
                                     height: 56,
                                     decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Provider.of<Providercolor>(context)
-                                          .selectedColor,
-                                    ),
+                                        shape: BoxShape.circle,
+                                        color:
+                                            Provider.of<Providercolor>(context)
+                                                .selectedColor,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0x005c6566)
+                                                .withOpacity(0.3),
+                                            blurRadius: 8,
+                                          )
+                                        ]),
                                     child: ClipOval(
                                       child: Transform.scale(
                                         scale: 0.7,
@@ -367,7 +399,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                           color: Provider.of<Providercolor>(
                                                   context)
                                               .selectedColor,
-                                          fontSize: 14,
+                                          fontSize: 15,
                                           fontWeight: FontWeight.w500),
                                     ),
                                   )
@@ -377,9 +409,6 @@ class _NotificationPageState extends State<NotificationPage> {
                           ],
                         ),
                       ),
-                      // const SizedBox(
-                      //   width: 15,
-                      // ),
                       GestureDetector(
                         onTap: () {
                           widget.onSelectPage(10);
@@ -398,10 +427,17 @@ class _NotificationPageState extends State<NotificationPage> {
                                     width: 56,
                                     height: 56,
                                     decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Provider.of<Providercolor>(context)
-                                          .selectedColor,
-                                    ),
+                                        shape: BoxShape.circle,
+                                        color:
+                                            Provider.of<Providercolor>(context)
+                                                .selectedColor,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0x005c6566)
+                                                .withOpacity(0.3),
+                                            blurRadius: 8,
+                                          )
+                                        ]),
                                     child: ClipOval(
                                       child: Transform.scale(
                                         scale: 0.7,
@@ -423,7 +459,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                           color: Provider.of<Providercolor>(
                                                   context)
                                               .selectedColor,
-                                          fontSize: 14,
+                                          fontSize: 15,
                                           fontWeight: FontWeight.w500),
                                     ),
                                   )
@@ -452,7 +488,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 127,
+                              width: 134,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -462,10 +498,17 @@ class _NotificationPageState extends State<NotificationPage> {
                                     width: 56,
                                     height: 56,
                                     decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Provider.of<Providercolor>(context)
-                                          .selectedColor,
-                                    ),
+                                        shape: BoxShape.circle,
+                                        color:
+                                            Provider.of<Providercolor>(context)
+                                                .selectedColor,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0x005c6566)
+                                                .withOpacity(0.3),
+                                            blurRadius: 8,
+                                          )
+                                        ]),
                                     child: ClipOval(
                                       child: Transform.scale(
                                           scale: 0.7,
@@ -483,7 +526,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                     child: Text(
                                       'Nguyên vật liệu tồn',
                                       style: GoogleFonts.robotoCondensed(
-                                          fontSize: 14,
+                                          fontSize: 15,
                                           color: Provider.of<Providercolor>(
                                                   context)
                                               .selectedColor,
@@ -498,9 +541,6 @@ class _NotificationPageState extends State<NotificationPage> {
                           ],
                         ),
                       ),
-                      // const SizedBox(
-                      //   width: 15,
-                      // ),
                       GestureDetector(
                         onTap: () {
                           widget.onSelectPage(12);
@@ -509,7 +549,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 127,
+                              width: 125,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -519,10 +559,17 @@ class _NotificationPageState extends State<NotificationPage> {
                                     width: 56,
                                     height: 56,
                                     decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Provider.of<Providercolor>(context)
-                                          .selectedColor,
-                                    ),
+                                        shape: BoxShape.circle,
+                                        color:
+                                            Provider.of<Providercolor>(context)
+                                                .selectedColor,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0x005c6566)
+                                                .withOpacity(0.3),
+                                            blurRadius: 8,
+                                          )
+                                        ]),
                                     child: ClipOval(
                                       child: Transform.scale(
                                         scale: 0.7,
@@ -544,7 +591,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                           color: Provider.of<Providercolor>(
                                                   context)
                                               .selectedColor,
-                                          fontSize: 14,
+                                          fontSize: 15,
                                           fontWeight: FontWeight.w500),
                                     ),
                                   )
@@ -554,9 +601,6 @@ class _NotificationPageState extends State<NotificationPage> {
                           ],
                         ),
                       ),
-                      // const SizedBox(
-                      //   width: 15,
-                      // ),
                       GestureDetector(
                         onTap: () {
                           widget.onSelectPage(11);
@@ -594,7 +638,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                           color: Provider.of<Providercolor>(
                                                   context)
                                               .selectedColor,
-                                          fontSize: 14,
+                                          fontSize: 15,
                                           fontWeight: FontWeight.w500),
                                     ),
                                   )

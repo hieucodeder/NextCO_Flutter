@@ -128,7 +128,6 @@ class _ProductreportpageState extends State<Productreportpage> {
         });
       }
     } catch (e) {
-      print("Error fetching data: $e");
       if (mounted) {
         setState(() {
           hasMoreData = false;
@@ -208,9 +207,7 @@ class _ProductreportpageState extends State<Productreportpage> {
           productReportList = dateFilteredList;
         });
       }
-    } catch (error) {
-      print('Error searching documents by date range: ${error.toString()}');
-    }
+    } catch (error) {}
   }
 
   void _clearDateRange() {
@@ -251,7 +248,8 @@ class _ProductreportpageState extends State<Productreportpage> {
       child: DropdownButton<String>(
         hint: Text(
           hint,
-          style: const TextStyle(fontSize: 14, color: Colors.black),
+          style: GoogleFonts.robotoCondensed(
+              fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black),
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
         ),
@@ -265,7 +263,10 @@ class _ProductreportpageState extends State<Productreportpage> {
             value: item,
             child: Text(
               item,
-              style: const TextStyle(fontSize: 14, color: Colors.black),
+              style: GoogleFonts.robotoCondensed(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
@@ -302,6 +303,10 @@ class _ProductreportpageState extends State<Productreportpage> {
     );
   }
 
+  final _textxData = GoogleFonts.robotoCondensed(
+      fontSize: 15, color: Colors.black, fontWeight: FontWeight.w500);
+  final _textTitile = GoogleFonts.robotoCondensed(
+      fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500);
   @override
   Widget build(BuildContext context) {
     List<DataModel> displayList = _isSearching
@@ -340,7 +345,7 @@ class _ProductreportpageState extends State<Productreportpage> {
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.symmetric(vertical: 3.0),
                       child: TextField(
                         controller: _searchDate,
                         readOnly: true,
@@ -348,7 +353,7 @@ class _ProductreportpageState extends State<Productreportpage> {
                         decoration: InputDecoration(
                           hintText: 'Chọn ngày bắt đầu và kết thúc',
                           hintStyle: GoogleFonts.robotoCondensed(
-                            fontSize: 14,
+                            fontSize: 15,
                             color: Colors.black38,
                           ),
                           border: InputBorder.none,
@@ -403,7 +408,7 @@ class _ProductreportpageState extends State<Productreportpage> {
                     decoration: InputDecoration(
                       hintText: 'Mã sản phẩm, tên sản phẩm',
                       hintStyle: GoogleFonts.robotoCondensed(
-                          fontSize: 14, color: Colors.black38),
+                          fontSize: 15, color: Colors.black38),
                       border: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(
                           Radius.circular(10),
@@ -501,83 +506,61 @@ class _ProductreportpageState extends State<Productreportpage> {
                               child: DataTable(
                                 columns: [
                                   DataColumn(
-                                      label: Text(
-                                    'STT',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('STT', style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Mã sản phẩm',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Mã sản phẩm',
+                                          style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Tên sản phẩm',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Tên sản phẩm',
+                                          style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Mã HS',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Mã HS', style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Số TKX',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label:
+                                          Text('Số TKX', style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Số lượng đã làm',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Số lượng đã làm',
+                                          style: _textTitile)),
                                   DataColumn(
-                                      label: Text(
-                                    'Số lượng tồn',
-                                    style: GoogleFonts.robotoCondensed(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  )),
+                                      label: Text('Số lượng tồn',
+                                          style: _textTitile)),
                                 ],
                                 rows: displayList.map((doc) {
                                   return DataRow(cells: [
                                     DataCell(Center(
                                         child: Text(
-                                            doc.rowNumber?.toString() ?? ''))),
+                                      doc.rowNumber?.toString() ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Center(
-                                        child: Text(doc.productCode ?? ''))),
+                                        child: Text(
+                                      doc.productCode ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Text(doc.hsCode ?? '')),
                                     DataCell(Center(
-                                        child: Text(doc.productName ?? ''))),
+                                        child: Text(
+                                      doc.productName ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Center(
-                                      child: Text(doc.exportDeclarationNumber
-                                              ?.toString() ??
-                                          ''),
+                                      child: Text(
+                                        doc.exportDeclarationNumber
+                                                ?.toString() ??
+                                            '',
+                                        style: _textxData,
+                                      ),
                                     )),
                                     DataCell(Center(
                                         child: Text(
-                                            doc.coUsed?.toString() ?? ''))),
+                                      doc.coUsed?.toString() ?? '',
+                                      style: _textxData,
+                                    ))),
                                     DataCell(Center(
                                       child: Text(
-                                          doc.coAvailable?.toString() ?? ''),
+                                        doc.coAvailable?.toString() ?? '',
+                                        style: _textxData,
+                                      ),
                                     )),
                                   ]);
                                 }).toList(),
@@ -615,7 +598,7 @@ class _ProductreportpageState extends State<Productreportpage> {
                   ),
                   child: Text(
                     '$currentPage',
-                    style: const TextStyle(color: Colors.black),
+                    style: _textxData,
                   ),
                 ),
                 IconButton(
@@ -643,7 +626,13 @@ class _ProductreportpageState extends State<Productreportpage> {
                     items: itemsPerPageOptions.map((int value) {
                       return DropdownMenuItem<int>(
                         value: value,
-                        child: Text('$value/trang'),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2.0),
+                          child: Text(
+                            '$value/trang',
+                            style: _textTitile,
+                          ),
+                        ),
                       );
                     }).toList(),
                     onChanged: (int? newValue) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LegendItem extends StatelessWidget {
   final Color color;
@@ -21,7 +22,8 @@ class LegendItem extends StatelessWidget {
         const SizedBox(width: 5),
         Text(
           text,
-          style: const TextStyle(fontSize: 13, color: Colors.black54),
+          style: GoogleFonts.robotoCondensed(
+              fontSize: 14, color: Colors.black87, fontWeight: FontWeight.w500),
         ),
         const SizedBox(width: 12),
       ],

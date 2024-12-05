@@ -17,7 +17,6 @@ class CustomerService {
       final userId = prefs.getString('userId');
 
       if (userId == null) {
-        print('No user ID found. User might not be logged in.');
         return [];
       }
       Body requestBody = Body(
@@ -42,10 +41,9 @@ class CustomerService {
         final Customers customerData = Customers.fromJson(jsonResponse);
         return customerData.data ?? [];
       } else {
-        throw Exception('Failed to load documents');
+        throw Exception('Failed to load customer');
       }
     } catch (error) {
-      print('Error fetching documents: $error');
       return [];
     }
   }
@@ -59,7 +57,6 @@ class CustomerService {
       final userId = prefs.getString('userId');
 
       if (userId == null) {
-        print('No user ID found. User might not be logged in.');
         return [];
       }
       Body requestBody = Body(
@@ -88,7 +85,6 @@ class CustomerService {
         throw Exception('Failed to load customers');
       }
     } catch (error) {
-      print('Error fetching customers: $error');
       return [];
     }
   }

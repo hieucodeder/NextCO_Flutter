@@ -16,6 +16,9 @@ class Materialresportservice {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
 
+      if (userId == null) {
+        return [];
+      }
       Bodyreport requestBody = Bodyreport(
         customerId: customerid,
         frCreatedDate: null,
@@ -35,19 +38,18 @@ class Materialresportservice {
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-        final Materialreportmodel MaterialreportmodelData =
+        final Materialreportmodel materialreportmodelData =
             Materialreportmodel.fromJson(jsonResponse);
-        return MaterialreportmodelData.data ?? []; 
+        return materialreportmodelData.data ?? [];
       } else {
-        throw Exception('Failed to load documents');
+        throw Exception('Failed to load materialResport');
       }
     } catch (error) {
-      print('Error fetching documents: $error');
       return [];
     }
   }
 
-  Future<List<Data>> fetchMateriaDataAlllsReport(int page, int pageSize) async {
+  Future<List<Data>> fetchMateriaDataAlllsReport(int page, int pageSize, String? search, String? customerid) async {
     try {
       final url = Uri.parse(apiUrl);
       final headers = await ApiConfig.getHeaders();
@@ -55,15 +57,14 @@ class Materialresportservice {
       final userId = prefs.getString('userId');
 
       if (userId == null) {
-        print('No user ID found. User might not be logged in.');
         return [];
       }
       Bodyreport requestBody = Bodyreport(
-        customerId: null,
+        customerId: customerid,
         frCreatedDate: null,
         pageIndex: page,
         pageSize: pageSize,
-        searchContent: "",
+        searchContent: search,
         toCreatedDate: null,
         typeSearch: 1,
         userId: userId,
@@ -82,13 +83,9 @@ class Materialresportservice {
             Materialreportmodel.fromJson(jsonResponse);
         return materialReportModel.data ?? [];
       } else {
-        print(
-            'Error: Server responded with status code ${response.statusCode}');
-        print('Response body: ${response.body}');
-        throw Exception('Failed to load documents');
+        throw Exception('Failed to load materialResport');
       }
     } catch (error) {
-      print('Error fetching documents: $error');
       return [];
     }
   }
@@ -102,7 +99,6 @@ class Materialresportservice {
       final userId = prefs.getString('userId');
 
       if (userId == null) {
-        print('No user ID found. User might not be logged in.');
         return [];
       }
       Bodyreport requestBody = Bodyreport(
@@ -129,13 +125,9 @@ class Materialresportservice {
             Materialreportmodel.fromJson(jsonResponse);
         return materialReportModel.data ?? [];
       } else {
-        print(
-            'Error: Server responded with status code ${response.statusCode}');
-        print('Response body: ${response.body}');
-        throw Exception('Failed to load documents');
+        throw Exception('Failed to load materialResport');
       }
     } catch (error) {
-      print('Error fetching documents: $error');
       return [];
     }
   }

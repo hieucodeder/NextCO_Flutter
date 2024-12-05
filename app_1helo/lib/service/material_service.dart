@@ -37,10 +37,9 @@ class MaterialService {
         final Materials materialsData = Materials.fromJson(jsonResponse);
         return materialsData.data ?? []; // Return the data list
       } else {
-        throw Exception('Failed to load documents');
+        throw Exception('Failed to load material');
       }
     } catch (error) {
-      print('Error fetching documents: $error');
       return [];
     }
   }
@@ -77,7 +76,6 @@ class MaterialService {
         throw Exception('Failed to load customers');
       }
     } catch (error) {
-      print('Error fetching customers: $error');
       return [];
     }
   }

@@ -2,6 +2,7 @@ import 'package:app_1helo/charPage/MultiBarChartWidget.dart';
 import 'package:app_1helo/model/columnChar.dart';
 import 'package:app_1helo/service/columnChar_service.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Columncharpage extends StatefulWidget {
   final Function(int) onSelectPage;
@@ -34,9 +35,17 @@ class _ColumncharpageState extends State<Columncharpage> {
       final int year = currentYear - index;
       return DropdownMenuItem<int>(
         value: year,
-        child: Text(year.toString()),
+        child: Text(
+          year.toString(),
+          style: GoogleFonts.robotoCondensed(
+              fontSize: 16, fontWeight: FontWeight.w600),
+        ),
       );
     });
+  }
+
+  Future<void> _onRefresh() async {
+    fetchChartDataForYear(selectedYear);
   }
 
   @override
@@ -51,9 +60,10 @@ class _ColumncharpageState extends State<Columncharpage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   'Lọc theo năm:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: GoogleFonts.robotoCondensed(
+                      fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(
                   width: 5,
@@ -81,56 +91,68 @@ class _ColumncharpageState extends State<Columncharpage> {
             ),
           ),
           Expanded(
-            child: FutureBuilder<List<ColumnChar>>(
-              future: futureData,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return const Center(child: Text('Lỗi khi tải dữ liệu'));
-                } else if (snapshot.hasData) {
-                  final data = snapshot.data!;
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        MultiBarChartWidget(
-                          data: data,
-                          title: 'Số lượng CO đã tạo',
-                          filterKey: 'coNumber',
-                        ),
-                        const SizedBox(height: 16),
-                        MultiBarChartWidget(
-                          data: data,
-                          title: 'Số lượng VAT đã tạo',
-                          filterKey: 'vatNumber',
-                        ),
-                        const SizedBox(height: 16),
-                        MultiBarChartWidget(
-                          data: data,
-                          title: 'Số lượng TKN đã tạo',
-                          filterKey: 'importDeclarationNumber',
-                        ),
-                        const SizedBox(height: 16),
-                        MultiBarChartWidget(
-                          data: data,
-                          title: 'Số lượng TKX đã tạo',
-                          filterKey: 'exportDeclarationNumber',
-                        ),
-                        const SizedBox(height: 16),
-                        MultiBarChartWidget(
-                          data: data,
-                          title: 'Số lượng người dùng đã tạo',
-                          filterKey: 'userNumber',
-                        ),
-                      ],
-                    ),
-                  );
-                } else {
-                  return const Center(
-                      child: Text('Không có dữ liệu để hiển thị'));
-                }
-              },
+            child: RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: FutureBuilder<List<ColumnChar>>(
+                future: futureData,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(
+                        child: Text(
+                      'Lỗi khi tải dữ liệu',
+                      style: GoogleFonts.robotoCondensed(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                    ));
+                  } else if (snapshot.hasData) {
+                    final data = snapshot.data!;
+                    return SingleChildScrollView(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          MultiBarChartWidget(
+                            data: data,
+                            title: 'Số lượng CO đã tạo',
+                            filterKey: 'coNumber',
+                          ),
+                          const SizedBox(height: 16),
+                          MultiBarChartWidget(
+                            data: data,
+                            title: 'Số lượng VAT đã tạo',
+                            filterKey: 'vatNumber',
+                          ),
+                          const SizedBox(height: 16),
+                          MultiBarChartWidget(
+                            data: data,
+                            title: 'Số lượng TKN đã tạo',
+                            filterKey: 'importDeclarationNumber',
+                          ),
+                          const SizedBox(height: 16),
+                          MultiBarChartWidget(
+                            data: data,
+                            title: 'Số lượng TKX đã tạo',
+                            filterKey: 'exportDeclarationNumber',
+                          ),
+                          const SizedBox(height: 16),
+                          MultiBarChartWidget(
+                            data: data,
+                            title: 'Số lượng người dùng đã tạo',
+                            filterKey: 'userNumber',
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return Center(
+                        child: Text(
+                      'Không có dữ liệu để hiển thị',
+                      style: GoogleFonts.robotoCondensed(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                    ));
+                  }
+                },
+              ),
             ),
           ),
         ],

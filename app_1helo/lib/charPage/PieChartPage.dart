@@ -1,13 +1,9 @@
 import 'dart:async';
-import 'dart:ffi';
-import 'package:app_1helo/model/customers.dart';
 import 'package:app_1helo/model/dropdownEmployee.dart';
 import 'package:app_1helo/model/pieCharModel.dart';
 import 'package:app_1helo/model/user.dart';
 import 'package:app_1helo/service/authService.dart';
-import 'package:app_1helo/service/customer_service..dart';
 import 'package:app_1helo/service/pieChar_service.dart';
-import 'package:app_1helo/service/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -22,23 +18,14 @@ class Piechartpage extends StatefulWidget {
 }
 
 class PiechartpageState extends State<Piechartpage> {
-  final _searchControllerCustomer = TextEditingController();
-  final _searchControllerUsers = TextEditingController();
-  final UserService _userService = UserService();
-  final CustomerService _customerService = CustomerService();
   final AuthService _athServiceService = AuthService();
   Map<String, double> dataMap = {};
-  List<Data> _customerList = [];
-  List<Data> _filteredCustomers = [];
-  List<DataUser> _userList = [];
-  List<DataUser> _filteredUsers = [];
   DataUser? selectedUsers;
   dropdownEmployee? selectedDropdownEmployee;
   List<dropdownEmployee> _filtereddropdownEmployee = [];
   EmployeeCustomer? selectedDropdownCustomer;
   List<EmployeeCustomer> _filtereddropdownCustomer = [];
   bool _isFetchingData = false;
-  bool _isLoading = false;
   List<PieCharModel> pieCharChartData = [];
   int currentPage = 1;
   int pageSize = 10;
@@ -54,9 +41,7 @@ class PiechartpageState extends State<Piechartpage> {
 
 //Refres
   Future<void> refreshChartData() async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() {});
 
     {
       setState(() {
@@ -223,11 +208,8 @@ class PiechartpageState extends State<Piechartpage> {
 
   Future<void> _fetchUsersData() async {
     try {
-      _userList = await _userService.fetchUsers(currentPage, pageSize);
       if (mounted) {
-        setState(() {
-          _filteredUsers = _userList;
-        });
+        setState(() {});
       }
     } catch (e) {
       print("Error fetching user data: $e");
@@ -253,7 +235,8 @@ class PiechartpageState extends State<Piechartpage> {
       child: DropdownButton<String>(
         hint: Text(
           hint,
-          style: const TextStyle(fontSize: 13, color: Colors.black),
+          style: GoogleFonts.robotoCondensed(
+              fontSize: 15, color: Colors.black, fontWeight: FontWeight.w500),
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
         ),
@@ -267,7 +250,10 @@ class PiechartpageState extends State<Piechartpage> {
             value: item,
             child: Text(
               item,
-              style: const TextStyle(fontSize: 13, color: Colors.black),
+              style: GoogleFonts.robotoCondensed(
+                  fontSize: 15,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
@@ -474,7 +460,7 @@ class PiechartpageState extends State<Piechartpage> {
                             hintText: 'Chọn ngày bắt đầu và kết thúc',
                             hintStyle: GoogleFonts.robotoCondensed(
                               fontSize: 14,
-                              color: Colors.black38,
+                              color: Colors.black45,
                             ),
                             border: InputBorder.none,
                           ),

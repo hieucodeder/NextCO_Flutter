@@ -18,8 +18,6 @@ class LineChartService {
 
     try {
       final headers = await ApiConfig.getHeaders();
-      print(
-          'Fetching line chart data with employeeId: $employeeId and customerId: $customerId');
 
       final response = await http.post(
         url,
@@ -27,19 +25,14 @@ class LineChartService {
         body: jsonEncode(requestBody),
       );
 
-      print('Response status: ${response.statusCode}');
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = jsonDecode(response.body);
         LinecharModel lineChartResponse = LinecharModel.fromJson(jsonData);
-        print('Success: ${lineChartResponse.success}');
         return lineChartResponse;
       } else {
-        print(
-            'Failed to fetch line chart data. Status code: ${response.statusCode}');
         return null;
       }
     } catch (error) {
-      print('Error fetching line chart data: $error');
       return null;
     }
   }
@@ -51,7 +44,6 @@ class LineChartService {
     final userId = prefs.getString('userId');
 
     if (userId == null) {
-      print('No user ID found. User might not be logged in.');
       return [];
     }
 
@@ -60,46 +52,31 @@ class LineChartService {
         '${ApiConfig.baseUrl}/employees/dropdown-employeeid/$userId';
 
     try {
-      print('Fetching employee list from API: $employeeApiUrl');
       final response =
           await http.get(Uri.parse(employeeApiUrl), headers: headers);
 
-      print('Employee list response status: ${response.statusCode}');
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = jsonDecode(response.body);
-        print('Employee list fetched successfully. Count: ${jsonData.length}');
         return jsonData.map((json) => dropdownEmployee.fromJson(json)).toList();
       } else {
-        print(
-            'Failed to fetch employee list. Status code: ${response.statusCode}');
         return [];
       }
     } catch (error) {
-      print('Error fetching employees: $error');
       return [];
     }
   }
 
   Future<void> fetchDataForUser(String fullName) async {
-    print('Fetching data for user: $fullName');
-
     List<dropdownEmployee> employees = await fetchEmployeeList();
 
     String employeeId = getEmployeeIdByFullName(fullName, employees);
-    print('Retrieved employeeId: $employeeId for full name: $fullName');
 
     if (employeeId.isNotEmpty) {
       final LinecharModel? response =
           await fetchLineChartData(employeeId, null);
       if (response != null) {
-        print(
-            'Line chart data fetched successfully for employeeId: $employeeId');
-      } else {
-        print('Failed to fetch line chart data for employeeId: $employeeId');
-      }
-    } else {
-      print('Employee ID is empty for full name: $fullName');
-    }
+      } else {}
+    } else {}
   }
 
   String getEmployeeIdByFullName(
@@ -109,7 +86,6 @@ class LineChartService {
         return employee.value ?? '';
       }
     }
-    print('No employee found for full name: $fullName');
     return '';
   }
 }

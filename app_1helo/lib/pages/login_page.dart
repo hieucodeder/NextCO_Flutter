@@ -5,7 +5,6 @@ import 'package:app_1helo/service/authService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:keyboard_avoider/keyboard_avoider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -19,7 +18,6 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  String? _errorMessage;
 
   final AuthService _authService = AuthService();
 
@@ -43,15 +41,11 @@ class _LoginPageState extends State<LoginPage> {
         if (response != null) {
           showLoginSnackbar(context);
         } else {
-          setState(() {
-            _errorMessage = 'Đăng nhập thất bại. Vui lòng thử lại.';
-          });
+          setState(() {});
           showLoginErrorSnackbar(context);
         }
       } catch (error) {
-        setState(() {
-          _errorMessage = 'Có lỗi xảy ra. Vui lòng thử lại sau.';
-        });
+        setState(() {});
         showLoginErrorSnackbar(context);
       }
     } else {

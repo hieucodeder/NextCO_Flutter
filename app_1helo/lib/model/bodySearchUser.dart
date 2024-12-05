@@ -1,6 +1,6 @@
 class Bodysearchuser {
   String? branchId;
-  Null? customerId;
+  String? customerId;
   String? departmentId;
   int? pageIndex;
   int? pageSize;

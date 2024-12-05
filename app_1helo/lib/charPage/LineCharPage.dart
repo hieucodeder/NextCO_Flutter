@@ -9,6 +9,7 @@ import 'package:app_1helo/service/lineChar_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:app_1helo/Cusstom/LegendItem.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Linecharpage extends StatefulWidget {
   const Linecharpage({super.key});
@@ -341,7 +342,8 @@ class LinecharpageState extends State<Linecharpage> {
       child: DropdownButton<String>(
         hint: Text(
           hint,
-          style: const TextStyle(fontSize: 13, color: Colors.black),
+          style: GoogleFonts.robotoCondensed(
+              fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black),
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
         ),
@@ -355,7 +357,10 @@ class LinecharpageState extends State<Linecharpage> {
             value: item,
             child: Text(
               item,
-              style: const TextStyle(fontSize: 13, color: Colors.black),
+              style: GoogleFonts.robotoCondensed(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
@@ -397,7 +402,7 @@ class LinecharpageState extends State<Linecharpage> {
 
     if (selectedDropdownEmployee == null &&
         _filtereddropdownEmployee.isNotEmpty) {
-      selectedDropdownEmployee = _filtereddropdownEmployee[0];
+      selectedDropdownEmployee = _filtereddropdownEmployee[1];
       _fetchData();
     }
     return buildDropdown(
@@ -491,10 +496,10 @@ class LinecharpageState extends State<Linecharpage> {
                                   getTitlesWidget: (value, meta) {
                                     return Text(
                                       value.toInt().toString(),
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 12,
-                                      ),
+                                      style: GoogleFonts.robotoCondensed(
+                                          color: Colors.black,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500),
                                     );
                                   },
                                 ),
@@ -519,10 +524,10 @@ class LinecharpageState extends State<Linecharpage> {
 
                                     return Text(
                                       '$month/$year',
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 12,
-                                      ),
+                                      style: GoogleFonts.robotoCondensed(
+                                          color: Colors.black,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500),
                                     );
                                   },
                                 ),

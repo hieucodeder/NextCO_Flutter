@@ -58,12 +58,15 @@ class _PersonalInfoState extends State<PersonalInfo> {
     }
   }
 
-  final TextStyle colorsRed = const TextStyle(
+  final colorsRed = GoogleFonts.robotoCondensed(
     color: Colors.red,
     fontSize: 16,
     fontWeight: FontWeight.bold,
   );
-
+  final _text = GoogleFonts.robotoCondensed(
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+  );
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -84,15 +87,18 @@ class _PersonalInfoState extends State<PersonalInfo> {
                     const SizedBox(
                       width: 5,
                     ),
-                    const Text('Họ và tên')
+                    Text(
+                      'Họ và tên',
+                      style: _text,
+                    )
                   ],
                 ),
                 TextField(
                   controller: nameController,
-                  decoration: const InputDecoration(
-                    hintText: 'Họ và tên',
-                    border: OutlineInputBorder(),
-                  ),
+                  decoration: InputDecoration(
+                      hintText: 'Họ và tên',
+                      border: OutlineInputBorder(),
+                      hintStyle: _text),
                 ),
               ],
             ),
@@ -108,17 +114,20 @@ class _PersonalInfoState extends State<PersonalInfo> {
                     const SizedBox(
                       width: 5,
                     ),
-                    const Text('Tài khoản')
+                    Text(
+                      'Tài khoản',
+                      style: _text,
+                    )
                   ],
                 ),
                 TextField(
                   controller: accountController,
                   readOnly: true,
                   enabled: false,
-                  decoration: const InputDecoration(
-                    hintText: 'Tài khoản',
-                    border: OutlineInputBorder(),
-                  ),
+                  decoration: InputDecoration(
+                      hintText: 'Tài khoản',
+                      border: const OutlineInputBorder(),
+                      hintStyle: _text),
                 ),
               ],
             ),
@@ -134,15 +143,18 @@ class _PersonalInfoState extends State<PersonalInfo> {
                     const SizedBox(
                       width: 5,
                     ),
-                    const Text('Ngày sinh')
+                    Text(
+                      'Ngày sinh',
+                      style: _text,
+                    )
                   ],
                 ),
                 TextField(
                   controller: dateController,
-                  decoration: const InputDecoration(
-                    hintText: 'Ngày sinh',
-                    border: OutlineInputBorder(),
-                  ),
+                  decoration: InputDecoration(
+                      hintText: 'Ngày sinh',
+                      border: OutlineInputBorder(),
+                      hintStyle: _text),
                 ),
               ],
             ),
@@ -158,28 +170,37 @@ class _PersonalInfoState extends State<PersonalInfo> {
                     const SizedBox(
                       width: 5,
                     ),
-                    const Text('Giới tính')
+                    Text(
+                      'Giới tính',
+                      style: _text,
+                    )
                   ],
                 ),
                 DropdownButtonFormField<int>(
-                  decoration: const InputDecoration(
-                    hintText: 'Giới tính',
-                    border: OutlineInputBorder(),
-                  ),
+                  decoration: InputDecoration(
+                      hintText: 'Giới tính',
+                      border: OutlineInputBorder(),
+                      hintStyle: _text),
                   value: gender,
                   onChanged: (value) {
                     setState(() {
                       gender = value;
                     });
                   },
-                  items: const [
+                  items: [
                     DropdownMenuItem(
                       value: 0, // Nam
-                      child: Text('Nữ'),
+                      child: Text(
+                        'Nữ',
+                        style: _text,
+                      ),
                     ),
                     DropdownMenuItem(
                       value: 1, // Nữ
-                      child: Text('Nam'),
+                      child: Text(
+                        'Nam',
+                        style: _text,
+                      ),
                     ),
                   ],
                 ),
@@ -197,15 +218,18 @@ class _PersonalInfoState extends State<PersonalInfo> {
                     const SizedBox(
                       width: 5,
                     ),
-                    const Text('Email')
+                    Text(
+                      'Email',
+                      style: _text,
+                    )
                   ],
                 ),
                 TextField(
                   controller: emailController,
-                  decoration: const InputDecoration(
-                    hintText: 'Email',
-                    border: OutlineInputBorder(),
-                  ),
+                  decoration: InputDecoration(
+                      hintText: 'Email',
+                      border: OutlineInputBorder(),
+                      hintStyle: _text),
                 ),
               ],
             ),
@@ -221,26 +245,32 @@ class _PersonalInfoState extends State<PersonalInfo> {
                     const SizedBox(
                       width: 5,
                     ),
-                    const Text('Số điện thoại')
+                    Text(
+                      'Số điện thoại',
+                      style: _text,
+                    )
                   ],
                 ),
                 TextField(
                   controller: foneController,
-                  decoration: const InputDecoration(
-                    hintText: 'Số điện thoại',
-                    border: OutlineInputBorder(),
-                  ),
+                  decoration: InputDecoration(
+                      hintText: 'Số điện thoại',
+                      border: OutlineInputBorder(),
+                      hintStyle: _text),
                 ),
               ],
             ),
             const SizedBox(height: 10),
-            const Text('Mô tả'),
+            Text(
+              'Mô tả',
+              style: _text,
+            ),
             TextField(
               controller: descriptionController,
-              decoration: const InputDecoration(
-                hintText: 'Mô tả',
-                border: OutlineInputBorder(),
-              ),
+              decoration: InputDecoration(
+                  hintText: 'Mô tả',
+                  border: OutlineInputBorder(),
+                  hintStyle: _text),
             ),
             const SizedBox(
               height: 10,
