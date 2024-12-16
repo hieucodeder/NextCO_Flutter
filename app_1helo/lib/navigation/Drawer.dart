@@ -170,7 +170,7 @@ class _DrawerCustomState extends State<DrawerCustom> {
       leading: Icon(icon, color: Colors.white),
       title: Text(title,
           style:
-              GoogleFonts.robotoCondensed(fontSize: 14, color: Colors.white)),
+              GoogleFonts.robotoCondensed(fontSize: 15, color: Colors.white)),
       onTap: onTap,
     );
   }
@@ -184,7 +184,7 @@ class _DrawerCustomState extends State<DrawerCustom> {
       leading: Icon(icon, color: Colors.white),
       title: Text(
         title,
-        style: GoogleFonts.robotoCondensed(fontSize: 14, color: Colors.white),
+        style: GoogleFonts.robotoCondensed(fontSize: 15, color: Colors.white),
       ),
       childrenPadding: const EdgeInsets.only(left: 20.0),
       iconColor: Colors.white,
@@ -204,7 +204,8 @@ class _DrawerCustomState extends State<DrawerCustom> {
       child: Row(
         children: [
           Text('Colors:',
-              style: GoogleFonts.robotoCondensed(color: Colors.white)),
+              style: GoogleFonts.robotoCondensed(
+                  fontSize: 15, color: Colors.white)),
           const SizedBox(width: 5),
           Wrap(
             children: colors.map((color) {

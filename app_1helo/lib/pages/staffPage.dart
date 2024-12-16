@@ -31,7 +31,6 @@ class _StaffpageState extends State<Staffpage> {
   final TextEditingController _searchControllerRoom = TextEditingController();
 
   List<DataUser> _searchResults = [];
-  List<DataUser> _branchResults = [];
   List<DataUser> _filteredUsersRoom = [];
   List<DataUser> _filteredUsersBranch = [];
   List<DataUser> _staffList = [];

@@ -402,7 +402,7 @@ class LinecharpageState extends State<Linecharpage> {
 
     if (selectedDropdownEmployee == null &&
         _filtereddropdownEmployee.isNotEmpty) {
-      selectedDropdownEmployee = _filtereddropdownEmployee[1];
+      selectedDropdownEmployee = _filtereddropdownEmployee[0];
       _fetchData();
     }
     return buildDropdown(

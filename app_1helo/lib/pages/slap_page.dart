@@ -1,3 +1,4 @@
+import 'package:app_1helo/pages/LoginPageDomain.dart';
 import 'package:app_1helo/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -81,9 +82,6 @@ class _SlapPageState extends State<SlapPage> with TickerProviderStateMixin {
                   ],
                 ),
               ),
-
-
-              
             ],
           ),
         ),

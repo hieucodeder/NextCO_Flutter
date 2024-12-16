@@ -8,8 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'api_config.dart';
 
 class PiecharService {
-  final String apiUrl =
-      '${ApiConfig.baseUrlBasic}/api-co/co-documents/dashboard';
+  final String apiUrl = '${ApiConfig.baseUrl}/co-documents/dashboard';
 
   Future<List<PieCharModel>?> fetchPieChartData(DateTime? startDate,
       DateTime? endDate, String? employeeId, String? customerId) async {

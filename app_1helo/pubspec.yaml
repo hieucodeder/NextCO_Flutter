@@ -48,6 +48,9 @@ dependencies:
   flutter_svg: ^2.0.14
   webview_flutter: ^4.10.0
   rename_app: ^1.6.1
+  flutter_inappwebview: ^6.1.5
+  sqflite: ^2.4.1
+  path: ^1.9.0
  
  
 
@@ -57,23 +60,30 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   flutter_launcher_icons: ^0.14.1
 
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/icon/icon.png"
-  min_sdk_android: 21 
-  web:
-    generate: true
-    image_path: "path/to/image.png"
-    background_color: "#hexcode"
-    theme_color: "#hexcode"
-  windows:
-    generate: true
-    image_path: "path/to/image.png"
-    icon_size: 48
-  macos:
-    generate: true
-    image_path: "path/to/image.png"
+flutter_icons:
+  android: true # Bật hỗ trợ Android
+  ios: true     # Bật hỗ trợ iOS
+  image_path: "assets/icon/icon.png" # Đường dẫn tới file icon (PNG)
+  adaptive_icon_background: "#FFFFFF" # Màu nền (cần thiết cho Android Adaptive Icons)
+  adaptive_icon_foreground: "assets/icon/icon.png" # (tùy chọn) file foreground cho Adaptive Icons
+  min_sdk_android: 21 # Yêu cầu phiên bản tối thiểu cho Android
+# flutter_launcher_icons:
+#   android: "launcher_icon"
+#   ios: true
+#   image_path: "assets/icon/icon.png"
+#   min_sdk_android: 21 
+#   web:
+#     generate: true
+#     image_path: "path/to/image.png"
+#     background_color: "#hexcode"
+#     theme_color: "#hexcode"
+#   windows:
+#     generate: true
+#     image_path: "path/to/image.png"
+#     icon_size: 48
+#   macos:
+#     generate: true
+#     image_path: "path/to/image.png"
 
 
     

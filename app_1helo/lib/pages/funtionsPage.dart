@@ -87,7 +87,7 @@ class _NotificationPageState extends State<NotificationPage> {
               ),
             ),
             const SizedBox(
-              height: 16,
+              height: 26,
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
