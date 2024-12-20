@@ -9,8 +9,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class Materialresportpage extends StatefulWidget {
-  final Function(int) onSelectPage;
-  const Materialresportpage({super.key, required this.onSelectPage});
+ 
+  const Materialresportpage({super.key});
 
   @override
   State<Materialresportpage> createState() => _MaterreportpageState();

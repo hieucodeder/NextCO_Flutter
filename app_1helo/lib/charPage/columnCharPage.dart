@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Columncharpage extends StatefulWidget {
-  final Function(int) onSelectPage;
-  const Columncharpage({super.key, required this.onSelectPage});
+
+  const Columncharpage({super.key});
   @override
   _ColumncharpageState createState() => _ColumncharpageState();
 }

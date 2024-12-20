@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:app_1helo/provider/navigationProvider.dart';
 import 'package:app_1helo/provider/providerColor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -6,15 +7,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class NotificationPage extends StatefulWidget {
-  final Function(int) onSelectPage;
-  const NotificationPage({super.key, required this.onSelectPage});
+class Funtionspage extends StatefulWidget {
+  const Funtionspage({super.key});
 
   @override
-  State<NotificationPage> createState() => _NotificationPageState();
+  State<Funtionspage> createState() => _FuntionspageState();
 }
 
-class _NotificationPageState extends State<NotificationPage> {
+class _FuntionspageState extends State<Funtionspage> {
   Timer? _timer;
   final List<String> _images = [
     'resources/xuatxu3.jpg',
@@ -53,6 +53,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final navigationProvider = Provider.of<NavigationProvider>(context);
     return Container(
       constraints: const BoxConstraints.expand(),
       color: Colors.white,
@@ -100,7 +101,7 @@ class _NotificationPageState extends State<NotificationPage> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          widget.onSelectPage(9);
+                          navigationProvider.setCurrentIndex(9);
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -160,7 +161,7 @@ class _NotificationPageState extends State<NotificationPage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          widget.onSelectPage(3);
+                          navigationProvider.setCurrentIndex(3);
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -220,7 +221,7 @@ class _NotificationPageState extends State<NotificationPage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          widget.onSelectPage(7);
+                          navigationProvider.setCurrentIndex(7);
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -291,7 +292,7 @@ class _NotificationPageState extends State<NotificationPage> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          widget.onSelectPage(8);
+                          navigationProvider.setCurrentIndex(8);
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -351,7 +352,7 @@ class _NotificationPageState extends State<NotificationPage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          widget.onSelectPage(6);
+                          navigationProvider.setCurrentIndex(6);
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -411,7 +412,7 @@ class _NotificationPageState extends State<NotificationPage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          widget.onSelectPage(10);
+                          navigationProvider.setCurrentIndex(10);
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -482,7 +483,7 @@ class _NotificationPageState extends State<NotificationPage> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          widget.onSelectPage(13);
+                          navigationProvider.setCurrentIndex(13);
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -543,7 +544,7 @@ class _NotificationPageState extends State<NotificationPage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          widget.onSelectPage(12);
+                          navigationProvider.setCurrentIndex(12);
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -603,7 +604,7 @@ class _NotificationPageState extends State<NotificationPage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          widget.onSelectPage(11);
+                          navigationProvider.setCurrentIndex(11);
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,

@@ -1,127 +1,94 @@
-import 'package:app_1helo/provider/providerColor.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:app_1helo/provider/providerColor.dart';
 
 class BottomNavigation extends StatefulWidget {
-  final ValueChanged<int> changCurrentIndex;
-  BottomNavigation({super.key, required this.changCurrentIndex});
+  final int currentIndex;
+  final Function(int) onTap;
+  const BottomNavigation(
+      {super.key, required this.currentIndex, required this.onTap});
 
   @override
   State<BottomNavigation> createState() => _BottomNavigationState();
 }
 
 class _BottomNavigationState extends State<BottomNavigation> {
-  int _currentIndex = 0;
-  void _onTabTapped(int index) {
-    widget.changCurrentIndex(index);
-    setState(() {
-      _currentIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BottomAppBar(
-      color: Provider.of<Providercolor>(context).selectedColor,
-      padding: EdgeInsets.zero,
-      height: 55,
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          GestureDetector(
-            onTap: () {
-              _onTabTapped(0);
-            },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 30,
-                  child: IconButton(
-                    iconSize: 25,
-                    padding: EdgeInsets.zero,
-                    icon: Icon(
-                      Icons.home_outlined,
-                      color: _currentIndex == 0 ? Colors.orange : Colors.white,
-                    ),
-                    onPressed: () {
-                      _onTabTapped(0);
-                    },
-                  ),
-                ),
-                Text('Trang chủ',
-                    style: GoogleFonts.robotoCondensed(
-                        textStyle: TextStyle(
-                            fontSize: 13,
-                            color: _currentIndex == 0
-                                ? Colors.orange
-                                : Colors.white)))
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              _onTabTapped(1);
-            },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 30,
-                  child: IconButton(
-                    iconSize: 25,
-                    padding: EdgeInsets.zero,
-                    icon: Icon(
-                      Icons.dashboard_outlined,
-                      color: _currentIndex == 1 ? Colors.orange : Colors.white,
-                    ),
-                    onPressed: () {
-                      _onTabTapped(1);
-                    },
-                  ),
-                ),
-                Text('Chức năng',
-                    style: GoogleFonts.robotoCondensed(
-                        fontSize: 13,
-                        color:
-                            _currentIndex == 1 ? Colors.orange : Colors.white))
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              _onTabTapped(2);
-            },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 30,
-                  child: IconButton(
-                    iconSize: 25,
-                    padding: EdgeInsets.zero,
-                    icon: Icon(
-                      Icons.account_box_rounded,
-                      color: _currentIndex == 2 ? Colors.orange : Colors.white,
-                    ),
-                    onPressed: () {
-                      _onTabTapped(2);
-                    },
-                  ),
-                ),
-                Text('Cá nhân',
-                    style: GoogleFonts.robotoCondensed(
-                        fontSize: 13,
-                        color:
-                            _currentIndex == 2 ? Colors.orange : Colors.white))
-              ],
-            ),
+    final selectedColor = Provider.of<Providercolor>(context).selectedColor;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: selectedColor.withOpacity(0.9),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
           ),
         ],
       ),
+      child: BottomNavigationBar(
+        currentIndex: widget.currentIndex,
+        onTap: widget.onTap,
+        backgroundColor: Colors.transparent,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.orange,
+        unselectedItemColor: Colors.white,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        elevation: 0,
+        selectedLabelStyle: GoogleFonts.robotoCondensed(
+          textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+        ),
+        unselectedLabelStyle: GoogleFonts.robotoCondensed(
+          textStyle: const TextStyle(fontSize: 13),
+        ),
+        items: [
+          _buildNavItem(
+            isSelected: widget.currentIndex == 0,
+            activeIcon: Icons.home,
+            inactiveIcon: Icons.home_outlined,
+            label: 'Trang chủ',
+          ),
+          _buildNavItem(
+            isSelected: widget.currentIndex == 1,
+            activeIcon: Icons.dashboard,
+            inactiveIcon: Icons.dashboard_outlined,
+            label: 'Chức năng',
+          ),
+          _buildNavItem(
+            isSelected: widget.currentIndex == 2,
+            activeIcon: Icons.account_box,
+            inactiveIcon: Icons.account_box_outlined,
+            label: 'Cá nhân',
+          ),
+        ],
+      ),
+    );
+  }
+
+  BottomNavigationBarItem _buildNavItem({
+    required bool isSelected,
+    required IconData activeIcon,
+    required IconData inactiveIcon,
+    required String label,
+  }) {
+    return BottomNavigationBarItem(
+      icon: Container(
+        padding: const EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          color:
+              isSelected ? Colors.orange.withOpacity(0.2) : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          isSelected ? activeIcon : inactiveIcon,
+          size: 25,
+        ),
+      ),
+      label: label,
     );
   }
 }

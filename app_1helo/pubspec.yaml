@@ -60,13 +60,23 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   flutter_launcher_icons: ^0.14.1
 
-flutter_icons:
-  android: true # Bật hỗ trợ Android
-  ios: true     # Bật hỗ trợ iOS
-  image_path: "assets/icon/icon.png" # Đường dẫn tới file icon (PNG)
-  adaptive_icon_background: "#FFFFFF" # Màu nền (cần thiết cho Android Adaptive Icons)
-  adaptive_icon_foreground: "assets/icon/icon.png" # (tùy chọn) file foreground cho Adaptive Icons
-  min_sdk_android: 21 # Yêu cầu phiên bản tối thiểu cho Android
+flutter_launcher_icons:
+  image_path: "assets/icon/icon.png"
+  android: true
+  ios: true
+  web:
+    generate: true
+    image_path: "assets/icon/icon.png"
+    background_color: "#FFFFFF" # Replace with your desired background color
+    theme_color: "#000000" # Replace with your desired theme color
+  windows:
+    generate: true
+    image_path: "assets/icon/icon.png"
+    icon_size: 48 # Adjust the size if needed
+  macos:
+    generate: true
+    image_path: "assets/icon/icon.png"
+
 # flutter_launcher_icons:
 #   android: "launcher_icon"
 #   ios: true
@@ -85,16 +95,11 @@ flutter_icons:
 #     generate: true
 #     image_path: "path/to/image.png"
 
-
-    
- 
-
-
 flutter:
   uses-material-design: true
   assets:
     - resources/
-    - assets/icon/
+    - assets/icon/icon.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

@@ -1,7 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:app_1helo/model/bodyUser.dart';
 import 'package:app_1helo/model/bodylogin.dart';
+import 'package:app_1helo/model/userDomainModel.dart';
 import 'package:app_1helo/pages/AppScreen.dart';
 import 'package:app_1helo/pages/ForgotPassword.dart';
 import 'package:app_1helo/service/api_config.dart';
+import 'package:app_1helo/service/athServiceDomain.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -16,103 +21,13 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // List of domains
-  final List<String> _domains = [
-    "https://demo.nextco.vn",
-    "test-api.example.com",
-    "dev-api.example.com",
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadDomain();
-  }
-
   String? _domain;
-
   final _formKey = GlobalKey<FormState>();
-
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
+  final Athservicedomain _athservicedomain = Athservicedomain();
   final AuthService _authService = AuthService();
-
   bool _isPasswordVisible = false;
-
-// Future<void> _login() async {
-//   final phone = _usernameController.text.trim();
-//   final password = _passwordController.text.trim();
-
-//   if (phone.isEmpty || password.isEmpty) {
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       const SnackBar(content: Text("Vui lòng nhập đầy đủ thông tin")),
-//     );
-//     return;
-//   }
-
-//   try {
-//     // Kiểm tra thông tin người dùng trong database
-//     final user = await DatabaseHelper.instance.getUserByPhone(phone);
-//     print("User data: $user"); // Log dữ liệu để kiểm tra
-
-//     if (user != null && user['password'] == password) {
-//       final String? domain = user['domain'];
-//       if (domain != null && domain.isNotEmpty) {
-//         setState(() {
-//           _domain = domain;
-//         });
-//         ApiConfig.domain = domain; // Gán giá trị domain
-//         print("Domain set in ApiConfig: ${ApiConfig.domain}");
-//       } else {
-//         print("Domain is null or empty for user: $phone");
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           const SnackBar(content: Text("Domain không hợp lệ")),
-//         );
-//         return;
-//       }
-
-//       // Hiển thị thông báo đăng nhập thành công
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(content: Text("Đăng nhập thành công!")),
-//       );
-
-//       // Chuyển sang màn hình chính
-//       Navigator.pushReplacement(
-//         context,
-//         MaterialPageRoute(builder: (context) => const HomePage()), // Thay đổi LoginPage thành HomePage nếu cần
-//       );
-//     } else {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(content: Text("Số điện thoại hoặc mật khẩu không đúng")),
-//       );
-//     }
-//   } catch (error) {
-//     print("Error during login: $error"); // Log lỗi để kiểm tra
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       const SnackBar(content: Text("Có lỗi xảy ra. Vui lòng thử lại!")),
-//     );
-//   }
-// }
-
-  // Load the domain from SharedPreferences
-  _loadDomain() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _domain = prefs.getString('selectedDomain') ??
-          _domains[0]; // Set the default if no domain is saved
-      if (!_domains.contains(_domain)) {
-        _domain = _domains[0]; // Ensure the domain is valid
-      }
-      ApiConfig.domain = _domain; // Set domain for ApiConfig
-    });
-  }
-
-  // Save selected domain to SharedPreferences
-  _saveDomain(String? domain) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('selectedDomain', domain ?? _domains[0]);
-  }
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
@@ -120,27 +35,64 @@ class _LoginPageState extends State<LoginPage> {
         const SnackBar(content: Text('Đang xử lý dữ liệu...')),
       );
 
-      final String username = _usernameController.text.trim();
+      final String phone = _phoneController.text.trim();
       final String password = _passwordController.text.trim();
 
-      //   // Lấy domain từ ApiConfig
-      //   print("Using domain: ${ApiConfig.domain}");
-      // String domain = await fetchDomainForUsername(username);
-      // print("Using domain: $domain");
-      final Bodylogin loginData =
-          Bodylogin(username: username, password: password);
+      final Bodyuser loginData = Bodyuser(phone: phone, password: password);
 
       try {
-        Map<String, dynamic>? response = await _authService.login(loginData);
+        Map<String, dynamic>? initialResponse =
+            await _athservicedomain.login(loginData);
 
-        if (response != null) {
-          showLoginSnackbar(context);
+        if (initialResponse != null) {
+          String? username = initialResponse['username'];
+          String? subdomain = initialResponse['subdomain'];
+
+          Userdomainmodel? user;
+          if (username != null) {
+            user = Userdomainmodel(
+                username: username, password: password, subdomain: subdomain);
+          } else {}
+
+          if (user != null && subdomain != null) {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setString('username', user.username ?? '');
+            await prefs.setString('password', password);
+            await prefs.setString('selectedDomain', subdomain);
+
+            await ApiConfig.loadDomain();
+
+            String? configuredDomain = ApiConfig.domain;
+
+            if (configuredDomain == null || configuredDomain.isEmpty) {
+              showLoginErrorSnackbar(context);
+              return;
+            }
+
+            final Bodylogin secondLoginData = Bodylogin(
+              username: user.username ?? '',
+              password: password,
+            );
+
+            try {
+              final secondLoginResponse =
+                  await _authService.login(secondLoginData);
+
+              if (secondLoginResponse != null) {
+                showLoginSnackbar(context);
+              } else {
+                showLoginErrorSnackbar(context);
+              }
+            } catch (e) {
+              showLoginErrorSnackbar(context);
+            }
+          } else {
+            showLoginErrorSnackbar(context);
+          }
         } else {
-          setState(() {});
           showLoginErrorSnackbar(context);
         }
       } catch (error) {
-        setState(() {});
         showLoginErrorSnackbar(context);
       }
     } else {
@@ -241,29 +193,6 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(
                           height: 20,
                         ),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              DropdownButton<String>(
-                                hint: const Text("Select a domain"),
-                                value: _domain,
-                                items: _domains.map((domain) {
-                                  return DropdownMenuItem<String>(
-                                    value: domain,
-                                    child: Text(domain),
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _domain = value;
-                                    _saveDomain(value);
-                                    ApiConfig.domain = value;
-                                  });
-                                },
-                              ),
-                            ]),
-                        const SizedBox(height: 5),
                         SizedBox(
                           width: (MediaQuery.of(context).size.width),
                           height: 200,
@@ -273,7 +202,7 @@ class _LoginPageState extends State<LoginPage> {
                               Row(
                                 children: [
                                   Text(
-                                    'Tài khoản',
+                                    'Số điện thoại',
                                     style: GoogleFonts.robotoCondensed(
                                         fontSize: 14,
                                         color: const Color(0xFF064265),
@@ -296,12 +225,12 @@ class _LoginPageState extends State<LoginPage> {
                                   TextFormField(
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
-                                        return 'Vui lòng nhập tài khoản';
+                                        return 'Vui lòng nhập số điện thoại';
                                       }
                                       return null;
                                     },
                                     style: const TextStyle(color: Colors.black),
-                                    controller: _usernameController,
+                                    controller: _phoneController,
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: const Color.fromARGB(
@@ -309,7 +238,7 @@ class _LoginPageState extends State<LoginPage> {
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      hintText: 'Tài khoản',
+                                      hintText: 'Số điện thoại',
                                       hintStyle: GoogleFonts.robotoCondensed(
                                           fontSize: 14,
                                           color: const Color(0xFF064265)),
@@ -528,7 +457,7 @@ void showLoginErrorSnackbar(BuildContext context) {
   final snackBar = SnackBar(
     backgroundColor: Colors.white,
     content: Text(
-      'Sai tài khoản hoặc mật khẩu.',
+      'Sai số điện thoại hoặc mật khẩu.',
       style: GoogleFonts.robotoCondensed(color: Colors.black),
     ),
     duration: const Duration(seconds: 3),

@@ -16,6 +16,7 @@ import 'package:app_1helo/pages/materialsPage.dart';
 import 'package:app_1helo/pages/productPage.dart';
 import 'package:app_1helo/pages/productReportPage.dart';
 import 'package:app_1helo/pages/staffPage.dart';
+import 'package:app_1helo/provider/navigationProvider.dart';
 import 'package:app_1helo/provider/providerColor.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,79 +30,20 @@ class AppScreen extends StatefulWidget {
 }
 
 class _AppScreenState extends State<AppScreen> {
-  String _appBarTitle = "BÁO CÁO HOẠT ĐỘNG NEXTCO";
-  int _currenIndex = 0;
-
-  void _changeCurrentIndex(int index) {
-    setState(() {
-      _currenIndex = index;
-      _updateAppBarTitle(index);
-    });
-  }
-
-  void _updateAppBarTitle(int index) {
-    switch (index) {
-      case 0:
-        _appBarTitle = "BÁO CÁO HOẠT ĐỘNG NEXTCO";
-        break;
-      case 1:
-        _appBarTitle = "CHỨC NĂNG NEXTCO";
-        break;
-      case 2:
-        _appBarTitle = "CÁ NHÂN";
-        break;
-      case 3:
-        _appBarTitle = "DANH SÁCH HỒ SƠ C/O";
-        break;
-      case 4:
-        _appBarTitle = "THÔNG TIN CÁ NHÂN";
-        break;
-      case 5:
-        _appBarTitle = "ĐỔI MẬT KHẨU";
-        break;
-      case 6:
-        _appBarTitle = "QUẢN LÝ NGƯỜI DÙNG";
-        break;
-      case 7:
-        _appBarTitle = "DANH SÁCH SẢN PHẨM";
-        break;
-      case 8:
-        _appBarTitle = "QUẢN LÝ NGUYÊN VẬT LIỆU";
-        break;
-      case 9:
-        _appBarTitle = "DANH SÁCH KHÁCH HÀNG";
-        break;
-      case 10:
-        _appBarTitle = "THÔNG TIN SỬ DỤNG PHẦN MỀM";
-        break;
-      case 11:
-        _appBarTitle = "THÔNG TIN THANH TOÁN";
-        break;
-      case 12:
-        _appBarTitle = "BÁO CÁO TỒN SẢN PHẨM ";
-        break;
-      case 13:
-        _appBarTitle = "BÁO CÁO TỒN NGUYÊN VẬT LIỆU ";
-        break;
-      default:
-        _appBarTitle = "BÁO CÁO HOẠT ĐỘNG NEXTCO";
-    }
-  }
-
   Widget _getPage(int index) {
     switch (index) {
       case 0:
         return const HomePage();
       case 1:
-        return NotificationPage(onSelectPage: _changeCurrentIndex);
+        return const Funtionspage();
       case 2:
-        return AcountPage(onSelectPage: _changeCurrentIndex);
+        return const AcountPage();
       case 3:
         return const Dshosoco();
       case 4:
-        return PersonalInfo(onSelectPage: _changeCurrentIndex);
+        return const PersonalInfo();
       case 5:
-        return Changepassword(onSelectPage: _changeCurrentIndex);
+        return const Changepassword();
       case 6:
         return const Staffpage();
       case 7:
@@ -111,15 +53,51 @@ class _AppScreenState extends State<AppScreen> {
       case 9:
         return const Clientpage();
       case 10:
-        return Columncharpage(onSelectPage: _changeCurrentIndex);
+        return const Columncharpage();
       case 11:
-        return Paypage(onSelectPage: _changeCurrentIndex);
+        return const Paypage();
       case 12:
         return const Productreportpage();
       case 13:
-        return Materialresportpage(onSelectPage: _changeCurrentIndex);
+        return const Materialresportpage();
       default:
         return const HomePage();
+    }
+  }
+
+  /// Get app bar title based on the index
+  String _getAppBarTitle(int index) {
+    switch (index) {
+      case 0:
+        return "BÁO CÁO HOẠT ĐỘNG NEXTCO";
+      case 1:
+        return "CHỨC NĂNG NEXTCO";
+      case 2:
+        return "CÁ NHÂN";
+      case 3:
+        return "DANH SÁCH HỒ SƠ C/O";
+      case 4:
+        return "THÔNG TIN CÁ NHÂN";
+      case 5:
+        return "ĐỔI MẬT KHẨU";
+      case 6:
+        return "QUẢN LÝ NGƯỜI DÙNG";
+      case 7:
+        return "DANH SÁCH SẢN PHẨM";
+      case 8:
+        return "QUẢN LÝ NGUYÊN VẬT LIỆU";
+      case 9:
+        return "DANH SÁCH KHÁCH HÀNG";
+      case 10:
+        return "THÔNG TIN SỬ DỤNG PHẦN MỀM";
+      case 11:
+        return "THÔNG TIN THANH TOÁN";
+      case 12:
+        return "BÁO CÁO TỒN SẢN PHẨM ";
+      case 13:
+        return "BÁO CÁO TỒN NGUYÊN VẬT LIỆU ";
+      default:
+        return "BÁO CÁO HOẠT ĐỘNG NEXTCO";
     }
   }
 
@@ -133,51 +111,76 @@ class _AppScreenState extends State<AppScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final navigationProvider = Provider.of<NavigationProvider>(context);
+    final currentIndex = navigationProvider.currentIndex;
+    final selectedColor = Provider.of<Providercolor>(context).selectedColor;
+    const totalPages = 14;
+    final validIndex =
+        (currentIndex >= 0 && currentIndex < totalPages) ? currentIndex : 0;
+
     return Scaffold(
-      drawer: DrawerCustom(onSelectPage: _changeCurrentIndex),
+      drawer: DrawerCustom(
+        onItemSelected: (index) {
+          navigationProvider.setCurrentIndex(index);
+          Navigator.pop(context);
+        },
+      ),
       appBar: AppBar(
         title: Text(
-          _appBarTitle,
+          _getAppBarTitle(validIndex),
           style: GoogleFonts.robotoCondensed(
             fontSize: 17,
             color: Colors.white,
-            // color: const Color(0xfff064265),
             fontWeight: FontWeight.bold,
           ),
         ),
         actions: [
           IconButton(
-              onPressed: () {
-                showMenu(
-                  context: context,
-                  position: const RelativeRect.fromLTRB(100, 100, 0, 0),
-                  items: [
-                    const PopupMenuItem(
-                      value: 'all',
-                      child: Text('Tất cả'),
+            onPressed: () {
+              showMenu(
+                context: context,
+                position: const RelativeRect.fromLTRB(100, 100, 0, 0),
+                items: [
+                  PopupMenuItem(
+                    value: 'unread',
+                    child: Text(
+                      'Chưa đọc',
+                      style: GoogleFonts.robotoCondensed(
+                          fontSize: 16,
+                          color: Colors.red,
+                          fontWeight: FontWeight.w600),
                     ),
-                    const PopupMenuItem(
-                      value: 'unread',
-                      child: Text('Chưa đọc'),
+                  ),
+                  PopupMenuItem(
+                    value: 'all',
+                    child: Text(
+                      'Tất cả',
+                      style: GoogleFonts.robotoCondensed(
+                          fontSize: 16, fontWeight: FontWeight.w600),
                     ),
-                  ],
-                ).then((value) {
-                  if (value == 'all') {
-                  } else if (value == 'unread') {}
-                });
-              },
-              icon: const Icon(Icons.notifications_none_outlined, size: 24),
-              color: Colors.white),
+                  ),
+                ],
+              ).then((value) {
+                if (value == 'all') {
+                } else if (value == 'unread') {}
+              });
+            },
+            icon: const Icon(Icons.notifications_none_outlined, size: 24),
+            color: Colors.white,
+          ),
         ],
         iconTheme: const IconThemeData(
           color: Colors.white,
         ),
         centerTitle: true,
-        backgroundColor: Provider.of<Providercolor>(context).selectedColor,
+        backgroundColor: selectedColor,
       ),
-      body: _getPage(_currenIndex),
+      body: _getPage(validIndex),
       bottomNavigationBar: BottomNavigation(
-        changCurrentIndex: _changeCurrentIndex,
+        currentIndex: validIndex,
+        onTap: (index) {
+          navigationProvider.setCurrentIndex(index);
+        },
       ),
       floatingActionButton: Stack(
         alignment: Alignment.bottomRight,
@@ -198,8 +201,7 @@ class _AppScreenState extends State<AppScreen> {
                             builder: (context) => const FacebookPage()));
                   },
                   tooltip: 'Button 3',
-                  backgroundColor:
-                      Provider.of<Providercolor>(context).selectedColor,
+                  backgroundColor: selectedColor,
                   child: const Icon(
                     Icons.facebook_outlined,
                     color: Colors.white,
@@ -223,8 +225,7 @@ class _AppScreenState extends State<AppScreen> {
                         MaterialPageRoute(
                             builder: (context) => const Chatbox()));
                   },
-                  backgroundColor:
-                      Provider.of<Providercolor>(context).selectedColor,
+                  backgroundColor: selectedColor,
                   tooltip: 'Button 2',
                   child: const Icon(
                     Icons.zoom_out_map_outlined,
@@ -246,8 +247,7 @@ class _AppScreenState extends State<AppScreen> {
                   onPressed: () {
                     print('Button 1 Pressed');
                   },
-                  backgroundColor:
-                      Provider.of<Providercolor>(context).selectedColor,
+                  backgroundColor: selectedColor,
                   tooltip: 'Button 1',
                   child: const Icon(
                     Icons.phone_callback_outlined,
@@ -263,8 +263,7 @@ class _AppScreenState extends State<AppScreen> {
             child: FloatingActionButton(
               onPressed: _toggleButtons,
               tooltip: 'Toggle',
-              backgroundColor:
-                  Provider.of<Providercolor>(context).selectedColor,
+              backgroundColor: selectedColor,
               child: Icon(
                 isExpanded ? Icons.close : Icons.support_agent_outlined,
                 color: Colors.white,

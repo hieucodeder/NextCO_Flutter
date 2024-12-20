@@ -1,4 +1,5 @@
 import 'package:app_1helo/model/account.dart';
+import 'package:app_1helo/provider/navigationProvider.dart';
 import 'package:app_1helo/provider/providerColor.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class PersonalInfo extends StatefulWidget {
-  final Function(int) onSelectPage;
-  const PersonalInfo({super.key, required this.onSelectPage});
+ 
+  const PersonalInfo({super.key});
 
   @override
   State<PersonalInfo> createState() => _PersonalInfoState();
@@ -69,6 +70,8 @@ class _PersonalInfoState extends State<PersonalInfo> {
   );
   @override
   Widget build(BuildContext context) {
+        final navigationProvider = Provider.of<NavigationProvider>(context);
+
     return Container(
       constraints: const BoxConstraints.expand(),
       margin: const EdgeInsets.all(10),
@@ -289,7 +292,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
                   ),
                   child: TextButton(
                     onPressed: () {
-                      widget.onSelectPage(2);
+                      navigationProvider.setCurrentIndex(2);
                     },
                     child: Text(
                       'Quay lại',

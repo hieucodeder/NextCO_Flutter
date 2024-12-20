@@ -1,11 +1,11 @@
+import 'package:app_1helo/provider/navigationProvider.dart';
 import 'package:app_1helo/provider/providerColor.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class Changepassword extends StatefulWidget {
-  final Function(int) onSelectPage;
-  const Changepassword({super.key, required this.onSelectPage});
+  const Changepassword({super.key});
 
   @override
   State<Changepassword> createState() => _ChangepasswordState();
@@ -15,6 +15,8 @@ class _ChangepasswordState extends State<Changepassword> {
   final TextStyle colorsRed = const TextStyle(color: Colors.red, fontSize: 16);
   @override
   Widget build(BuildContext context) {
+        final navigationProvider = Provider.of<NavigationProvider>(context);
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -112,7 +114,7 @@ class _ChangepasswordState extends State<Changepassword> {
                   ),
                   child: TextButton(
                     onPressed: () {
-                      widget.onSelectPage(2);
+                      navigationProvider.setCurrentIndex(2);
                     },
                     child: Text(
                       'Quay lại',

@@ -1,5 +1,6 @@
 import 'package:app_1helo/pages/slap_page.dart';
 import 'package:app_1helo/provider/bottomNavProvider.dart';
+import 'package:app_1helo/provider/navigationProvider.dart';
 import 'package:app_1helo/provider/providerColor.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => Providercolor()),
         ChangeNotifierProvider(create: (_) => Bottomnavprovider()),
+        ChangeNotifierProvider(create: (_) => NavigationProvider())
       ],
       child: const MyApp(),
     ),

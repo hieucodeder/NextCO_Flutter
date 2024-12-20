@@ -1,13 +1,14 @@
 import 'package:app_1helo/pages/login_page.dart';
+import 'package:app_1helo/provider/navigationProvider.dart';
 import 'package:app_1helo/provider/providerColor.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class AcountPage extends StatefulWidget {
-  final Function(int) onSelectPage;
+ 
 
-  const AcountPage({super.key, required this.onSelectPage});
+  const AcountPage({super.key});
 
   @override
   State<AcountPage> createState() => _AcountPageState();
@@ -18,6 +19,8 @@ class _AcountPageState extends State<AcountPage> {
       fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500);
   @override
   Widget build(BuildContext context) {
+        final navigationProvider = Provider.of<NavigationProvider>(context);
+
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -35,7 +38,7 @@ class _AcountPageState extends State<AcountPage> {
               const SizedBox(width: 10),
               TextButton(
                 onPressed: () {
-                  widget.onSelectPage(4);
+                  navigationProvider.setCurrentIndex(4);
                 },
                 child: Text('Thông tin cá nhân', style: styleText),
               ),
@@ -51,7 +54,7 @@ class _AcountPageState extends State<AcountPage> {
               const SizedBox(width: 10),
               TextButton(
                 onPressed: () {
-                  widget.onSelectPage(5);
+                  navigationProvider.setCurrentIndex(5);
                 },
                 child: Text('Đổi mật khẩu', style: styleText),
               ),

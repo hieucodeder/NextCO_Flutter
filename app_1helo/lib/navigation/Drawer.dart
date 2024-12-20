@@ -1,4 +1,5 @@
 import 'package:app_1helo/model/account.dart';
+import 'package:app_1helo/provider/navigationProvider.dart';
 import 'package:app_1helo/provider/providerColor.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:flutter/material.dart';
@@ -7,9 +8,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class DrawerCustom extends StatefulWidget {
-  final Function(int) onSelectPage;
-
-  const DrawerCustom({Key? key, required this.onSelectPage}) : super(key: key);
+  final Function(int) onItemSelected;
+  const DrawerCustom({super.key, required this.onItemSelected});
 
   @override
   State<DrawerCustom> createState() => _DrawerCustomState();
@@ -17,15 +17,6 @@ class DrawerCustom extends StatefulWidget {
 
 class _DrawerCustomState extends State<DrawerCustom> {
   final AuthService _authService = AuthService();
-  int _currentIndex = 0;
-
-  void _onTileTap(int index) {
-    setState(() {
-      _currentIndex = index;
-      widget.onSelectPage(index);
-      Navigator.pop(context);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,18 +33,18 @@ class _DrawerCustomState extends State<DrawerCustom> {
                 child: Column(
                   children: [
                     _buildListTile(
-                      icon: Icons.dashboard,
+                      icon: Icons.dashboard_outlined,
                       title: 'Thống kê báo cáo',
-                      onTap: () => _onTileTap(0),
+                      onTap: () => widget.onItemSelected(0),
                     ),
                     _buildExpansionTile(
                       title: 'Quản lý hồ sơ C/O',
-                      icon: Icons.backup_table_outlined,
+                      icon: Icons.backup_table,
                       children: [
                         _buildListTile(
                           icon: Icons.description_outlined,
                           title: 'Danh sách hồ sơ C/O',
-                          onTap: () => _onTileTap(3),
+                          onTap: () => widget.onItemSelected(3),
                         ),
                       ],
                     ),
@@ -64,23 +55,23 @@ class _DrawerCustomState extends State<DrawerCustom> {
                         _buildListTile(
                           icon: Icons.description_outlined,
                           title: 'Nguyên liệu',
-                          onTap: () => _onTileTap(8),
+                          onTap: () => widget.onItemSelected(8),
                         ),
                       ],
                     ),
                     _buildExpansionTile(
                       title: 'Báo cáo thống kê',
-                      icon: Icons.dashboard,
+                      icon: Icons.dashboard_outlined,
                       children: [
                         _buildListTile(
                           icon: Icons.description_outlined,
                           title: 'Báo cáo tồn SP',
-                          onTap: () => _onTileTap(8),
+                          onTap: () => widget.onItemSelected(12),
                         ),
                         _buildListTile(
                           icon: Icons.description_outlined,
                           title: 'Báo cáo tồn NVL',
-                          onTap: () => _onTileTap(8),
+                          onTap: () => widget.onItemSelected(13),
                         )
                       ],
                     ),
@@ -91,7 +82,7 @@ class _DrawerCustomState extends State<DrawerCustom> {
                         _buildListTile(
                           icon: Icons.description_outlined,
                           title: 'Thông tin sản phẩm',
-                          onTap: () => _onTileTap(7),
+                          onTap: () => widget.onItemSelected(7),
                         ),
                       ],
                     ),
@@ -102,12 +93,12 @@ class _DrawerCustomState extends State<DrawerCustom> {
                         _buildListTile(
                           icon: Icons.description_outlined,
                           title: 'Thông tin sử dụng phần mềm',
-                          onTap: () => _onTileTap(10),
+                          onTap: () => widget.onItemSelected(10),
                         ),
                         _buildListTile(
                           icon: Icons.description_outlined,
                           title: 'Thông tin thanh toán',
-                          onTap: () => _onTileTap(11),
+                          onTap: () => widget.onItemSelected(11),
                         ),
                       ],
                     ),
@@ -118,12 +109,12 @@ class _DrawerCustomState extends State<DrawerCustom> {
                         _buildListTile(
                           icon: Icons.description_outlined,
                           title: 'Quản lý người dùng',
-                          onTap: () => _onTileTap(6),
+                          onTap: () => widget.onItemSelected(6),
                         ),
                         _buildListTile(
                           icon: Icons.description_outlined,
                           title: 'Quản lý khách hàng',
-                          onTap: () => _onTileTap(9),
+                          onTap: () => widget.onItemSelected(9),
                         ),
                       ],
                     ),
@@ -148,7 +139,7 @@ class _DrawerCustomState extends State<DrawerCustom> {
           IconButton(
             icon: const Icon(Icons.menu, color: Colors.white),
             iconSize: 23,
-            onPressed: () => _onTileTap(0),
+            onPressed: () => widget.onItemSelected(3),
           ),
           SvgPicture.asset(
             'resources/logo.svg',

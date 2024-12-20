@@ -8,8 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:screenshot/screenshot.dart';
 
 class Paypage extends StatefulWidget {
-  final Function(int) onSelectPage;
-  const Paypage({super.key, required this.onSelectPage});
+ 
+  const Paypage({super.key});
   @override
   _PaypageState createState() => _PaypageState();
 }
