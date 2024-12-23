@@ -65,7 +65,6 @@ class _AppScreenState extends State<AppScreen> {
     }
   }
 
-  /// Get app bar title based on the index
   String _getAppBarTitle(int index) {
     switch (index) {
       case 0:
@@ -114,9 +113,9 @@ class _AppScreenState extends State<AppScreen> {
     final navigationProvider = Provider.of<NavigationProvider>(context);
     final currentIndex = navigationProvider.currentIndex;
     final selectedColor = Provider.of<Providercolor>(context).selectedColor;
-    const totalPages = 14;
-    final validIndex =
-        (currentIndex >= 0 && currentIndex < totalPages) ? currentIndex : 0;
+    // const totalPages = 14;
+    // final validIndex =
+    //     (currentIndex >= 0 && currentIndex < totalPages) ? currentIndex : 0;
 
     return Scaffold(
       drawer: DrawerCustom(
@@ -127,7 +126,7 @@ class _AppScreenState extends State<AppScreen> {
       ),
       appBar: AppBar(
         title: Text(
-          _getAppBarTitle(validIndex),
+          _getAppBarTitle(currentIndex),
           style: GoogleFonts.robotoCondensed(
             fontSize: 17,
             color: Colors.white,
@@ -175,13 +174,12 @@ class _AppScreenState extends State<AppScreen> {
         centerTitle: true,
         backgroundColor: selectedColor,
       ),
-      body: _getPage(validIndex),
+      body: _getPage(currentIndex),
       bottomNavigationBar: BottomNavigation(
-        currentIndex: validIndex,
-        onTap: (index) {
-          navigationProvider.setCurrentIndex(index);
-        },
-      ),
+          currentIndex: currentIndex.clamp(0, 2),
+          onTap: (index) {
+            navigationProvider.setCurrentIndex(index);
+          }),
       floatingActionButton: Stack(
         alignment: Alignment.bottomRight,
         children: [

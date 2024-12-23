@@ -14,8 +14,11 @@ class Funtionspage extends StatefulWidget {
   State<Funtionspage> createState() => _FuntionspageState();
 }
 
-class _FuntionspageState extends State<Funtionspage> {
-  Timer? _timer;
+class _FuntionspageState extends State<Funtionspage>
+    with TickerProviderStateMixin {
+  late AnimationController _animationController;
+  late PageController _pageController;
+
   final List<String> _images = [
     'resources/xuatxu3.jpg',
     'resources/quytrinhthutuc.jpg',
@@ -24,29 +27,34 @@ class _FuntionspageState extends State<Funtionspage> {
     'resources/cang.png',
   ];
   int _currentIndex = 0;
-  late PageController _pageController;
+
   @override
   void initState() {
     super.initState();
+    // Initialize PageController
     _pageController = PageController(initialPage: _currentIndex);
-
-    _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
-      if (_currentIndex < _images.length - 1) {
-        _currentIndex++;
-      } else {
-        _currentIndex = 0;
-      }
-      _pageController.animateToPage(
-        _currentIndex,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeIn,
-      );
-    });
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..addListener(() {
+        if (_animationController.isCompleted) {
+          setState(() {
+            _currentIndex = (_currentIndex + 1) % _images.length;
+          });
+          _pageController.animateToPage(
+            _currentIndex,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeIn,
+          );
+          _animationController.forward(from: 0);
+        }
+      });
+    _animationController.forward();
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _animationController.dispose();
     _pageController.dispose();
     super.dispose();
   }
