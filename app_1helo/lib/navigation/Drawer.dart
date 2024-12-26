@@ -1,5 +1,6 @@
 import 'package:app_1helo/model/account.dart';
 import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/service/appLocalizations%20.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -19,8 +20,10 @@ class _DrawerCustomState extends State<DrawerCustom> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedColor = Provider.of<Providercolor>(context).selectedColor;
+    final localization = AppLocalizations.of(context);
     return Drawer(
-      backgroundColor: Provider.of<Providercolor>(context).selectedColor,
+      backgroundColor: selectedColor,
       child: SafeArea(
         minimum: const EdgeInsets.only(left: 5, top: 27, right: 20),
         child: Column(
@@ -33,86 +36,109 @@ class _DrawerCustomState extends State<DrawerCustom> {
                   children: [
                     _buildListTile(
                       icon: Icons.dashboard_outlined,
-                      title: 'Thống kê báo cáo',
+                      title: localization?.translate('dashboard') ??
+                          'Bảng điều khiển',
                       onTap: () => widget.onItemSelected(0),
                     ),
                     _buildExpansionTile(
-                      title: 'Quản lý hồ sơ C/O',
+                      title: localization?.translate('managing_recordsdr') ??
+                          'Quản lý hồ sơ C/O',
                       icon: Icons.backup_table,
                       children: [
                         _buildListTile(
                           icon: Icons.description_outlined,
-                          title: 'Danh sách hồ sơ C/O',
+                          title: localization?.translate('list_documentsdr') ??
+                              'Danh sách hồ sơ C/O',
                           onTap: () => widget.onItemSelected(3),
                         ),
                       ],
                     ),
                     _buildExpansionTile(
-                      title: 'Quản lý nguyên vật liệu',
+                      title: localization?.translate('material_managementdr') ??
+                          'Quản lý nguyên vật liệu',
                       icon: Icons.layers_outlined,
                       children: [
                         _buildListTile(
                           icon: Icons.description_outlined,
-                          title: 'Nguyên liệu',
+                          title: localization?.translate('material') ??
+                              'Nguyên liệu',
                           onTap: () => widget.onItemSelected(8),
                         ),
                       ],
                     ),
                     _buildExpansionTile(
-                      title: 'Báo cáo thống kê',
+                      title: localization?.translate('statistical_reportdr') ??
+                          'Báo cáo thống kê',
                       icon: Icons.dashboard_outlined,
                       children: [
                         _buildListTile(
                           icon: Icons.description_outlined,
-                          title: 'Báo cáo tồn SP',
+                          title:
+                              localization?.translate('product_inventorydr') ??
+                                  'Báo cáo tồn sản phẩm',
                           onTap: () => widget.onItemSelected(12),
                         ),
                         _buildListTile(
                           icon: Icons.description_outlined,
-                          title: 'Báo cáo tồn NVL',
+                          title:
+                              localization?.translate('material_inventorydr') ??
+                                  'Báo cáo tồn NVL',
                           onTap: () => widget.onItemSelected(13),
                         )
                       ],
                     ),
                     _buildExpansionTile(
-                      title: 'Quản lý sản phẩm',
+                      title: localization?.translate('product_managementdr') ??
+                          'Quản lý sản phẩm',
                       icon: Icons.view_compact_alt_outlined,
                       children: [
                         _buildListTile(
                           icon: Icons.description_outlined,
-                          title: 'Thông tin sản phẩm',
+                          title: localization
+                                  ?.translate('product_informationdr') ??
+                              'Thông tin sản phẩm',
                           onTap: () => widget.onItemSelected(7),
                         ),
                       ],
                     ),
                     _buildExpansionTile(
-                      title: 'Hỗ trợ kỹ thuật',
+                      title: localization?.translate('technical_supportdr') ??
+                          'Hỗ trợ kỹ thuật',
                       icon: Icons.space_dashboard_outlined,
                       children: [
                         _buildListTile(
                           icon: Icons.description_outlined,
-                          title: 'Thông tin sử dụng phần mềm',
+                          title: localization
+                                  ?.translate('software_informationdr') ??
+                              'Thông tin sử dụng phần mềm',
                           onTap: () => widget.onItemSelected(10),
                         ),
                         _buildListTile(
                           icon: Icons.description_outlined,
-                          title: 'Thông tin thanh toán',
+                          title: localization
+                                  ?.translate('payment_informationdr') ??
+                              'Thông tin thanh toán',
                           onTap: () => widget.onItemSelected(11),
                         ),
                       ],
                     ),
                     _buildExpansionTile(
-                      title: 'Quản trị hệ thống và danh mục',
+                      title: localization
+                              ?.translate('system_catalog_managementdr') ??
+                          'Quản trị hệ thống và danh mục',
                       icon: Icons.space_dashboard_outlined,
                       children: [
                         _buildListTile(
                           icon: Icons.description_outlined,
-                          title: 'Quản lý người dùng',
+                          title: localization?.translate('user_managementdr') ??
+                              'Quản lý người dùng',
                           onTap: () => widget.onItemSelected(6),
                         ),
                         _buildListTile(
                           icon: Icons.description_outlined,
-                          title: 'Quản lý khách hàng',
+                          title:
+                              localization?.translate('customer_managemetdr') ??
+                                  'Quản lý khách hàng',
                           onTap: () => widget.onItemSelected(9),
                         ),
                       ],
@@ -184,6 +210,7 @@ class _DrawerCustomState extends State<DrawerCustom> {
   }
 
   Widget _buildColorSelector(BuildContext context) {
+    final localization = AppLocalizations.of(context);
     final colors = [
       const Color(0xff042E4D),
       const Color(0xff004225),
@@ -193,7 +220,7 @@ class _DrawerCustomState extends State<DrawerCustom> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Row(
         children: [
-          Text('Colors:',
+          Text(localization?.translate('colors') ?? 'Colors',
               style: GoogleFonts.robotoCondensed(
                   fontSize: 15, color: Colors.white)),
           const SizedBox(width: 5),

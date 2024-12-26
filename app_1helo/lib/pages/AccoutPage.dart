@@ -1,13 +1,12 @@
 import 'package:app_1helo/pages/login_page.dart';
 import 'package:app_1helo/provider/navigationProvider.dart';
 import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/service/appLocalizations%20.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class AcountPage extends StatefulWidget {
- 
-
   const AcountPage({super.key});
 
   @override
@@ -19,8 +18,8 @@ class _AcountPageState extends State<AcountPage> {
       fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500);
   @override
   Widget build(BuildContext context) {
-        final navigationProvider = Provider.of<NavigationProvider>(context);
-
+    final navigationProvider = Provider.of<NavigationProvider>(context);
+    final localization = AppLocalizations.of(context);
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -40,7 +39,10 @@ class _AcountPageState extends State<AcountPage> {
                 onPressed: () {
                   navigationProvider.setCurrentIndex(4);
                 },
-                child: Text('Thông tin cá nhân', style: styleText),
+                child: Text(
+                    localization?.translate('personal_infoac') ??
+                        'Thông tin cá nhân',
+                    style: styleText),
               ),
             ],
           ),
@@ -56,7 +58,10 @@ class _AcountPageState extends State<AcountPage> {
                 onPressed: () {
                   navigationProvider.setCurrentIndex(5);
                 },
-                child: Text('Đổi mật khẩu', style: styleText),
+                child: Text(
+                    localization?.translate('change_passwordac') ??
+                        'Đổi mật khẩu',
+                    style: styleText),
               ),
             ],
           ),
@@ -71,7 +76,8 @@ class _AcountPageState extends State<AcountPage> {
                   onPressed: () {
                     _showAlertDialog(context);
                   },
-                  child: Text('Đăng xuất', style: styleText))
+                  child: Text(localization?.translate('log_out') ?? 'Đăng xuất',
+                      style: styleText))
             ],
           )
         ],

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:app_1helo/provider/navigationProvider.dart';
 import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/service/appLocalizations%20.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -62,6 +63,7 @@ class _FuntionspageState extends State<Funtionspage>
   @override
   Widget build(BuildContext context) {
     final navigationProvider = Provider.of<NavigationProvider>(context);
+    final localization = AppLocalizations.of(context);
     return Container(
       constraints: const BoxConstraints.expand(),
       color: Colors.white,
@@ -115,7 +117,7 @@ class _FuntionspageState extends State<Funtionspage>
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 127,
+                              width: 135,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -152,7 +154,8 @@ class _FuntionspageState extends State<Funtionspage>
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      'Khách hàng',
+                                      localization?.translate('customer') ??
+                                          'Khách hàng',
                                       style: GoogleFonts.robotoCondensed(
                                           fontSize: 15,
                                           color: Provider.of<Providercolor>(
@@ -175,7 +178,7 @@ class _FuntionspageState extends State<Funtionspage>
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 127,
+                              width: 132,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -212,7 +215,8 @@ class _FuntionspageState extends State<Funtionspage>
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      'Hồ sơ C/O',
+                                      localization?.translate('file') ??
+                                          'Hồ sơ C/O',
                                       style: GoogleFonts.robotoCondensed(
                                           color: Provider.of<Providercolor>(
                                                   context)
@@ -235,7 +239,7 @@ class _FuntionspageState extends State<Funtionspage>
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 127,
+                              width: 125,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -272,7 +276,8 @@ class _FuntionspageState extends State<Funtionspage>
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      'Sản phẩm',
+                                      localization?.translate('products') ??
+                                          'Sản phẩm',
                                       style: GoogleFonts.robotoCondensed(
                                           color: Provider.of<Providercolor>(
                                                   context)
@@ -306,7 +311,7 @@ class _FuntionspageState extends State<Funtionspage>
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 127,
+                              width: 135,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -343,7 +348,8 @@ class _FuntionspageState extends State<Funtionspage>
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      'Nguyên vật liệu',
+                                      localization?.translate('material') ??
+                                          'Nguyên vật liệu',
                                       style: GoogleFonts.robotoCondensed(
                                           fontSize: 15,
                                           color: Provider.of<Providercolor>(
@@ -366,7 +372,7 @@ class _FuntionspageState extends State<Funtionspage>
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 127,
+                              width: 132,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -403,7 +409,8 @@ class _FuntionspageState extends State<Funtionspage>
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      'Nhân viên',
+                                      localization?.translate('employeed') ??
+                                          'Nhân viên',
                                       style: GoogleFonts.robotoCondensed(
                                           color: Provider.of<Providercolor>(
                                                   context)
@@ -426,7 +433,7 @@ class _FuntionspageState extends State<Funtionspage>
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 127,
+                              width: 125,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -463,7 +470,8 @@ class _FuntionspageState extends State<Funtionspage>
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      'Thống kê',
+                                      localization?.translate('statistics') ??
+                                          'Thống kê',
                                       style: GoogleFonts.robotoCondensed(
                                           color: Provider.of<Providercolor>(
                                                   context)
@@ -497,7 +505,7 @@ class _FuntionspageState extends State<Funtionspage>
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 134,
+                              width: 135,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -533,7 +541,9 @@ class _FuntionspageState extends State<Funtionspage>
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      'Nguyên vật liệu tồn',
+                                      localization?.translate(
+                                              'material_inventory') ??
+                                          'Nguyên vật liệu tồn',
                                       style: GoogleFonts.robotoCondensed(
                                           fontSize: 15,
                                           color: Provider.of<Providercolor>(
@@ -558,7 +568,7 @@ class _FuntionspageState extends State<Funtionspage>
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 125,
+                              width: 132,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -595,7 +605,9 @@ class _FuntionspageState extends State<Funtionspage>
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      'Sản phẩm tồn',
+                                      localization?.translate(
+                                              'products_inventory') ??
+                                          'Sản phẩm tồn',
                                       style: GoogleFonts.robotoCondensed(
                                           color: Provider.of<Providercolor>(
                                                   context)
@@ -618,7 +630,7 @@ class _FuntionspageState extends State<Funtionspage>
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(
-                              width: 127,
+                              width: 125,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -642,7 +654,8 @@ class _FuntionspageState extends State<Funtionspage>
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      'Thanh toán',
+                                      localization?.translate('payment') ??
+                                          'Thanh toán',
                                       style: GoogleFonts.robotoCondensed(
                                           color: Provider.of<Providercolor>(
                                                   context)

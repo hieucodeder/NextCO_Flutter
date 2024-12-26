@@ -1,11 +1,11 @@
 import 'package:app_1helo/charPage/MultiBarChartWidget.dart';
 import 'package:app_1helo/model/columnChar.dart';
+import 'package:app_1helo/service/appLocalizations%20.dart';
 import 'package:app_1helo/service/columnChar_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Columncharpage extends StatefulWidget {
-
   const Columncharpage({super.key});
   @override
   _ColumncharpageState createState() => _ColumncharpageState();
@@ -50,6 +50,8 @@ class _ColumncharpageState extends State<Columncharpage> {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context);
+
     return Container(
       constraints: const BoxConstraints.expand(),
       color: Colors.white,
@@ -61,7 +63,7 @@ class _ColumncharpageState extends State<Columncharpage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Lọc theo năm:',
+                  localization?.translate('filter_year') ?? 'Lọc theo năm:',
                   style: GoogleFonts.robotoCondensed(
                       fontSize: 16, fontWeight: FontWeight.bold),
                 ),
@@ -101,7 +103,8 @@ class _ColumncharpageState extends State<Columncharpage> {
                   } else if (snapshot.hasError) {
                     return Center(
                         child: Text(
-                      'Lỗi khi tải dữ liệu',
+                      localization?.translate('error_data') ??
+                          'Lỗi khi tải dữ liệu',
                       style: GoogleFonts.robotoCondensed(
                           fontSize: 16, fontWeight: FontWeight.bold),
                     ));
@@ -113,31 +116,40 @@ class _ColumncharpageState extends State<Columncharpage> {
                         children: [
                           MultiBarChartWidget(
                             data: data,
-                            title: 'Số lượng CO đã tạo',
+                            title: localization?.translate('create_numberCo') ??
+                                'Số lượng CO đã tạo',
                             filterKey: 'coNumber',
                           ),
                           const SizedBox(height: 16),
                           MultiBarChartWidget(
                             data: data,
-                            title: 'Số lượng VAT đã tạo',
+                            title:
+                                localization?.translate('create_numberVAT') ??
+                                    'Số lượng VAT đã tạo',
                             filterKey: 'vatNumber',
                           ),
                           const SizedBox(height: 16),
                           MultiBarChartWidget(
                             data: data,
-                            title: 'Số lượng TKN đã tạo',
+                            title:
+                                localization?.translate('create_numberTKN') ??
+                                    'Số lượng TKN đã tạo',
                             filterKey: 'importDeclarationNumber',
                           ),
                           const SizedBox(height: 16),
                           MultiBarChartWidget(
                             data: data,
-                            title: 'Số lượng TKX đã tạo',
+                            title:
+                                localization?.translate('create_numberTKX') ??
+                                    'Số lượng TKX đã tạo',
                             filterKey: 'exportDeclarationNumber',
                           ),
                           const SizedBox(height: 16),
                           MultiBarChartWidget(
                             data: data,
-                            title: 'Số lượng người dùng đã tạo',
+                            title:
+                                localization?.translate('create_numberUser') ??
+                                    'Số lượng người dùng đã tạo',
                             filterKey: 'userNumber',
                           ),
                         ],
@@ -146,7 +158,8 @@ class _ColumncharpageState extends State<Columncharpage> {
                   } else {
                     return Center(
                         child: Text(
-                      'Không có dữ liệu để hiển thị',
+                      localization?.translate('null_dataShow') ??
+                          'Không có dữ liệu để hiển thị',
                       style: GoogleFonts.robotoCondensed(
                           fontSize: 16, fontWeight: FontWeight.bold),
                     ));

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:app_1helo/model/dropdownEmployee.dart';
 import 'package:app_1helo/model/pieCharModel.dart';
 import 'package:app_1helo/model/user.dart';
+import 'package:app_1helo/service/appLocalizations%20.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:app_1helo/service/pieChar_service.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +38,12 @@ class PiechartpageState extends State<Piechartpage> {
       _fetchData();
       _fetchDataCustomer();
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    refreshChartData();
   }
 
 //Refres
@@ -106,6 +113,8 @@ class PiechartpageState extends State<Piechartpage> {
   }
 
   void _processPieChartData(List<PieCharModel>? pieChartData) {
+    final localization = AppLocalizations.of(context);
+
     if (pieChartData != null && pieChartData.isNotEmpty) {
       int completedTotal = 0;
       int processingTotal = 0;
@@ -158,30 +167,38 @@ class PiechartpageState extends State<Piechartpage> {
         dataMap = total > 0
             ? {
                 if (completedTotal > 0)
-                  "Hoàn thành: ($completedTotal)":
+                  "${localization?.translate('completed') ?? 'Hoàn thành'}: ($completedTotal)":
                       (completedTotal / total) * 100,
                 if (processingTotal > 0)
-                  "Đang thực hiện: ($processingTotal)":
+                  "${localization?.translate('processing') ?? 'Đang thực hiện'}: ($processingTotal)":
                       (processingTotal / total) * 100,
                 if (waitingcancelTotal > 0)
-                  "Chờ hủy: ($waitingcancelTotal)":
+                  "${localization?.translate('waiting_cancel') ?? 'Chờ hủy'}: ($waitingcancelTotal)":
                       (waitingcancelTotal / total) * 100,
                 if (waitingTotal > 0)
-                  "Chờ duyệt: ($waitingTotal)": (waitingTotal / total) * 100,
+                  "${localization?.translate('waiting_approval') ?? 'Chờ duyệt'}: ($waitingTotal)":
+                      (waitingTotal / total) * 100,
                 if (refusedconsider > 0)
-                  "Từ chối xét duyệt: ($refusedconsider)":
+                  "${localization?.translate('refused_consideration') ?? 'Từ chối xét duyệt'}: ($refusedconsider)":
                       (refusedconsider / total) * 100,
-                if (cancel > 0) "Đã hủy: ($cancel)": (cancel / total) * 100,
-                if (editor > 0) "Đang sửa: ($editor)": (editor / total) * 100,
+                if (cancel > 0)
+                  "${localization?.translate('canceled') ?? 'Đã hủy'}: ($cancel)":
+                      (cancel / total) * 100,
+                if (editor > 0)
+                  "${localization?.translate('editing') ?? 'Đang sửa'}: ($editor)":
+                      (editor / total) * 100,
                 if (waitingrepair > 0)
-                  "Chờ sửa: ($waitingrepair)": (waitingrepair / total) * 100,
+                  "${localization?.translate('waiting_repair') ?? 'Chờ sửa'}: ($waitingrepair)":
+                      (waitingrepair / total) * 100,
               }
-            : {"Không có dữ liệu": 0};
+            : {localization?.translate('no_data') ?? 'Không có dữ liệu': 0};
       });
     } else {
       print("Pie chart data is empty");
       setState(() {
-        dataMap = {"Không có dữ liệu": 0};
+        final noDataText =
+            localization?.translate('no_data') ?? 'Không có dữ liệu';
+        dataMap = {noDataText: 0};
       });
     }
   }
@@ -263,21 +280,24 @@ class PiechartpageState extends State<Piechartpage> {
     );
   }
 
-  Widget renderCustomerDropdown() {
+  Widget renderCustomerDropdown(BuildContext context) {
+    final localization = AppLocalizations.of(context);
     List<String> customerNames = _filtereddropdownCustomer
         .map((c) => c.customerName ?? '')
         .toSet()
         .toList();
-    customerNames.insert(0, 'Tất cả khách hàng');
+    String allCustomersLabel =
+        localization?.translate('all_customers') ?? 'Tất cả khách hàng';
+    customerNames.insert(0, allCustomersLabel);
 
     return buildDropdown(
       items: customerNames,
       selectedItem: selectedDropdownCustomer?.customerName,
-      hint: 'Tất cả khách hàng',
+      hint: allCustomersLabel,
       width: 180,
       onChanged: (String? newValue) {
         setState(() {
-          selectedDropdownCustomer = newValue == 'Tất cả khách hàng'
+          selectedDropdownCustomer = newValue == allCustomersLabel
               ? null
               : _filtereddropdownCustomer.firstWhere(
                   (c) => c.customerName == newValue,
@@ -289,10 +309,13 @@ class PiechartpageState extends State<Piechartpage> {
     );
   }
 
-  Widget renderUserDropdown() {
+  Widget renderUserDropdown(BuildContext context) {
+    final localization = AppLocalizations.of(context);
     List<String> userNames =
         _filtereddropdownEmployee.map((u) => u.label ?? '').toSet().toList();
-
+    String allCustomersLabel =
+        localization?.translate('all_employeed') ?? 'Tất cả nhân viên';
+    userNames.insert(0, allCustomersLabel);
     if (selectedDropdownEmployee == null &&
         _filtereddropdownEmployee.isNotEmpty) {
       selectedDropdownEmployee = _filtereddropdownEmployee[0];
@@ -301,11 +324,11 @@ class PiechartpageState extends State<Piechartpage> {
     return buildDropdown(
       items: userNames,
       selectedItem: selectedDropdownEmployee?.label,
-      hint: 'Tất cả nhân viên',
+      hint: allCustomersLabel,
       width: 160,
       onChanged: (String? newValue) {
         setState(() {
-          if (newValue == 'Tất cả nhân viên') {
+          if (newValue == allCustomersLabel) {
             selectedDropdownEmployee = null;
           } else {
             selectedDropdownEmployee = _filtereddropdownEmployee.firstWhere(
@@ -326,7 +349,6 @@ class PiechartpageState extends State<Piechartpage> {
   final PiecharService piecharService = PiecharService();
 
   void _selectDateRange() async {
-    // Show the date picker to select the start date
     final DateTime? startPicked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -418,6 +440,7 @@ class PiechartpageState extends State<Piechartpage> {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context);
     final colorList = dataMap.keys.contains("Không có dữ liệu")
         ? [Colors.grey]
         : [
@@ -457,7 +480,8 @@ class PiechartpageState extends State<Piechartpage> {
                           readOnly: true,
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(
-                            hintText: 'Chọn ngày bắt đầu và kết thúc',
+                            hintText: localization?.translate('date') ??
+                                'Chọn ngày bắt đầu và kết thúc',
                             hintStyle: GoogleFonts.robotoCondensed(
                               fontSize: 14,
                               color: Colors.black45,
@@ -499,11 +523,12 @@ class PiechartpageState extends State<Piechartpage> {
                   children: [
                     FittedBox(
                         child: SizedBox(
-                            width: 200, child: renderCustomerDropdown())),
+                            width: 200,
+                            child: renderCustomerDropdown(context))),
                     const SizedBox(width: 6.0),
                     FittedBox(
-                        child:
-                            SizedBox(width: 140, child: renderUserDropdown())),
+                        child: SizedBox(
+                            width: 140, child: renderUserDropdown(context))),
                   ],
                 ),
               ),

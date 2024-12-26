@@ -1,5 +1,6 @@
 import 'package:app_1helo/model/customers.dart';
 import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/service/appLocalizations%20.dart';
 import 'package:app_1helo/service/customer_service..dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -92,6 +93,7 @@ class _ClientpageState extends State<Clientpage> {
   Widget build(BuildContext context) {
     List<Data> displayList = (_isSearching ? _searchResults : customerList)
       ..sort((a, b) => (a.rowNumber ?? 0).compareTo(b.rowNumber ?? 0));
+    final localization = AppLocalizations.of(context);
     return Container(
         constraints: const BoxConstraints.expand(),
         padding: const EdgeInsets.all(10),
@@ -117,7 +119,8 @@ class _ClientpageState extends State<Clientpage> {
                           fontSize: 15,
                           fontWeight: FontWeight.w500),
                       decoration: InputDecoration(
-                        hintText: 'Nhập KH, tên KH, mã số thuế ...',
+                        hintText: localization?.translate('search_customer') ??
+                            'Nhập KH, tên KH, mã số thuế ...',
                         hintStyle: GoogleFonts.robotoCondensed(
                             fontSize: 15,
                             color: Colors.black38,
@@ -165,7 +168,8 @@ class _ClientpageState extends State<Clientpage> {
                     : displayList.isEmpty
                         ? Center(
                             child: Text(
-                              "Dữ liệu tìm kiếm không có!!!",
+                              localization?.translate('data_null') ??
+                                  "Dữ liệu tìm kiếm không có!!!",
                               style: GoogleFonts.robotoCondensed(
                                   fontSize: 16,
                                   color: Provider.of<Providercolor>(context)
@@ -198,29 +202,46 @@ class _ClientpageState extends State<Clientpage> {
                                     columns: [
                                       DataColumn(
                                           label: Text(
-                                        'STT',
+                                        localization?.translate(
+                                                'numerical_order') ??
+                                            'STT',
                                         style: _textTitile,
                                         textAlign: TextAlign.center,
                                       )),
                                       DataColumn(
-                                          label: Text('Mã khách hàng',
+                                          label: Text(
+                                              localization?.translate(
+                                                      'customer_code') ??
+                                                  'Mã khách hàng',
                                               style: _textTitile,
                                               textAlign: TextAlign.center)),
                                       DataColumn(
-                                          label: Text('Tên khách hàng',
+                                          label: Text(
+                                              localization?.translate(
+                                                      'customer_name') ??
+                                                  'Tên khách hàng',
                                               style: _textTitile,
                                               textAlign: TextAlign.center)),
                                       DataColumn(
-                                        label: Text('Số điện thoại',
+                                        label: Text(
+                                            localization?.translate(
+                                                    'phone_number') ??
+                                                'Số điện thoại',
                                             style: _textTitile,
                                             textAlign: TextAlign.center),
                                       ),
                                       DataColumn(
-                                          label: Text('Mã số thuế',
+                                          label: Text(
+                                              localization
+                                                      ?.translate('tax_code') ??
+                                                  'Mã số thuế',
                                               style: _textTitile,
                                               textAlign: TextAlign.center)),
                                       DataColumn(
-                                          label: Text('Địa chỉ',
+                                          label: Text(
+                                              localization
+                                                      ?.translate('address') ??
+                                                  'Địa chỉ',
                                               style: _textTitile,
                                               textAlign: TextAlign.center)),
                                     ],
@@ -340,7 +361,7 @@ class _ClientpageState extends State<Clientpage> {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 2.0),
                             child: Text(
-                              '$value/trang',
+                              '$value/${localization?.translate('page') ?? 'trang'}',
                               style: _textTitile,
                             ),
                           ),
@@ -375,13 +396,16 @@ void showCustomerDetailsDialog(BuildContext context, String customerName,
       TextEditingController(text: address);
   final textStyleDiaLog = GoogleFonts.robotoCondensed(
       fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black);
+  final localization = AppLocalizations.of(context);
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Center(
+        title: Center(
           child: Text(
-            'Chi tiết khách hàng',
+            localization?.translate('customer_details') ??
+                'Chi tiết khách hàng',
           ),
         ),
         content: SizedBox(
@@ -401,7 +425,8 @@ void showCustomerDetailsDialog(BuildContext context, String customerName,
                         width: 5,
                       ),
                       Text(
-                        'Tên khách hàng',
+                        localization?.translate('customer_name') ??
+                            'Tên khách hàng',
                         style: textStyleDiaLog,
                       ),
                     ],
@@ -428,7 +453,8 @@ void showCustomerDetailsDialog(BuildContext context, String customerName,
                         width: 5,
                       ),
                       Text(
-                        'Số điện thoại',
+                        localization?.translate('phone_number') ??
+                            'Số điện thoại',
                         style: textStyleDiaLog,
                       ),
                     ],
@@ -455,7 +481,7 @@ void showCustomerDetailsDialog(BuildContext context, String customerName,
                         width: 5,
                       ),
                       Text(
-                        'Mã số thuế',
+                        localization?.translate('tax_code') ?? 'Mã số thuế',
                         style: textStyleDiaLog,
                       ),
                     ],
@@ -482,7 +508,7 @@ void showCustomerDetailsDialog(BuildContext context, String customerName,
                         width: 5,
                       ),
                       Text(
-                        'Địa chỉ',
+                        localization?.translate('address') ?? 'Địa chỉ',
                         style: textStyleDiaLog,
                       ),
                     ],
@@ -515,7 +541,7 @@ void showCustomerDetailsDialog(BuildContext context, String customerName,
                         Navigator.of(context).pop();
                       },
                       child: Text(
-                        'Đóng',
+                        localization?.translate('close') ?? 'Đóng',
                         style: GoogleFonts.robotoCondensed(
                             color: Provider.of<Providercolor>(context)
                                 .selectedColor),

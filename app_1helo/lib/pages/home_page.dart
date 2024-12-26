@@ -4,6 +4,7 @@ import 'package:app_1helo/charPage/PieChartPage.dart';
 import 'package:app_1helo/charPage/tableEmployeedPage.dart';
 import 'package:app_1helo/model/prodcutReportModel.dart';
 import 'package:app_1helo/model/totalModel.dart';
+import 'package:app_1helo/service/appLocalizations%20.dart';
 import 'package:app_1helo/service/productReport_service.dart';
 
 import 'package:app_1helo/service/total_service.dart';
@@ -182,6 +183,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context);
     return RefreshIndicator(
       onRefresh: _onRefresh,
       child: SingleChildScrollView(
@@ -229,7 +231,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   const Color.fromARGB(255, 108, 55, 172),
                                 ),
                                 Text(
-                                  'Khách hàng',
+                                  localization?.translate('customer') ??
+                                      'Khách hàng',
                                   style: GoogleFonts.robotoCondensed(
                                       textStyle: const TextStyle(
                                           fontSize: 14,
@@ -279,7 +282,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   totalEmployee,
                                   const Color.fromARGB(255, 131, 129, 11),
                                 ),
-                                Text('Nhân viên',
+                                Text(
+                                    localization?.translate('employeed') ??
+                                        'Nhân viên',
                                     style: GoogleFonts.robotoCondensed(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
@@ -354,7 +359,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   const Color(0xff389E0D),
                                 ),
                                 Text(
-                                  'Sản phẩm C/O',
+                                  localization?.translate('products') ??
+                                      'Sản phẩm C/O',
                                   style: GoogleFonts.robotoCondensed(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
@@ -404,7 +410,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   const Color(0xff064265),
                                 ),
                                 Text(
-                                  'Hồ sơ C/O',
+                                  localization?.translate('file') ??
+                                      'Hồ sơ C/O',
                                   style: GoogleFonts.robotoCondensed(
                                       color: const Color(0xff064265),
                                       fontSize: 14,
@@ -461,7 +468,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     totalProductsResport,
                                     const Color.fromARGB(255, 255, 82, 82),
                                   ),
-                                  Text('Sản phẩm tồn',
+                                  Text(
+                                      localization?.translate(
+                                              'product_inventory') ??
+                                          'Sản phẩm tồn',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: GoogleFonts.robotoCondensed(
@@ -514,7 +524,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     totalMaterial,
                                     const Color(0xffFA8C16),
                                   ),
-                                  Text('Nguyên vật liệu',
+                                  Text(
+                                      localization?.translate('material') ??
+                                          'Nguyên vật liệu',
                                       style: GoogleFonts.robotoCondensed(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
@@ -564,7 +576,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             width: MediaQuery.of(context).size.width,
                             height: 40,
                             padding: const EdgeInsets.all(8),
-                            child: Text('Số lượng hồ sơ C/O theo nhân viên',
+                            child: Text(
+                                localization?.translate('number_employee') ??
+                                    'Số lượng hồ sơ C/O theo nhân viên',
                                 style: GoogleFonts.robotoCondensed(
                                     fontSize: 17, fontWeight: FontWeight.bold)),
                           ),
@@ -606,7 +620,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             width: MediaQuery.of(context).size.width,
                             height: 40,
                             padding: const EdgeInsets.all(8),
-                            child: Text('Số lượng hồ sơ C/O theo trạng thái',
+                            child: Text(
+                                localization?.translate('number_status') ??
+                                    'Số lượng hồ sơ C/O theo trạng thái',
                                 style: GoogleFonts.robotoCondensed(
                                     fontSize: 17, fontWeight: FontWeight.bold)),
                           ),
@@ -650,7 +666,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           height: 40,
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           margin: const EdgeInsets.symmetric(horizontal: 5),
-                          child: Text('Tỷ lệ hồ sơ C/O theo trạng thái',
+                          child: Text(
+                              localization?.translate('applications_status') ??
+                                  'Tỷ lệ hồ sơ C/O theo trạng thái',
                               style: GoogleFonts.robotoCondensed(
                                   fontSize: 17, fontWeight: FontWeight.bold)),
                         ),

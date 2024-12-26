@@ -1,6 +1,7 @@
 import 'package:app_1helo/model/dropdownCustomer.dart';
 import 'package:app_1helo/model/materials.dart';
 import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/service/appLocalizations%20.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:app_1helo/service/material_service.dart';
 import 'package:flutter/material.dart';
@@ -201,20 +202,23 @@ class _MaterialspageState extends State<Materialspage> {
     );
   }
 
-  Widget renderCustomerDropdown() {
+  Widget renderCustomerDropdown(BuildContext context) {
+    final localization = AppLocalizations.of(context);
     List<String> customerNames = _filtereddropdownCustomer
         .map((u) => u.customerName ?? '')
         .toSet()
         .toList();
-    customerNames.insert(0, 'Tất cả khách hàng');
+    String allCustomersLabel =
+        localization?.translate('all_customers') ?? 'Tất cả khách hàng';
+    customerNames.insert(0, allCustomersLabel);
 
     return buildDropdown(
       items: customerNames,
       selectedItem: selectedDropdownCustomer?.customerName,
-      hint: 'Tất cả khách hàng',
+      hint: allCustomersLabel,
       onChanged: (String? newValue) {
         setState(() {
-          selectedDropdownCustomer = newValue == 'Tất cả khách hàng'
+          selectedDropdownCustomer = newValue == allCustomersLabel
               ? null
               : _filtereddropdownCustomer.firstWhere(
                   (u) => u.customerName == newValue,
@@ -244,6 +248,8 @@ class _MaterialspageState extends State<Materialspage> {
   Widget build(BuildContext context) {
     List<Data> displayList = (_isSearching ? _searchResults : materialList)
       ..sort((a, b) => (a.rowNumber ?? 0).compareTo(b.rowNumber ?? 0));
+    final localization = AppLocalizations.of(context);
+
     return Container(
       padding: const EdgeInsets.all(10),
       width: MediaQuery.of(context).size.width,
@@ -254,7 +260,8 @@ class _MaterialspageState extends State<Materialspage> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               FittedBox(
-                  child: SizedBox(width: 200, child: renderCustomerDropdown())),
+                  child: SizedBox(
+                      width: 200, child: renderCustomerDropdown(context))),
               const SizedBox(
                 width: 6,
               ),
@@ -272,7 +279,8 @@ class _MaterialspageState extends State<Materialspage> {
                     // autofocus: true,
                     controller: _searchController,
                     decoration: InputDecoration(
-                      hintText: 'Mã NVL, Tên NVL...',
+                      hintText: localization?.translate('search_material') ??
+                          'Mã NVL, Tên NVL...',
                       hintStyle: GoogleFonts.robotoCondensed(
                           fontSize: 15, color: Colors.black38),
                       border: OutlineInputBorder(
@@ -312,7 +320,8 @@ class _MaterialspageState extends State<Materialspage> {
                 : displayList.isEmpty
                     ? Center(
                         child: Text(
-                          "Dữ liệu tìm kiếm không có!!!",
+                          localization?.translate('data_null') ??
+                              "Dữ liệu tìm kiếm không có!!!",
                           style: GoogleFonts.robotoCondensed(
                               fontSize: 16,
                               color: Provider.of<Providercolor>(context)
@@ -343,23 +352,45 @@ class _MaterialspageState extends State<Materialspage> {
                               child: DataTable(
                                 columns: [
                                   DataColumn(
-                                      label: Text('STT', style: _textTitile)),
-                                  DataColumn(
-                                      label: Text('Mã nguyên vật liệu',
+                                      label: Text(
+                                          localization?.translate(
+                                                  'numerical_order') ??
+                                              'STT',
                                           style: _textTitile)),
                                   DataColumn(
-                                      label: Text('Tên nguyên vật liệu',
+                                      label: Text(
+                                          localization?.translate(
+                                                  'code_material') ??
+                                              'Mã nguyên vật liệu',
                                           style: _textTitile)),
                                   DataColumn(
-                                      label: Text('ĐVT', style: _textTitile)),
-                                  DataColumn(
-                                      label:
-                                          Text('Tổng tồn', style: _textTitile)),
-                                  DataColumn(
-                                      label: Text('Tổng chiếm giữ',
+                                      label: Text(
+                                          localization?.translate(
+                                                  'name_material') ??
+                                              'Tên nguyên vật liệu',
                                           style: _textTitile)),
                                   DataColumn(
-                                      label: Text('Tổng khả dụng',
+                                      label: Text(
+                                          localization?.translate('unit') ??
+                                              'Đơn vị tính',
+                                          style: _textTitile)),
+                                  DataColumn(
+                                      label: Text(
+                                          localization?.translate(
+                                                  'total_inventory') ??
+                                              'Tổng tồn',
+                                          style: _textTitile)),
+                                  DataColumn(
+                                      label: Text(
+                                          localization?.translate(
+                                                  'total_occupation') ??
+                                              'Tổng chiếm giữ',
+                                          style: _textTitile)),
+                                  DataColumn(
+                                      label: Text(
+                                          localization?.translate(
+                                                  'total_available') ??
+                                              'Tổng khả dụng',
                                           style: _textTitile)),
                                 ],
                                 rows: displayList.map((doc) {
@@ -468,7 +499,7 @@ class _MaterialspageState extends State<Materialspage> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 2.0),
                           child: Text(
-                            '$value/trang',
+                            '$value/${localization?.translate('page') ?? 'trang'}',
                             style: _textTitile,
                           ),
                         ),

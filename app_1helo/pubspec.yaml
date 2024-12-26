@@ -31,6 +31,8 @@ dependencies:
   provider: ^6.0.5
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter  
   fl_chart: ^0.69.0
 
   cupertino_icons: ^1.0.8
@@ -100,6 +102,8 @@ flutter:
   assets:
     - resources/
     - assets/icon/icon.png
+    - assets/lang/en.json
+    - assets/lang/vi.json
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

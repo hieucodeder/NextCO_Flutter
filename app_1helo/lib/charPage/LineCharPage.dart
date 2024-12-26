@@ -4,6 +4,7 @@ import 'package:app_1helo/model/dropdownCustomer.dart';
 import 'package:app_1helo/model/dropdownEmployee.dart';
 import 'package:app_1helo/model/lineCharModel.dart';
 import 'package:app_1helo/model/user.dart';
+import 'package:app_1helo/service/appLocalizations%20.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:app_1helo/service/lineChar_service.dart';
 import 'package:flutter/material.dart';
@@ -65,6 +66,12 @@ class LinecharpageState extends State<Linecharpage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateLegendItems(); // Cập nhật giao diện khi ngôn ngữ thay đổi
+  }
+
+  @override
   void dispose() {
     _searchControllerCustomer.dispose();
     _searchControllerUsers.dispose();
@@ -118,7 +125,6 @@ class LinecharpageState extends State<Linecharpage> {
       }
 
       if (mounted) {
-        _legendItems.clear();
         _completeCoSpots.clear();
         _processingCoSpots.clear();
         _canceledCoSpots.clear();
@@ -127,32 +133,22 @@ class LinecharpageState extends State<Linecharpage> {
             lineChartResponse!.data!.completeCo!.isNotEmpty) {
           _completeCoSpots =
               _mapDataToFlSpot(lineChartResponse.data!.completeCo);
-          _legendItems
-              .add(const LegendItem(color: Colors.green, text: 'Hoàn thành'));
         }
 
         if (lineChartResponse?.data?.processingCo != null &&
             lineChartResponse!.data!.processingCo!.isNotEmpty) {
           _processingCoSpots =
               _mapDataToFlSpot(lineChartResponse.data!.processingCo);
-          _legendItems
-              .add(const LegendItem(color: Colors.orange, text: 'Đã sửa'));
         }
+
         if (lineChartResponse?.data?.canceledCo != null &&
             lineChartResponse!.data!.canceledCo!.isNotEmpty) {
           _canceledCoSpots =
               _mapDataToFlSpot(lineChartResponse.data!.canceledCo);
-          _legendItems.add(const LegendItem(color: Colors.red, text: 'Đã hủy'));
-        }
-
-        if (_completeCoSpots.isEmpty &&
-            _processingCoSpots.isEmpty &&
-            _canceledCoSpots.isEmpty) {
-          _legendItems.add(
-              const LegendItem(color: Colors.grey, text: 'Hãy chọn nhân viên'));
         }
 
         _calculateAxisRanges();
+        _updateLegendItems();
       }
     } catch (e) {
       print('An error occurred: $e');
@@ -179,60 +175,35 @@ class LinecharpageState extends State<Linecharpage> {
 
       List<EmployeeCustomer>? customers =
           await _athServiceService.getEmployeeCustomerInfo();
-      if (customers != null) {
+      if (customers != null && mounted) {
         setState(() {
           _filteredEmployeeCustomer = customers;
         });
       }
+
       if (employeeId == null && customerId == null) {
-        setState(() {
-          _completeCoSpots.clear();
-          _processingCoSpots.clear();
-          _canceledCoSpots.clear();
-          _legendItems = [
-            const LegendItem(
-                color: Colors.grey, text: 'Vui lòng chọn nhân viên!!!')
-          ];
-          _isLoading = false;
-        });
+        _clearChartData();
+        _addNoSelectionLegend();
         return;
       }
 
       if (mounted) {
-        _legendItems.clear();
-        _completeCoSpots.clear();
-        _processingCoSpots.clear();
-        _canceledCoSpots.clear();
+        _clearChartData();
 
         if (lineChartResponse?.data?.completeCo != null &&
             lineChartResponse!.data!.completeCo!.isNotEmpty) {
           _completeCoSpots =
               _mapDataToFlSpot(lineChartResponse.data!.completeCo);
-          _legendItems
-              .add(const LegendItem(color: Colors.green, text: 'Hoàn thành'));
         }
-        if (lineChartResponse?.data?.processingCo != null &&
-            lineChartResponse!.data!.processingCo!.isNotEmpty) {
-          _processingCoSpots =
-              _mapDataToFlSpot(lineChartResponse.data!.processingCo);
-          _legendItems
-              .add(const LegendItem(color: Colors.orange, text: 'Đã sửa'));
-        }
+
         if (lineChartResponse?.data?.canceledCo != null &&
             lineChartResponse!.data!.canceledCo!.isNotEmpty) {
           _canceledCoSpots =
               _mapDataToFlSpot(lineChartResponse.data!.canceledCo);
-          _legendItems.add(const LegendItem(color: Colors.red, text: 'Đã hủy'));
-        }
-
-        if (_completeCoSpots.isEmpty &&
-            _processingCoSpots.isEmpty &&
-            _canceledCoSpots.isEmpty) {
-          _legendItems.add(
-              const LegendItem(color: Colors.grey, text: 'Không có dữ liệu'));
         }
 
         _calculateAxisRanges();
+        _updateLegendItems();
       }
     } catch (e) {
       print('An error occurred while fetching account customer data: $e');
@@ -243,6 +214,74 @@ class LinecharpageState extends State<Linecharpage> {
         });
       }
     }
+  }
+
+  void _clearChartData() {
+    _completeCoSpots.clear();
+    _processingCoSpots.clear();
+    _canceledCoSpots.clear();
+  }
+
+  void _addNoSelectionLegend() {
+    final localization = AppLocalizations.of(context);
+    setState(() {
+      _legendItems = [
+        LegendItem(
+          color: Colors.grey,
+          text: localization?.translate('please_select_employee') ??
+              'Vui lòng chọn nhân viên!!!',
+        ),
+      ];
+      _isLoading = false;
+    });
+  }
+
+  void _updateLegendItems() {
+    if (!mounted) return;
+
+    final localization = AppLocalizations.of(context);
+    setState(() {
+      _legendItems.clear();
+
+      if (_completeCoSpots.isNotEmpty) {
+        _legendItems.add(
+          LegendItem(
+            color: Colors.green,
+            text: localization?.translate('completed') ?? 'Hoàn thành',
+          ),
+        );
+      }
+
+      if (_processingCoSpots.isNotEmpty) {
+        _legendItems.add(
+          LegendItem(
+            color: Colors.orange,
+            text: localization?.translate('processing') ?? 'Đã sửa',
+          ),
+        );
+      }
+
+      if (_canceledCoSpots.isNotEmpty) {
+        _legendItems.add(
+          LegendItem(
+            color: Colors.red,
+            text: localization?.translate('canceled') ?? 'Đã hủy',
+          ),
+        );
+      }
+
+      if (_completeCoSpots.isEmpty &&
+          _processingCoSpots.isEmpty &&
+          _canceledCoSpots.isEmpty) {
+        _legendItems.add(
+          LegendItem(
+            color: Colors.grey,
+            text: localization?.translate('select_employee') ??
+                'Hãy chọn nhân viên',
+          ),
+        );
+      }
+    });
   }
 
   List<FlSpot> _mapDataToFlSpot(List<dynamic>? dataList) {
@@ -370,21 +409,26 @@ class LinecharpageState extends State<Linecharpage> {
     );
   }
 
-  Widget renderCustomerDropdown() {
+  Widget renderCustomerDropdown(BuildContext context) {
+    final localization = AppLocalizations.of(context);
+
     List<String> userNames = _filteredEmployeeCustomer
         .map((u) => u.customerName ?? '')
         .toSet()
         .toList();
-    userNames.insert(0, 'Tất cả khách hàng');
+
+    String allCustomersLabel =
+        localization?.translate('all_customers') ?? 'Tất cả khách hàng';
+    userNames.insert(0, allCustomersLabel);
 
     return buildDropdown(
       items: userNames,
       selectedItem: selectedemployeeCustomer?.customerName,
-      hint: 'Tất cả khách hàng',
+      hint: allCustomersLabel,
       width: 180,
       onChanged: (String? newValue) {
         setState(() {
-          selectedemployeeCustomer = newValue == 'Tất cả khách hàng'
+          selectedemployeeCustomer = newValue == allCustomersLabel
               ? null
               : _filteredEmployeeCustomer.firstWhere(
                   (c) => c.customerName == newValue,
@@ -396,10 +440,13 @@ class LinecharpageState extends State<Linecharpage> {
     );
   }
 
-  Widget renderUserDropdown() {
+  Widget renderUserDropdown(BuildContext context) {
+    final localization = AppLocalizations.of(context);
     List<String> userNames =
         _filtereddropdownEmployee.map((u) => u.label ?? '').toSet().toList();
-
+    String allEmployeedLabel =
+        localization?.translate('all_employeed') ?? 'Tất cả nhân viên';
+    userNames.insert(0, allEmployeedLabel);
     if (selectedDropdownEmployee == null &&
         _filtereddropdownEmployee.isNotEmpty) {
       selectedDropdownEmployee = _filtereddropdownEmployee[0];
@@ -408,11 +455,11 @@ class LinecharpageState extends State<Linecharpage> {
     return buildDropdown(
       items: userNames,
       selectedItem: selectedDropdownEmployee?.label,
-      hint: 'Tất cả nhân viên',
+      hint: allEmployeedLabel,
       width: 160,
       onChanged: (String? newValue) {
         setState(() {
-          if (newValue == 'Tất cả nhân viên') {
+          if (newValue == allEmployeedLabel) {
             selectedDropdownEmployee = null;
           } else {
             selectedDropdownEmployee = _filtereddropdownEmployee.firstWhere(
@@ -437,11 +484,12 @@ class LinecharpageState extends State<Linecharpage> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 FittedBox(
-                    child:
-                        SizedBox(width: 200, child: renderCustomerDropdown())),
+                    child: SizedBox(
+                        width: 200, child: renderCustomerDropdown(context))),
                 const SizedBox(width: 6),
                 FittedBox(
-                    child: SizedBox(width: 140, child: renderUserDropdown())),
+                    child: SizedBox(
+                        width: 140, child: renderUserDropdown(context))),
               ],
             ),
             const SizedBox(height: 10),

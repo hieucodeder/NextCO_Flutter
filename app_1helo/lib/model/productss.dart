@@ -37,7 +37,7 @@ class Productss {
 class Data {
   String? productId;
   int? normId; // Update from Null? to int?
-  int? productExpenseId; // Update from Null? to int?
+  int? productExpenseId; 
   String? productCode;
   String? hsCode;
   String? productName;

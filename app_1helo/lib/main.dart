@@ -1,17 +1,26 @@
 import 'package:app_1helo/pages/slap_page.dart';
-import 'package:app_1helo/provider/bottomNavProvider.dart';
+import 'package:app_1helo/provider/locale_provider.dart';
 import 'package:app_1helo/provider/navigationProvider.dart';
 import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/service/appLocalizations%20.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize the LocaleProvider and load the saved language preference
+  final localeProvider = LocaleProvider();
+  await localeProvider.loadLocaleFromSharedPreferences();
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => Providercolor()),
-        ChangeNotifierProvider(create: (_) => Bottomnavprovider()),
-        ChangeNotifierProvider(create: (_) => NavigationProvider())
+        ChangeNotifierProvider(create: (_) => NavigationProvider()),
+        ChangeNotifierProvider(
+            create: (_) => LocaleProvider()), // Thêm LocaleProvider tại đây
       ],
       child: const MyApp(),
     ),
@@ -23,10 +32,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider =
+        Provider.of<LocaleProvider>(context); // Lấy LocaleProvider từ context
+    final colorProvider =
+        Provider.of<Providercolor>(context); // Lấy màu từ Providercolor
+
     return MaterialApp(
-      title: 'App CO',
+      title: 'App Next CO',
+      locale: provider.locale,
+      supportedLocales: const [
+        Locale('en'), // Tiếng Anh
+        Locale('vi'), // Tiếng Việt
+      ],
+      localizationsDelegates: const [
+        AppLocalizationsDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: ThemeData(
-        primaryColor: Provider.of<Providercolor>(context).selectedColor,
+        primaryColor: colorProvider.selectedColor,
       ),
       debugShowCheckedModeBanner: false,
       home: const SlapPage(),

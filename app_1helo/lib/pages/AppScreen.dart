@@ -16,8 +16,10 @@ import 'package:app_1helo/pages/materialsPage.dart';
 import 'package:app_1helo/pages/productPage.dart';
 import 'package:app_1helo/pages/productReportPage.dart';
 import 'package:app_1helo/pages/staffPage.dart';
+import 'package:app_1helo/provider/locale_provider.dart';
 import 'package:app_1helo/provider/navigationProvider.dart';
 import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/service/appLocalizations%20.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -30,6 +32,10 @@ class AppScreen extends StatefulWidget {
 }
 
 class _AppScreenState extends State<AppScreen> {
+  final List<Map<String, dynamic>> languages = [
+    {'locale': const Locale('vi'), 'name': 'Tiếng Việt', 'flag': '🇻🇳'},
+    {'locale': const Locale('en'), 'name': 'English', 'flag': '🇺🇸'},
+  ];
   Widget _getPage(int index) {
     switch (index) {
       case 0:
@@ -65,38 +71,44 @@ class _AppScreenState extends State<AppScreen> {
     }
   }
 
-  String _getAppBarTitle(int index) {
+  String _getAppBarTitle(BuildContext context, int index) {
+    final localization = AppLocalizations.of(context);
+
+    if (localization == null) {
+      return "Default Title"; // Fallback title in case localization is null
+    }
+
     switch (index) {
       case 0:
-        return "BÁO CÁO HOẠT ĐỘNG NEXTCO";
+        return localization.translate('activity_report');
       case 1:
-        return "CHỨC NĂNG NEXTCO";
+        return localization.translate('functions');
       case 2:
-        return "CÁ NHÂN";
+        return localization.translate('personal');
       case 3:
-        return "DANH SÁCH HỒ SƠ C/O";
+        return localization.translate('co_list');
       case 4:
-        return "THÔNG TIN CÁ NHÂN";
+        return localization.translate('personal_info');
       case 5:
-        return "ĐỔI MẬT KHẨU";
+        return localization.translate('change_password');
       case 6:
-        return "QUẢN LÝ NGƯỜI DÙNG";
+        return localization.translate('user_management');
       case 7:
-        return "DANH SÁCH SẢN PHẨM";
+        return localization.translate('product_list');
       case 8:
-        return "QUẢN LÝ NGUYÊN VẬT LIỆU";
+        return localization.translate('material_management');
       case 9:
-        return "DANH SÁCH KHÁCH HÀNG";
+        return localization.translate('customer_list');
       case 10:
-        return "THÔNG TIN SỬ DỤNG PHẦN MỀM";
+        return localization.translate('software_usage_info');
       case 11:
-        return "THÔNG TIN THANH TOÁN";
+        return localization.translate('payment_info');
       case 12:
-        return "BÁO CÁO TỒN SẢN PHẨM ";
+        return localization.translate('product_stock_report');
       case 13:
-        return "BÁO CÁO TỒN NGUYÊN VẬT LIỆU ";
+        return localization.translate('material_stock_report');
       default:
-        return "BÁO CÁO HOẠT ĐỘNG NEXTCO";
+        return localization.translate('activity_report');
     }
   }
 
@@ -113,9 +125,7 @@ class _AppScreenState extends State<AppScreen> {
     final navigationProvider = Provider.of<NavigationProvider>(context);
     final currentIndex = navigationProvider.currentIndex;
     final selectedColor = Provider.of<Providercolor>(context).selectedColor;
-    // const totalPages = 14;
-    // final validIndex =
-    //     (currentIndex >= 0 && currentIndex < totalPages) ? currentIndex : 0;
+    final currentLocale = context.watch<LocaleProvider>().locale;
 
     return Scaffold(
       drawer: DrawerCustom(
@@ -126,7 +136,7 @@ class _AppScreenState extends State<AppScreen> {
       ),
       appBar: AppBar(
         title: Text(
-          _getAppBarTitle(currentIndex),
+          _getAppBarTitle(context, currentIndex),
           style: GoogleFonts.robotoCondensed(
             fontSize: 17,
             color: Colors.white,
@@ -134,39 +144,60 @@ class _AppScreenState extends State<AppScreen> {
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              showMenu(
-                context: context,
-                position: const RelativeRect.fromLTRB(100, 100, 0, 0),
-                items: [
-                  PopupMenuItem(
-                    value: 'unread',
-                    child: Text(
-                      'Chưa đọc',
-                      style: GoogleFonts.robotoCondensed(
-                          fontSize: 16,
-                          color: Colors.red,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'all',
-                    child: Text(
-                      'Tất cả',
-                      style: GoogleFonts.robotoCondensed(
-                          fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ],
-              ).then((value) {
-                if (value == 'all') {
-                } else if (value == 'unread') {}
-              });
+          DropdownButton<Locale>(
+            value: currentLocale,
+            onChanged: (Locale? newLocale) {
+              if (newLocale != null) {
+                context.read<LocaleProvider>().setLocale(newLocale);
+              }
             },
-            icon: const Icon(Icons.notifications_none_outlined, size: 24),
-            color: Colors.white,
+            items: languages.map((language) {
+              return DropdownMenuItem<Locale>(
+                value: language['locale'],
+                child: Row(
+                  children: [
+                    Text(
+                      language['flag'],
+                      style: const TextStyle(fontSize: 24),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
           ),
+          // IconButton(
+          //   onPressed: () {
+          //     showMenu(
+          //       context: context,
+          //       position: const RelativeRect.fromLTRB(100, 100, 0, 0),
+          //       items: [
+          //         PopupMenuItem(
+          //           value: 'unread',
+          //           child: Text(
+          //             'Chưa đọc',
+          //             style: GoogleFonts.robotoCondensed(
+          //                 fontSize: 16,
+          //                 color: Colors.red,
+          //                 fontWeight: FontWeight.w600),
+          //           ),
+          //         ),
+          //         PopupMenuItem(
+          //           value: 'all',
+          //           child: Text(
+          //             'Tất cả',
+          //             style: GoogleFonts.robotoCondensed(
+          //                 fontSize: 16, fontWeight: FontWeight.w600),
+          //           ),
+          //         ),
+          //       ],
+          //     ).then((value) {
+          //       if (value == 'all') {
+          //       } else if (value == 'unread') {}
+          //     });
+          //   },
+          //   icon: const Icon(Icons.notifications_none_outlined, size: 24),
+          //   color: Colors.white,
+          // ),
         ],
         iconTheme: const IconThemeData(
           color: Colors.white,
@@ -242,9 +273,7 @@ class _AppScreenState extends State<AppScreen> {
                 height: 40,
                 child: FloatingActionButton(
                   heroTag: 'uniqueTagForButton1',
-                  onPressed: () {
-                    print('Button 1 Pressed');
-                  },
+                  onPressed: () {},
                   backgroundColor: selectedColor,
                   tooltip: 'Button 1',
                   child: const Icon(

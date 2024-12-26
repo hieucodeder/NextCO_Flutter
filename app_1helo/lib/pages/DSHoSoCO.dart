@@ -2,6 +2,7 @@ import 'package:app_1helo/model/documentss.dart';
 import 'package:app_1helo/model/dropdownCustomer.dart';
 import 'package:app_1helo/model/dropdownEmployee.dart';
 import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/service/appLocalizations%20.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:app_1helo/service/document_service.dart';
 import 'package:flutter/material.dart';
@@ -308,20 +309,24 @@ class _DshosocoState extends State<Dshosoco> {
     );
   }
 
-  Widget renderCustomerDropdown() {
+  Widget renderCustomerDropdown(BuildContext context) {
+    final localization = AppLocalizations.of(context);
+
     List<String> customerNames = _filtereddropdownCustomer
         .map((u) => u.customerName ?? '')
         .toSet()
         .toList();
-    customerNames.insert(0, 'Tất cả khách hàng');
+    String allCustomersLabel =
+        localization?.translate('all_customers') ?? 'Tất cả khách hàng';
+    customerNames.insert(0, allCustomersLabel);
 
     return buildDropdown(
       items: customerNames,
       selectedItem: selectedDropdownCustomer?.customerName,
-      hint: 'Tất cả khách hàng',
+      hint: allCustomersLabel,
       onChanged: (String? newValue) {
         setState(() {
-          selectedDropdownCustomer = newValue == 'Tất cả khách hàng'
+          selectedDropdownCustomer = newValue == allCustomersLabel
               ? null
               : _filtereddropdownCustomer.firstWhere(
                   (u) => u.customerName == newValue,
@@ -336,18 +341,21 @@ class _DshosocoState extends State<Dshosoco> {
     );
   }
 
-  Widget renderUserDropdown() {
+  Widget renderUserDropdown(BuildContext context) {
+    final localization = AppLocalizations.of(context);
     List<String> userNames =
         _filtereddropdownEmployee.map((u) => u.label ?? '').toSet().toList();
-    userNames.insert(0, 'Tất cả nhân viên');
+    String allEmployeedLabel =
+        localization?.translate('all_employeed') ?? 'Tất cả nhân viên';
+    userNames.insert(0, allEmployeedLabel);
 
     return buildDropdown(
       items: userNames,
       selectedItem: selectedDropdownEmployee?.label,
-      hint: 'Tất cả nhân viên',
+      hint: allEmployeedLabel,
       onChanged: (String? newValue) {
         setState(() {
-          selectedDropdownEmployee = newValue == 'Tất cả nhân viên'
+          selectedDropdownEmployee = newValue == allEmployeedLabel
               ? null
               : _filtereddropdownEmployee.firstWhere(
                   (u) => u.label == newValue,
@@ -363,12 +371,15 @@ class _DshosocoState extends State<Dshosoco> {
 
   final _textxData = GoogleFonts.robotoCondensed(
       fontSize: 15, color: Colors.black, fontWeight: FontWeight.w500);
-  final _textTitile = GoogleFonts.robotoCondensed(
+  final _textTitle = GoogleFonts.robotoCondensed(
       fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500);
+
   @override
   Widget build(BuildContext context) {
     List<Data> displayList = (_isSearching ? _searchResults : _documentLits)
       ..sort((a, b) => (a.rowNumber ?? 0).compareTo(b.rowNumber ?? 0));
+    final localization = AppLocalizations.of(context);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(10.0),
@@ -379,12 +390,14 @@ class _DshosocoState extends State<Dshosoco> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               FittedBox(
-                  child: SizedBox(width: 200, child: renderCustomerDropdown())),
+                  child: SizedBox(
+                      width: 200, child: renderCustomerDropdown(context))),
               const SizedBox(
                 width: 10,
               ),
               FittedBox(
-                  child: SizedBox(width: 160, child: renderUserDropdown())),
+                  child:
+                      SizedBox(width: 160, child: renderUserDropdown(context))),
             ],
           ),
           const SizedBox(
@@ -414,7 +427,8 @@ class _DshosocoState extends State<Dshosoco> {
                               readOnly: true,
                               textAlign: TextAlign.center,
                               decoration: InputDecoration(
-                                hintText: 'Chọn ngày bắt đầu và kết thúc',
+                                hintText: localization?.translate('date') ??
+                                    'Chọn ngày bắt đầu và kết thúc',
                                 hintStyle: GoogleFonts.robotoCondensed(
                                     fontSize: 15,
                                     color: Colors.black38,
@@ -473,7 +487,8 @@ class _DshosocoState extends State<Dshosoco> {
                         });
                       },
                       decoration: InputDecoration(
-                        hintText: 'Số hồ sơ, tờ khai xuất, tình trạng',
+                        hintText: localization?.translate('search_file') ??
+                            'Số hồ sơ, tờ khai xuất, tình trạng',
                         hintStyle: GoogleFonts.robotoCondensed(
                             fontSize: 15,
                             color: Colors.black38,
@@ -517,7 +532,8 @@ class _DshosocoState extends State<Dshosoco> {
                   : displayList.isEmpty
                       ? Center(
                           child: Text(
-                            "Dữ liệu tìm kiếm không có!!!",
+                            localization?.translate('data_null') ??
+                                "Dữ liệu tìm kiếm không có!!!",
                             style: GoogleFonts.robotoCondensed(
                                 fontSize: 16,
                                 color: Provider.of<Providercolor>(context)
@@ -547,7 +563,7 @@ class _DshosocoState extends State<Dshosoco> {
                               child: SingleChildScrollView(
                                 scrollDirection: Axis.vertical,
                                 child: DataTable(
-                                  columns: _buildDataTableColumns(),
+                                  columns: _buildDataTableColumns(context),
                                   rows: displayList
                                       .map((doc) => _buildDataRow(doc))
                                       .toList(),
@@ -612,8 +628,8 @@ class _DshosocoState extends State<Dshosoco> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2.0),
                           child: Text(
-                            '$value/trang',
-                            style: _textTitile,
+                            '$value/${localization?.translate('page') ?? 'trang'}',
+                            style: _textTitle,
                           ),
                         ),
                       );
@@ -637,29 +653,34 @@ class _DshosocoState extends State<Dshosoco> {
     );
   }
 
-  List<DataColumn> _buildDataTableColumns() {
+  List<DataColumn> _buildDataTableColumns(BuildContext context) {
     const columnTitles = [
-      'STT',
-      'Mã định danh',
-      'Form C/O',
-      'Ngày tạo',
-      'Số tờ khai xuất-DKVC',
-      'Số Invoice',
-      'Khách hàng',
-      'Nhân viên',
-      'Trạng thái',
+      'numerical_order',
+      'id_code',
+      'form_co',
+      'creation_date',
+      'declaration_number',
+      'invoice_number',
+      'customer',
+      'employeed',
+      'status',
     ];
 
-    return columnTitles.asMap().entries.map((entry) {
-      final title = entry.value;
+    final localization = AppLocalizations.of(context);
 
-      if (title == 'Trạng thái') {
+    return columnTitles.asMap().entries.map((entry) {
+      final titleKey = entry.value;
+
+      // Translate the title using localization
+      final title = localization?.translate(titleKey) ?? titleKey;
+
+      if (titleKey == 'status') {
         return DataColumn(
           label: Center(
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(title, style: _textTitile),
+                Text(title, style: _textTitle),
               ],
             ),
           ),
@@ -667,7 +688,7 @@ class _DshosocoState extends State<Dshosoco> {
       } else {
         return DataColumn(
           label: Center(
-            child: Text(title, style: _textTitile),
+            child: Text(title, style: _textTitle),
           ),
         );
       }
@@ -675,14 +696,14 @@ class _DshosocoState extends State<Dshosoco> {
   }
 
   DataRow _buildDataRow(Data doc) {
-    final _textData = GoogleFonts.robotoCondensed(
+    final textData = GoogleFonts.robotoCondensed(
         fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black);
     return DataRow(cells: [
       DataCell(
         Center(
             child: Text(
           doc.rowNumber?.toString() ?? '',
-          style: _textData,
+          style: textData,
         )),
         placeholder: false,
         showEditIcon: false,
@@ -699,7 +720,7 @@ class _DshosocoState extends State<Dshosoco> {
         ),
       ),
       DataCell(Center(
-          child: Center(child: Text(doc.coFormId ?? '', style: _textData)))),
+          child: Center(child: Text(doc.coFormId ?? '', style: textData)))),
       DataCell(
         Center(
           child: Text(
@@ -707,7 +728,7 @@ class _DshosocoState extends State<Dshosoco> {
                   ? DateFormat('dd/MM/yyyy')
                       .format(DateTime.parse(doc.createdDate!))
                   : 'N/A',
-              style: _textData),
+              style: textData),
         ),
       ),
       DataCell(
@@ -727,11 +748,11 @@ class _DshosocoState extends State<Dshosoco> {
                   ?.map((e) => e.invoiceNumber ?? '')
                   .join(', ') ??
               '',
-          style: _textData,
+          style: textData,
         ),
       )),
-      DataCell(Center(child: Text(doc.customerName ?? '', style: _textData))),
-      DataCell(Center(child: Text(doc.employeeName ?? '', style: _textData))),
+      DataCell(Center(child: Text(doc.customerName ?? '', style: textData))),
+      DataCell(Center(child: Text(doc.employeeName ?? '', style: textData))),
       DataCell(
         Center(
           child: Text(

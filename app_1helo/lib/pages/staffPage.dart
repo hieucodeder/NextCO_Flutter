@@ -1,8 +1,7 @@
-import 'package:app_1helo/model/dropdownBranchs.dart';
 import 'package:app_1helo/model/dropdownCustomer.dart';
-import 'package:app_1helo/model/dropdownRoom.dart';
 import 'package:app_1helo/model/user.dart';
 import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/service/appLocalizations%20.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:app_1helo/service/user_service.dart';
 import 'package:flutter/material.dart';
@@ -246,19 +245,22 @@ class _StaffpageState extends State<Staffpage> {
         .toList();
   }
 
-  Widget renderUserDropdownBranch() {
+  Widget renderUserDropdownBranch(BuildContext context) {
+    final localization = AppLocalizations.of(context);
     List<String> branchNames =
         getUniqueNames(_filteredUsersBranch, (user) => user.branchName ?? '');
-    branchNames.insert(0, 'Tất cả chi nhánh');
+    String allBranch =
+        localization?.translate('all_branch') ?? 'Tất cả chi nhánh';
+    branchNames.insert(0, allBranch);
 
     return buildDropdown(
       items: branchNames,
       selectedItem: selectedBranchUser?.branchName,
-      hint: 'Tất cả chi nhánh',
+      hint: allBranch,
       width: 170,
       onChanged: (String? newValue) {
         setState(() {
-          selectedBranchUser = newValue == 'Tất cả chi nhánh'
+          selectedBranchUser = newValue == allBranch
               ? null
               : _filteredUsersBranch.firstWhere(
                   (user) => user.branchName == newValue,
@@ -271,19 +273,22 @@ class _StaffpageState extends State<Staffpage> {
     );
   }
 
-  Widget renderDropdownRooms() {
+  Widget renderDropdownRooms(BuildContext context) {
+    final localization = AppLocalizations.of(context);
     List<String> departmentNames =
         getUniqueNames(_filteredUsersRoom, (user) => user.departmentName ?? '');
-    departmentNames.insert(0, 'Tất cả phòng ban');
+    String allDepartment =
+        localization?.translate('all_department') ?? 'Tất cả phòng ban';
+    departmentNames.insert(0, allDepartment);
 
     return buildDropdown(
       items: departmentNames,
       selectedItem: selectedRoomUser?.departmentName,
-      hint: 'Tất cả phòng ban',
+      hint: allDepartment,
       width: 160,
       onChanged: (String? newValue) {
         setState(() {
-          selectedRoomUser = newValue == 'Tất cả phòng ban'
+          selectedRoomUser = newValue == allDepartment
               ? null
               : _filteredUsersRoom.firstWhere(
                   (user) => user.departmentName == newValue,
@@ -296,20 +301,23 @@ class _StaffpageState extends State<Staffpage> {
     );
   }
 
-  Widget renderCustomer() {
+  Widget renderCustomer(BuildContext context) {
+    final localization = AppLocalizations.of(context);
     List<String> customerNames = _filteredEmployeeCustomer
         .map((u) => u.customerName ?? '')
         .toSet()
         .toList();
-    customerNames.insert(0, 'Tất cả khách hàng');
+    String allCustomer =
+        localization?.translate('all_customers') ?? 'Tất cả khách hàng';
+    customerNames.insert(0, allCustomer);
 
     return buildDropdown(
       items: customerNames,
       selectedItem: selectedEmployeeCustomer?.customerName,
-      hint: 'Tất cả khách hàng',
+      hint: allCustomer,
       onChanged: (String? newValue) {
         setState(() {
-          selectedEmployeeCustomer = newValue == 'Tất cả khách hàng'
+          selectedEmployeeCustomer = newValue == allCustomer
               ? null
               : _filteredEmployeeCustomer.firstWhere(
                   (u) => u.customerName == newValue,
@@ -330,6 +338,8 @@ class _StaffpageState extends State<Staffpage> {
   Widget build(BuildContext context) {
     List<DataUser> displayList = (_isSearching ? _searchResults : _staffList)
       ..sort((a, b) => (a.rowNumber ?? 0).compareTo(b.rowNumber ?? 0));
+    final localization = AppLocalizations.of(context);
+
     return Container(
       padding: const EdgeInsets.all(10),
       width: MediaQuery.of(context).size.width,
@@ -339,14 +349,15 @@ class _StaffpageState extends State<Staffpage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              FittedBox(child: SizedBox(width: 180, child: renderCustomer())),
+              FittedBox(
+                  child: SizedBox(width: 180, child: renderCustomer(context))),
               const SizedBox(
                 width: 6,
               ),
               FittedBox(
                 child: SizedBox(
                   width: 180,
-                  child: renderDropdownRooms(),
+                  child: renderDropdownRooms(context),
                 ),
               ),
             ],
@@ -371,7 +382,8 @@ class _StaffpageState extends State<Staffpage> {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
-                      hintText: 'Tên tài khoản ...',
+                      hintText: localization?.translate('search_user') ??
+                          'Tên tài khoản ...',
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide.none),
@@ -408,7 +420,7 @@ class _StaffpageState extends State<Staffpage> {
               FittedBox(
                 child: SizedBox(
                   width: 180,
-                  child: renderUserDropdownBranch(),
+                  child: renderUserDropdownBranch(context),
                 ),
               ),
             ],
@@ -420,7 +432,8 @@ class _StaffpageState extends State<Staffpage> {
                 : displayList.isEmpty
                     ? Center(
                         child: Text(
-                          "Dữ liệu tìm kiếm không có!!!",
+                          localization?.translate('data_null') ??
+                              "Dữ liệu tìm kiếm không có!!!",
                           style: GoogleFonts.robotoCondensed(
                             fontSize: 16,
                             color: Provider.of<Providercolor>(context)
@@ -453,29 +466,54 @@ class _StaffpageState extends State<Staffpage> {
                               child: DataTable(
                                 columns: [
                                   DataColumn(
-                                      label: Text('STT', style: _textTitile)),
-                                  DataColumn(
-                                      label: Text('Tài khoản',
+                                      label: Text(
+                                          localization?.translate(
+                                                  'numerical_order') ??
+                                              'STT',
                                           style: _textTitile)),
                                   DataColumn(
-                                      label: Text('Họ và tên',
+                                      label: Text(
+                                          localization?.translate('account') ??
+                                              'Tài khoản',
                                           style: _textTitile)),
                                   DataColumn(
-                                      label: Text('Số điện thoại',
+                                      label: Text(
+                                          localization
+                                                  ?.translate('full_name') ??
+                                              'Họ và tên',
                                           style: _textTitile)),
                                   DataColumn(
-                                      label: Text('Email', style: _textTitile)),
-                                  DataColumn(
-                                      label:
-                                          Text('Chức vụ', style: _textTitile)),
-                                  DataColumn(
-                                      label: Text('Chi nhánh',
+                                      label: Text(
+                                          localization
+                                                  ?.translate('phone_number') ??
+                                              'Số điện thoại',
                                           style: _textTitile)),
                                   DataColumn(
-                                      label: Text('Phòng ban',
+                                      label: Text(
+                                          localization?.translate('email') ??
+                                              'Email',
                                           style: _textTitile)),
                                   DataColumn(
-                                      label: Text('Phân quyền',
+                                      label: Text(
+                                          localization?.translate('position') ??
+                                              'Chức vụ',
+                                          style: _textTitile)),
+                                  DataColumn(
+                                      label: Text(
+                                          localization?.translate('branch') ??
+                                              'Chi nhánh',
+                                          style: _textTitile)),
+                                  DataColumn(
+                                      label: Text(
+                                          localization
+                                                  ?.translate('departments') ??
+                                              'Phòng ban',
+                                          style: _textTitile)),
+                                  DataColumn(
+                                      label: Text(
+                                          localization?.translate(
+                                                  'decentralization') ??
+                                              'Phân quyền',
                                           style: _textTitile)),
                                   // DataColumn(label: Text('Action')),
                                 ],
@@ -601,7 +639,7 @@ class _StaffpageState extends State<Staffpage> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 2.0),
                           child: Text(
-                            '$value/trang',
+                            '$value/${localization?.translate('page') ?? 'trang'}',
                             style: _textTitile,
                           ),
                         ),

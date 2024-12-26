@@ -1,3 +1,5 @@
+import 'package:app_1helo/provider/locale_provider.dart';
+import 'package:app_1helo/service/appLocalizations%20.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,7 +19,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
   @override
   Widget build(BuildContext context) {
     final selectedColor = Provider.of<Providercolor>(context).selectedColor;
-
+    final localization = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: selectedColor.withOpacity(0.9),
@@ -31,7 +33,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
       ),
       child: BottomNavigationBar(
         currentIndex: widget.currentIndex,
-        onTap: widget.onTap,
+        onTap: (index) {
+          widget.onTap(index);
+        },
         backgroundColor: Colors.transparent,
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.orange,
@@ -50,19 +54,19 @@ class _BottomNavigationState extends State<BottomNavigation> {
             isSelected: widget.currentIndex == 0,
             activeIcon: Icons.home,
             inactiveIcon: Icons.home_outlined,
-            label: 'Trang chủ',
+            label: localization?.translate('home') ?? 'Trang chủ',
           ),
           _buildNavItem(
             isSelected: widget.currentIndex == 1,
             activeIcon: Icons.dashboard,
             inactiveIcon: Icons.dashboard_outlined,
-            label: 'Chức năng',
+            label: localization?.translate('funtion') ?? 'Chức năng',
           ),
           _buildNavItem(
             isSelected: widget.currentIndex == 2,
-            activeIcon: Icons.account_box,
-            inactiveIcon: Icons.account_box_outlined,
-            label: 'Cá nhân',
+            activeIcon: Icons.settings_applications,
+            inactiveIcon: Icons.settings_applications_outlined,
+            label: localization?.translate('setting') ?? 'Cài đặt',
           ),
         ],
       ),

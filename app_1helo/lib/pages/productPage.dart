@@ -1,6 +1,7 @@
 import 'package:app_1helo/model/dropdownCustomer.dart';
 import 'package:app_1helo/model/productss.dart';
 import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/service/appLocalizations%20.dart';
 import 'package:app_1helo/service/authService.dart';
 import 'package:app_1helo/service/product_service.dart';
 import 'package:flutter/material.dart';
@@ -205,20 +206,24 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  Widget renderCustomerDropdown() {
+  Widget renderCustomerDropdown(BuildContext context) {
+    final localization = AppLocalizations.of(context);
+
     List<String> customerNames = _filtereddropdownCustomer
         .map((u) => u.customerName ?? '')
         .toSet()
         .toList();
-    customerNames.insert(0, 'Tất cả khách hàng');
+    String allCustomersLabel =
+        localization?.translate('all_customers') ?? 'Tất cả khách hàng';
+    customerNames.insert(0, allCustomersLabel);
 
     return buildDropdown(
       items: customerNames,
       selectedItem: selectedDropdownCustomer?.customerName,
-      hint: 'Tất cả khách hàng',
+      hint: allCustomersLabel,
       onChanged: (String? newValue) {
         setState(() {
-          selectedDropdownCustomer = newValue == 'Tất cả khách hàng'
+          selectedDropdownCustomer = newValue == allCustomersLabel
               ? null
               : _filtereddropdownCustomer.firstWhere(
                   (u) => u.customerName == newValue,
@@ -241,6 +246,7 @@ class _ProductPageState extends State<ProductPage> {
   Widget build(BuildContext context) {
     List<Data> displayList = (_isSearching ? _searchResults : productList)
       ..sort((a, b) => (a.rowNumber ?? 0).compareTo(b.rowNumber ?? 0));
+    final localization = AppLocalizations.of(context);
     return Container(
       constraints: const BoxConstraints.expand(),
       padding: const EdgeInsets.all(10),
@@ -251,7 +257,8 @@ class _ProductPageState extends State<ProductPage> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               FittedBox(
-                child: SizedBox(width: 200, child: renderCustomerDropdown()),
+                child: SizedBox(
+                    width: 200, child: renderCustomerDropdown(context)),
               ),
               const SizedBox(
                 width: 10,
@@ -270,7 +277,8 @@ class _ProductPageState extends State<ProductPage> {
                     // autofocus: true,
                     controller: _searchController,
                     decoration: InputDecoration(
-                      hintText: 'Mã sản phẩm, mã HS',
+                      hintText: localization?.translate('search_products') ??
+                          'Mã sản phẩm, mã HS',
                       hintStyle: GoogleFonts.robotoCondensed(
                           fontSize: 15, color: Colors.black38),
                       border: OutlineInputBorder(
@@ -309,7 +317,9 @@ class _ProductPageState extends State<ProductPage> {
                 ? const Center(child: CircularProgressIndicator())
                 : displayList.isEmpty
                     ? Center(
-                        child: Text("Dữ liệu tìm kiếm không có!!!",
+                        child: Text(
+                            localization?.translate('data_null') ??
+                                "Dữ liệu tìm kiếm không có!!!",
                             style: GoogleFonts.robotoCondensed(
                                 fontSize: 16,
                                 color: Provider.of<Providercolor>(context)
@@ -340,28 +350,50 @@ class _ProductPageState extends State<ProductPage> {
                               child: DataTable(
                                 columns: [
                                   DataColumn(
-                                      label: Text('STT', style: _textTitile)),
-                                  DataColumn(
-                                      label: Text('Mã HS', style: _textTitile)),
-                                  DataColumn(
-                                      label: Text('Mã sản phẩm',
+                                      label: Text(
+                                          localization?.translate(
+                                                  'numerical_order') ??
+                                              'STT',
                                           style: _textTitile)),
                                   DataColumn(
-                                      label: Text('Thông tin sản phẩm',
+                                      label: Text(
+                                          localization?.translate('code_HS') ??
+                                              'Mã HS',
                                           style: _textTitile)),
                                   DataColumn(
-                                      label:
-                                          Text('Định mức', style: _textTitile)),
-                                  DataColumn(
-                                      label: Text('Thông số trong QTSX',
+                                      label: Text(
+                                          localization
+                                                  ?.translate('product_code') ??
+                                              'Mã sản phẩm',
                                           style: _textTitile)),
                                   DataColumn(
-                                      label: Text('Tổng SP chưa làm C/O',
+                                      label: Text(
+                                          localization?.translate(
+                                                  'product_informationdr') ??
+                                              'Thông tin sản phẩm',
                                           style: _textTitile)),
                                   DataColumn(
-                                      label: Text('Đơn vị tính',
+                                      label: Text(
+                                          localization?.translate('norms') ??
+                                              'Định mức',
                                           style: _textTitile)),
-                                  // DataColumn(label: Text('Action')),
+                                  DataColumn(
+                                      label: Text(
+                                          localization
+                                                  ?.translate('parameters') ??
+                                              'Thông số trong QTSX',
+                                          style: _textTitile)),
+                                  DataColumn(
+                                      label: Text(
+                                          localization?.translate(
+                                                  'total_unprocesse_dproducts_c/o') ??
+                                              'Tổng SP chưa làm C/O',
+                                          style: _textTitile)),
+                                  DataColumn(
+                                      label: Text(
+                                          localization?.translate('unit') ??
+                                              'Đơn vị tính',
+                                          style: _textTitile)),
                                 ],
                                 rows: displayList.map((doc) {
                                   return DataRow(cells: [
@@ -398,9 +430,7 @@ class _ProductPageState extends State<ProductPage> {
                                         child: Text(doc.productName ?? '',
                                             style: _textxData))),
                                     DataCell(Center(
-                                      child: Text(
-                                          doc.productExpenseId?.toString() ??
-                                              '',
+                                      child: Text(doc.normId?.toString() ?? '',
                                           style: _textxData),
                                     )),
                                     DataCell(Center(
@@ -410,7 +440,7 @@ class _ProductPageState extends State<ProductPage> {
                                           style: _textxData),
                                     )),
                                     DataCell(Center(
-                                        child: Text(doc.customerName ?? '',
+                                        child: Text(doc.recordCount ?? '',
                                             style: _textxData))),
                                     DataCell(Center(
                                         child: Text(doc.unit?.toString() ?? '',
@@ -479,7 +509,7 @@ class _ProductPageState extends State<ProductPage> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2.0),
                           child: Text(
-                            '$value/trang',
+                            '$value/${localization?.translate('page') ?? 'trang'}',
                             style: _textTitile,
                           ),
                         ),
@@ -513,14 +543,15 @@ void showProductDetailsDialog(BuildContext context, String productsName,
   TextEditingController productsController =
       TextEditingController(text: CodeProducts);
   TextEditingController unitController = TextEditingController(text: unit);
+  final localization = AppLocalizations.of(context);
 
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Center(
+        title: Center(
           child: Text(
-            'Chi tiết sản phẩm',
+            localization?.translate('product_details') ?? 'Chi tiết sản phẩm',
           ),
         ),
         content: SizedBox(
@@ -530,16 +561,17 @@ void showProductDetailsDialog(BuildContext context, String productsName,
             children: <Widget>[
               Column(
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Text(
+                      const Text(
                         '*',
                         style: TextStyle(color: Colors.red),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
-                      Text('Tên sản phẩm'),
+                      Text(localization?.translate('product_name') ??
+                          'Tên sản phẩm'),
                     ],
                   ),
                   TextField(
@@ -554,16 +586,16 @@ void showProductDetailsDialog(BuildContext context, String productsName,
               const SizedBox(height: 10),
               Column(
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Text(
+                      const Text(
                         '*',
                         style: TextStyle(color: Colors.red),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
-                      Text('Mã HS'),
+                      Text(localization?.translate('code_HS') ?? 'Mã HS'),
                     ],
                   ),
                   TextField(
@@ -578,16 +610,17 @@ void showProductDetailsDialog(BuildContext context, String productsName,
               const SizedBox(height: 10),
               Column(
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Text(
+                      const Text(
                         '*',
                         style: TextStyle(color: Colors.red),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
-                      Text('Mã sản phẩm'),
+                      Text(localization?.translate('product_code') ??
+                          'Mã sản phẩm'),
                     ],
                   ),
                   TextField(
@@ -602,16 +635,16 @@ void showProductDetailsDialog(BuildContext context, String productsName,
               const SizedBox(height: 10),
               Column(
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Text(
+                      const Text(
                         '*',
                         style: TextStyle(color: Colors.red),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
-                      Text('Đơn vị tính'),
+                      Text(localization?.translate('unit') ?? 'Đơn vị tính'),
                     ],
                   ),
                   TextField(
@@ -641,7 +674,7 @@ void showProductDetailsDialog(BuildContext context, String productsName,
                         Navigator.of(context).pop();
                       },
                       child: Text(
-                        'Đóng',
+                        localization?.translate('close') ?? 'Đóng',
                         style: GoogleFonts.robotoCondensed(
                             color: Provider.of<Providercolor>(context)
                                 .selectedColor),
@@ -656,92 +689,6 @@ void showProductDetailsDialog(BuildContext context, String productsName,
             ],
           ),
         ),
-      );
-    },
-  );
-}
-
-void showDeleteProductDialog(BuildContext context, String customerName) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Center(
-          child: Text(
-            'Xóa sản phẩm',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        // backgroundColor: Provider.of<Providercolor>(context).selectedColor,
-        content: RichText(
-          text: TextSpan(
-            children: [
-              const TextSpan(
-                text: 'Bạn có muốn xóa sản phẩm ',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                ),
-              ),
-              TextSpan(
-                text: customerName,
-                style: const TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const TextSpan(
-                text: ' ?',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          Container(
-            height: 40,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                  width: 2,
-                  color: Provider.of<Providercolor>(context).selectedColor),
-            ),
-            child: TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                'KHông',
-                style: GoogleFonts.robotoCondensed(
-                    color: Provider.of<Providercolor>(context).selectedColor),
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Thêm logic lưu khách hàng
-              Navigator.of(context).pop();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor:
-                  Provider.of<Providercolor>(context).selectedColor,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  side: BorderSide.none),
-            ),
-            child: Text(
-              'Có',
-              style: GoogleFonts.robotoCondensed(color: Colors.white),
-            ),
-          ),
-        ],
       );
     },
   );
