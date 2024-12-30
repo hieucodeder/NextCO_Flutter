@@ -11,7 +11,6 @@ class SlapPage extends StatefulWidget {
 }
 
 class _SlapPageState extends State<SlapPage> with TickerProviderStateMixin {
-  double _opacity = 0.0;
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   @override

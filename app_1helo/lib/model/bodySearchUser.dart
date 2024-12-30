@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 class Bodysearchuser {
   String? branchId;
   String? customerId;
@@ -27,14 +29,14 @@ class Bodysearchuser {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['branch_id'] = this.branchId;
-    data['customer_id'] = this.customerId;
-    data['department_id'] = this.departmentId;
-    data['pageIndex'] = this.pageIndex;
-    data['pageSize'] = this.pageSize;
-    data['search_content'] = this.searchContent;
-    data['user_id'] = this.userId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['branch_id'] = branchId;
+    data['customer_id'] = customerId;
+    data['department_id'] = departmentId;
+    data['pageIndex'] = pageIndex;
+    data['pageSize'] = pageSize;
+    data['search_content'] = searchContent;
+    data['user_id'] = userId;
     return data;
   }
 }

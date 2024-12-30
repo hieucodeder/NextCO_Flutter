@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 class Bodyuser {
   String? phone;
   String? password;
@@ -10,9 +12,9 @@ class Bodyuser {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['phone'] = this.phone;
-    data['password'] = this.password;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['phone'] = phone;
+    data['password'] = password;
     return data;
   }
 }

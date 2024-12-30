@@ -1,5 +1,6 @@
+// ignore_for_file: file_names
 import 'dart:convert';
-import 'package:app_1helo/model/columnChar.dart';
+import 'package:app_1helo/model/column_char.dart';
 import 'package:app_1helo/service/api_config.dart';
 import 'package:http/http.dart' as http;
 

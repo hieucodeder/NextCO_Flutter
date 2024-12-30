@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'package:app_1helo/model/dropdownEmployee.dart';
-import 'package:app_1helo/model/lineCharModel.dart';
+import 'package:app_1helo/model/dropdown_employee.dart';
+import 'package:app_1helo/model/linechar_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api_config.dart';
 
-class LineChartService {
+class LinecharService {
   final String apiUrl = '${ApiConfig.baseUrl}/statistics/get-dashboard-co';
 
   Future<LinecharModel?> fetchLineChartData(
@@ -37,7 +37,7 @@ class LineChartService {
     }
   }
 
-  Future<List<dropdownEmployee>> fetchEmployeeList() async {
+  Future<List<DropdownEmployee>> fetchEmployeeList() async {
     final headers = await ApiConfig.getHeaders();
 
     final prefs = await SharedPreferences.getInstance();
@@ -57,7 +57,7 @@ class LineChartService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = jsonDecode(response.body);
-        return jsonData.map((json) => dropdownEmployee.fromJson(json)).toList();
+        return jsonData.map((json) => DropdownEmployee.fromJson(json)).toList();
       } else {
         return [];
       }
@@ -67,7 +67,7 @@ class LineChartService {
   }
 
   Future<void> fetchDataForUser(String fullName) async {
-    List<dropdownEmployee> employees = await fetchEmployeeList();
+    List<DropdownEmployee> employees = await fetchEmployeeList();
 
     String employeeId = getEmployeeIdByFullName(fullName, employees);
 
@@ -80,7 +80,7 @@ class LineChartService {
   }
 
   String getEmployeeIdByFullName(
-      String fullName, List<dropdownEmployee> employees) {
+      String fullName, List<DropdownEmployee> employees) {
     for (var employee in employees) {
       if (employee.label == fullName) {
         return employee.value ?? '';

@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:app_1helo/model/bodySearchPieChar.dart';
-import 'package:app_1helo/model/dropdownEmployee.dart';
-import 'package:app_1helo/model/pieCharModel.dart';
+import 'package:app_1helo/model/body_search_piechar.dart';
+import 'package:app_1helo/model/dropdown_employee.dart';
+import 'package:app_1helo/model/piechar_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,13 +47,14 @@ class PiecharService {
           } else {}
         } else {}
       } else {}
+    // ignore: empty_catches
     } catch (error) {}
 
     return [];
   }
 
   // Fetches a list of employees for dropdown
-  Future<List<dropdownEmployee>> fetchEmployeeList() async {
+  Future<List<DropdownEmployee>> fetchEmployeeList() async {
     final headers = await ApiConfig.getHeaders();
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
@@ -71,7 +72,7 @@ class PiecharService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = jsonDecode(response.body);
-        return jsonData.map((json) => dropdownEmployee.fromJson(json)).toList();
+        return jsonData.map((json) => DropdownEmployee.fromJson(json)).toList();
       } else {}
       // ignore: empty_catches
     } catch (error) {}
@@ -80,7 +81,7 @@ class PiecharService {
 
   // Fetches data for a specific employee based on full name
   Future<void> fetchDataForUser(String fullName) async {
-    List<dropdownEmployee> employees = await fetchEmployeeList();
+    List<DropdownEmployee> employees = await fetchEmployeeList();
     String employeeId = getEmployeeIdByFullName(fullName, employees);
 
     if (employeeId.isNotEmpty) {
@@ -93,7 +94,7 @@ class PiecharService {
 
   // Helper to get employee ID by full name
   String getEmployeeIdByFullName(
-      String fullName, List<dropdownEmployee> employees) {
+      String fullName, List<DropdownEmployee> employees) {
     for (var employee in employees) {
       if (employee.label == fullName) {
         return employee.value ?? '';
@@ -156,7 +157,7 @@ class PiecharService {
         throw Exception(
             'Failed to load data. Status Code: ${response.statusCode}, Response: ${response.body}');
       }
-    } catch (error, stacktrace) {
+    } catch (error) {
       // Log and handle errors
       return [];
     }

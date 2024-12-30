@@ -27,14 +27,14 @@ class Bodyfilter {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['search_content'] = this.searchContent;
-    data['pageIndex'] = this.pageIndex;
-    data['employee_id'] = this.employeeId;
-    data['customer_id'] = this.customerId;
-    data['pageSize'] = this.pageSize;
-    data['user_id'] = this.userId;
-    data['status_id'] = this.statusId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['search_content'] = searchContent;
+    data['pageIndex'] = pageIndex;
+    data['employee_id'] = employeeId;
+    data['customer_id'] = customerId;
+    data['pageSize'] = pageSize;
+    data['user_id'] = userId;
+    data['status_id'] = statusId;
     return data;
   }
 }

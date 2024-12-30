@@ -1,11 +1,13 @@
+// ignore_for_file: empty_catches, unused_local_variable
+
 import 'dart:async';
 import 'dart:math';
-import 'package:app_1helo/charPage/PieChartPage.dart';
-import 'package:app_1helo/charPage/tableEmployeedPage.dart';
-import 'package:app_1helo/model/prodcutReportModel.dart';
-import 'package:app_1helo/model/totalModel.dart';
-import 'package:app_1helo/service/appLocalizations%20.dart';
-import 'package:app_1helo/service/productReport_service.dart';
+import 'package:app_1helo/charPage/piechart_page.dart';
+import 'package:app_1helo/charPage/table_employeed_page.dart';
+import 'package:app_1helo/model/prodcutreport_model.dart';
+import 'package:app_1helo/model/total_model.dart';
+import 'package:app_1helo/service/app_localizations%20.dart';
+import 'package:app_1helo/service/product_report_service.dart';
 
 import 'package:app_1helo/service/total_service.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +15,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-import '../charPage/LineCharPage.dart';
+import '../charPage/linechar_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -96,7 +98,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         _fetchTotalDataProductsReport(),
       ]);
     } catch (e) {
-      print("Error fetching data: $e");
     } finally {
       if (mounted) {
         setState(() {
@@ -132,9 +133,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           totalProductsResport = totalQuantity;
         });
       }
-    } catch (e) {
-      print("Error fetching total data for products report: $e");
-    }
+    } catch (e) {}
   }
 
   Future<void> _fetchTotalData() async {
@@ -149,9 +148,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           totalEmployee = data?.employee;
         });
       }
-    } catch (e) {
-      print("Error fetching total data: $e");
-    }
+  
+    } catch (e) {}
   }
 
   String _formatNumber(int? number) {

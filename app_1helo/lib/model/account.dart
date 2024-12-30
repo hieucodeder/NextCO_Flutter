@@ -5,7 +5,7 @@ class Account {
   String? middleName;
   String? lastName;
   String? fullName;
-  Null? avatar;
+  Null avatar;
   int? gender;
   String? dateOfBirth;
   String? email;
@@ -55,25 +55,25 @@ class Account {
     if (json['functions'] != null) {
       functions = <Functions>[];
       json['functions'].forEach((v) {
-        functions!.add(new Functions.fromJson(v));
+        functions!.add(Functions.fromJson(v));
       });
     }
     if (json['actions'] != null) {
       actions = <Actions>[];
       json['actions'].forEach((v) {
-        actions!.add(new Actions.fromJson(v));
+        actions!.add(Actions.fromJson(v));
       });
     }
     if (json['customers'] != null) {
       customers = <Customers>[];
       json['customers'].forEach((v) {
-        customers!.add(new Customers.fromJson(v));
+        customers!.add(Customers.fromJson(v));
       });
     }
     if (json['employees'] != null) {
       employees = <Employees>[];
       json['employees'].forEach((v) {
-        employees!.add(new Employees.fromJson(v));
+        employees!.add(Employees.fromJson(v));
       });
     }
     token = json['token'];
@@ -81,32 +81,32 @@ class Account {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['user_id'] = this.userId;
-    data['role_group'] = this.roleGroup;
-    data['first_name'] = this.firstName;
-    data['middle_name'] = this.middleName;
-    data['last_name'] = this.lastName;
-    data['full_name'] = this.fullName;
-    data['avatar'] = this.avatar;
-    data['gender'] = this.gender;
-    data['date_of_birth'] = this.dateOfBirth;
-    data['email'] = this.email;
-    data['phone_number'] = this.phoneNumber;
-    data['user_name'] = this.userName;
-    data['online_flag'] = this.onlineFlag;
-    if (this.functions != null) {
-      data['functions'] = this.functions!.map((v) => v.toJson()).toList();
+    data['user_id'] = userId;
+    data['role_group'] = roleGroup;
+    data['first_name'] = firstName;
+    data['middle_name'] = middleName;
+    data['last_name'] = lastName;
+    data['full_name'] = fullName;
+    data['avatar'] = avatar;
+    data['gender'] = gender;
+    data['date_of_birth'] = dateOfBirth;
+    data['email'] = email;
+    data['phone_number'] = phoneNumber;
+    data['user_name'] = userName;
+    data['online_flag'] = onlineFlag;
+    if (functions != null) {
+      data['functions'] = functions!.map((v) => v.toJson()).toList();
     }
-    if (this.actions != null) {
-      data['actions'] = this.actions!.map((v) => v.toJson()).toList();
+    if (actions != null) {
+      data['actions'] = actions!.map((v) => v.toJson()).toList();
     }
-    if (this.customers != null) {
-      data['customers'] = this.customers!.map((v) => v.toJson()).toList();
+    if (customers != null) {
+      data['customers'] = customers!.map((v) => v.toJson()).toList();
     }
-    if (this.employees != null) {
-      data['employees'] = this.employees!.map((v) => v.toJson()).toList();
+    if (employees != null) {
+      data['employees'] = employees!.map((v) => v.toJson()).toList();
     }
-    data['token'] = this.token;
+    data['token'] = token;
     return data;
   }
 }
@@ -143,7 +143,7 @@ class Functions {
     if (json['children'] != null) {
       children = <Children>[];
       json['children'].forEach((v) {
-        children!.add(new Children.fromJson(v));
+        children!.add(Children.fromJson(v));
       });
     }
     sortOrder = json['sort_order'];
@@ -151,18 +151,18 @@ class Functions {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['title'] = this.title;
-    data['key'] = this.key;
-    data['value'] = this.value;
-    data['parent_id'] = this.parentId;
-    data['level'] = this.level;
-    data['url'] = this.url;
-    if (this.children != null) {
-      data['children'] = this.children!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['title'] = title;
+    data['key'] = key;
+    data['value'] = value;
+    data['parent_id'] = parentId;
+    data['level'] = level;
+    data['url'] = url;
+    if (children != null) {
+      data['children'] = children!.map((v) => v.toJson()).toList();
     }
-    data['sort_order'] = this.sortOrder;
-    data['is_leaf'] = this.isLeaf;
+    data['sort_order'] = sortOrder;
+    data['is_leaf'] = isLeaf;
     return data;
   }
 }
@@ -199,7 +199,7 @@ class Children {
     if (json['children'] != null) {
       children = <Children>[];
       json['children'].forEach((v) {
-        children!.add(new Children.fromJson(v));
+        children!.add(Children.fromJson(v));
       });
     }
     sortOrder = json['sort_order'];
@@ -207,18 +207,18 @@ class Children {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['title'] = this.title;
-    data['key'] = this.key;
-    data['value'] = this.value;
-    data['parent_id'] = this.parentId;
-    data['level'] = this.level;
-    data['url'] = this.url;
-    if (this.children != null) {
-      data['children'] = this.children!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['title'] = title;
+    data['key'] = key;
+    data['value'] = value;
+    data['parent_id'] = parentId;
+    data['level'] = level;
+    data['url'] = url;
+    if (children != null) {
+      data['children'] = children!.map((v) => v.toJson()).toList();
     }
-    data['sort_order'] = this.sortOrder;
-    data['is_leaf'] = this.isLeaf;
+    data['sort_order'] = sortOrder;
+    data['is_leaf'] = isLeaf;
     return data;
   }
 }
@@ -237,10 +237,10 @@ class Actions {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['action_code'] = this.actionCode;
-    data['action_api_url'] = this.actionApiUrl;
-    data['role_permission_id'] = this.rolePermissionId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['action_code'] = actionCode;
+    data['action_api_url'] = actionApiUrl;
+    data['role_permission_id'] = rolePermissionId;
     return data;
   }
 }
@@ -259,10 +259,10 @@ class Customers {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['customer_id'] = this.customerId;
-    data['customer_name'] = this.customerName;
-    data['tax_code'] = this.taxCode;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['customer_id'] = customerId;
+    data['customer_name'] = customerName;
+    data['tax_code'] = taxCode;
     return data;
   }
 }
@@ -281,10 +281,10 @@ class Employees {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['user_id'] = this.userId;
-    data['user_name'] = this.userName;
-    data['full_name'] = this.fullName;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['user_id'] = userId;
+    data['user_name'] = userName;
+    data['full_name'] = fullName;
     return data;
   }
 }

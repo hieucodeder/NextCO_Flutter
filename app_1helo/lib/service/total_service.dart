@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:app_1helo/model/bodyTotal.dart';
-import 'package:app_1helo/model/totalModel.dart';
+import 'package:app_1helo/model/body_total.dart';
+import 'package:app_1helo/model/total_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api_config.dart';

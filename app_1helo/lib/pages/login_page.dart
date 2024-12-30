@@ -2,12 +2,12 @@
 
 import 'package:app_1helo/model/bodyUser.dart';
 import 'package:app_1helo/model/bodylogin.dart';
-import 'package:app_1helo/model/userDomainModel.dart';
-import 'package:app_1helo/pages/AppScreen.dart';
-import 'package:app_1helo/pages/ForgotPassword.dart';
+import 'package:app_1helo/model/user_domain_model.dart';
+import 'package:app_1helo/pages/app_screen.dart';
+import 'package:app_1helo/pages/forgot_password.dart';
 import 'package:app_1helo/service/api_config.dart';
-import 'package:app_1helo/service/athServiceDomain.dart';
-import 'package:app_1helo/service/authService.dart';
+import 'package:app_1helo/service/ath_service_domain.dart';
+import 'package:app_1helo/service/authservice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,7 +21,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  String? _domain;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();

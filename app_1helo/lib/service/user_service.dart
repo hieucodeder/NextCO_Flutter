@@ -96,7 +96,6 @@ class UserService {
     final userId = prefs.getString('userId');
 
     if (userId == null) {
-      print('No user ID found. User might not be logged in.');
       return null;
     }
 
@@ -127,14 +126,11 @@ class UserService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = jsonDecode(response.body);
         User userResponse = User.fromJson(jsonData);
-        print('Total Items: ${userResponse.totalItems}');
         return userResponse;
       } else {
-        print('Failed to load user data, Status Code: ${response.statusCode}');
         return null;
       }
     } catch (error) {
-      print('Error fetching user data: $error');
       return null;
     }
   }

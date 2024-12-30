@@ -1,10 +1,12 @@
+// ignore_for_file: file_names
+
 import 'dart:convert';
 import 'package:app_1helo/model/account.dart';
 import 'package:app_1helo/model/bodylogin.dart';
-import 'package:app_1helo/model/dropdownBranchs.dart';
-import 'package:app_1helo/model/dropdownCustomer.dart';
-import 'package:app_1helo/model/dropdownEmployee.dart';
-import 'package:app_1helo/model/dropdownRoom.dart';
+import 'package:app_1helo/model/dropdown_branchs.dart';
+import 'package:app_1helo/model/dropdown_customer.dart';
+import 'package:app_1helo/model/dropdown_employee.dart';
+import 'package:app_1helo/model/dropdown_room.dart';
 import 'package:app_1helo/service/api_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,7 +14,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthService {
   Future<Map<String, dynamic>?> login(Bodylogin loginData) async {
     final url = Uri.parse('${ApiConfig.baseUrlBasic}login');
-    print('Đây là api login: $url');
     try {
       final response = await http.post(
         url,
@@ -77,7 +78,7 @@ class AuthService {
     }
   }
 
-  Future<List<dropdownEmployee>?> getEmployeeInfo() async {
+  Future<List<DropdownEmployee>?> getEmployeeInfo() async {
     final headers = await ApiConfig.getHeaders();
 
     if (!headers.containsKey('Authorization')) {
@@ -100,8 +101,8 @@ class AuthService {
       if (response.statusCode == 200) {
         final List<dynamic> jsonResponse = json.decode(response.body);
 
-        List<dropdownEmployee> dropdownEmployeeList = jsonResponse
-            .map((item) => dropdownEmployee.fromJson(item))
+        List<DropdownEmployee> dropdownEmployeeList = jsonResponse
+            .map((item) => DropdownEmployee.fromJson(item))
             .toList();
         return dropdownEmployeeList;
       } else {
@@ -112,7 +113,7 @@ class AuthService {
     }
   }
 
-  Future<List<EmployeeCustomer>?> getEmployeeCustomerInfo() async {
+   Future<List<EmployeeCustomer>?> getEmployeeCustomerInfo() async {
     final headers = await ApiConfig.getHeaders();
 
     if (!headers.containsKey('Authorization')) {
@@ -132,8 +133,8 @@ class AuthService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
 
-        dropdownCustomer dropdownCustomerInfo =
-            dropdownCustomer.fromJson(jsonResponse);
+        DropdownCustomer dropdownCustomerInfo =
+            DropdownCustomer.fromJson(jsonResponse);
         return dropdownCustomerInfo.employeeCustomer;
       } else {
         return null;

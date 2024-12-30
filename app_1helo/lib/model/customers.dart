@@ -22,14 +22,14 @@ class Customers {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['totalItems'] = this.totalItems;
-    data['page'] = this.page;
-    data['pageSize'] = this.pageSize;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['totalItems'] = totalItems;
+    data['page'] = page;
+    data['pageSize'] = pageSize;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    data['pageCount'] = this.pageCount;
+    data['pageCount'] = pageCount;
     return data;
   }
 }
@@ -65,15 +65,15 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['RowNumber'] = this.rowNumber;
-    data['processing_fee'] = this.processingFee;
-    data['customer_id'] = this.customerId;
-    data['customer_name'] = this.customerName;
-    data['tax_code'] = this.taxCode;
-    data['phone_number'] = this.phoneNumber;
-    data['address'] = this.address;
-    data['RecordCount'] = this.recordCount;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['RowNumber'] = rowNumber;
+    data['processing_fee'] = processingFee;
+    data['customer_id'] = customerId;
+    data['customer_name'] = customerName;
+    data['tax_code'] = taxCode;
+    data['phone_number'] = phoneNumber;
+    data['address'] = address;
+    data['RecordCount'] = recordCount;
     return data;
   }
 }

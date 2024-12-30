@@ -8,7 +8,6 @@ class ApiConfig {
   static Future<void> loadDomain() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     domain = prefs.getString('selectedDomain') ?? _defaultDomain;
-    print("Domain loaded: $domain");
   }
 
   static String get baseUrlBasic {

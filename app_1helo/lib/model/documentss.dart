@@ -15,21 +15,21 @@ class Documentss {
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
+        data!.add(Data.fromJson(v));
       });
     }
     pageCount = json['pageCount'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['totalItems'] = this.totalItems;
-    data['page'] = this.page;
-    data['pageSize'] = this.pageSize;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['totalItems'] = totalItems;
+    data['page'] = page;
+    data['pageSize'] = pageSize;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    data['pageCount'] = this.pageCount;
+    data['pageCount'] = pageCount;
     return data;
   }
 }
@@ -117,31 +117,31 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['co_document_id'] = this.coDocumentId;
-    data['co_document_number'] = this.coDocumentNumber;
-    data['created_date'] = this.createdDate;
-    data['employee_id'] = this.employeeId;
-    data['employee_name'] = this.employeeName;
-    data['customer_id'] = this.customerId;
-    data['co_form_id'] = this.coFormId;
-    data['status_id'] = this.statusId;
-    data['editable'] = this.editable;
-    data['customer_name'] = this.customerName;
-    data['form_name'] = this.formName;
-    data['status_name'] = this.statusName;
-    data['status_declarations'] = this.statusDeclarations;
-    data['number_tkx'] = this.numberTkx;
-    if (this.numberTkxWithShippingTerms != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['co_document_id'] = coDocumentId;
+    data['co_document_number'] = coDocumentNumber;
+    data['created_date'] = createdDate;
+    data['employee_id'] = employeeId;
+    data['employee_name'] = employeeName;
+    data['customer_id'] = customerId;
+    data['co_form_id'] = coFormId;
+    data['status_id'] = statusId;
+    data['editable'] = editable;
+    data['customer_name'] = customerName;
+    data['form_name'] = formName;
+    data['status_name'] = statusName;
+    data['status_declarations'] = statusDeclarations;
+    data['number_tkx'] = numberTkx;
+    if (numberTkxWithShippingTerms != null) {
       data['number_tkx_with_shipping_terms'] =
-          this.numberTkxWithShippingTerms!.map((v) => v.toJson()).toList();
+          numberTkxWithShippingTerms!.map((v) => v.toJson()).toList();
     }
-    data['ts'] = this.ts;
-    data['result'] = this.result;
-    data['cast'] = this.cast;
-    data['concat'] = this.concat;
-    data['RowNumber'] = this.rowNumber;
-    data['RecordCount'] = this.recordCount;
+    data['ts'] = ts;
+    data['result'] = result;
+    data['cast'] = cast;
+    data['concat'] = concat;
+    data['RowNumber'] = rowNumber;
+    data['RecordCount'] = recordCount;
     return data;
   }
 }
@@ -169,12 +169,12 @@ class NumberTkxWithShippingTerms {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['label'] = this.label;
-    data['value'] = this.value;
-    data['invoice_number'] = this.invoiceNumber;
-    data['shipping_terms'] = this.shippingTerms;
-    data['export_licence_number'] = this.exportLicenceNumber;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['label'] = label;
+    data['value'] = value;
+    data['invoice_number'] = invoiceNumber;
+    data['shipping_terms'] = shippingTerms;
+    data['export_licence_number'] = exportLicenceNumber;
     return data;
   }
 }

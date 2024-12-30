@@ -15,21 +15,21 @@ class Materials {
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
+        data!.add(Data.fromJson(v));
       });
     }
     pageCount = json['pageCount'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['totalItems'] = this.totalItems;
-    data['page'] = this.page;
-    data['pageSize'] = this.pageSize;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['totalItems'] = totalItems;
+    data['page'] = page;
+    data['pageSize'] = pageSize;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    data['pageCount'] = this.pageCount;
+    data['pageCount'] = pageCount;
     return data;
   }
 }
