@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ApiConfig {
   static String? domain;
 
-  static const String _defaultDomain = 'https://nextco.vn';
+  static const String _defaultDomain = 'https://demo.nextco.vn';
 
   static Future<void> loadDomain() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

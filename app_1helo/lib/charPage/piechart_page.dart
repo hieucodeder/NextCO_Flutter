@@ -373,7 +373,6 @@ class PiechartpageState extends State<Piechartpage> {
     );
 
     if (startPicked != null) {
-      // Show the date picker to select the end date
       final DateTime? endPicked = await showDatePicker(
         context: context,
         initialDate: startPicked.add(const Duration(days: 1)),
@@ -382,22 +381,18 @@ class PiechartpageState extends State<Piechartpage> {
       );
 
       if (endPicked != null) {
-        // Set the selected date range
         setState(() {
           startDate = DateFormat('yyyy-MM-dd').format(startPicked);
           endDate = DateFormat('yyyy-MM-dd').format(endPicked);
-          _controller.text =
-              '$startDate - $endDate'; // Update the text controller
+          _controller.text = '$startDate - $endDate';
         });
 
-        // Call function to fetch and update data based on selected date range
         await _updateDocumentsByDateRange();
       }
     }
   }
 
   Future<void> _updateDocumentsByDateRange() async {
-    // Ensure both start and end dates are selected
     if (startDate != null && endDate != null) {
       final DateTime parsedStartDate =
           DateFormat('yyyy-MM-dd').parse(startDate!);

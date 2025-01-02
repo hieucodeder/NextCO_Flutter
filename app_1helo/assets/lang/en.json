@@ -138,6 +138,15 @@
     "new_password":"New password",
     "confirm_new_password":"Confirm new password",
     "save":"Save",
-    "total_quantity":"Total quantity"
+    "total_quantity":"Total quantity",
+    "status_name":"Status name",
+    "quantity":"Quantity",
+    "rejected":"Rejected",
+    "approved_cancel":"Approved cancel",
+    "pending_cancel":"Pending cancel",
+    "pending":"Pending",
+    "in_progress":"In progress",
+    "pending_edit":"Pending edit",
+    "approved_edit":"Approved edit"
   }
   

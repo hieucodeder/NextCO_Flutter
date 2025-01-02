@@ -31,8 +31,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final GlobalKey<PiechartpageState> _pieChartKey =
       GlobalKey<PiechartpageState>();
 
-  final GlobalKey<TableemployeedpageState> _tableEmployeedPageKey =
-      GlobalKey<TableemployeedpageState>();
+  final GlobalKey<TableEmployeedPageState> _tableEmployeedPageKey =
+      GlobalKey<TableEmployeedPageState>();
   int? totalProductsResport;
   int? totalItems, totalDocuments, totalUser;
   int? totalCustomer, totalProduct, totalMaterial;
@@ -148,7 +148,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           totalEmployee = data?.employee;
         });
       }
-  
     } catch (e) {}
   }
 
@@ -174,6 +173,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     await Future.wait([
       _fetchAllData(),
+      _tableEmployeedPageKey.currentState?.refreshTabletData() ??
+          Future.value(),
       _lineChartKey.currentState?.refreshChartData() ?? Future.value(),
       _pieChartKey.currentState?.refreshChartData() ?? Future.value()
     ]);
@@ -568,24 +569,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                       width: MediaQuery.of(context).size.width,
                       height: 450,
-                      child: Column(
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 40,
-                            padding: const EdgeInsets.all(8),
-                            child: Text(
-                                localization?.translate('number_employee') ??
-                                    'Số lượng hồ sơ C/O theo nhân viên',
-                                style: GoogleFonts.robotoCondensed(
-                                    fontSize: 17, fontWeight: FontWeight.bold)),
-                          ),
-                          const Divider(color: Color(0xffC4C9CA)),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Tableemployeedpage(key: _tableEmployeedPageKey),
-                        ],
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width,
+                              height: 40,
+                              padding: const EdgeInsets.all(8),
+                              child: Text(
+                                  localization?.translate('number_employee') ??
+                                      'Số lượng hồ sơ C/O theo nhân viên',
+                                  style: GoogleFonts.robotoCondensed(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                            const Divider(color: Color(0xffC4C9CA)),
+                            TableEmployeedPage(
+                              key: _tableEmployeedPageKey,
+                              employeeId: '',
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

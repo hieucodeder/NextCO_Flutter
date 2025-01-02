@@ -1,69 +1,71 @@
-import 'package:app_1helo/model/dropdown_customer.dart';
 import 'package:app_1helo/model/dropdown_employee.dart';
-import 'package:app_1helo/model/table_employeed_model.dart';
 import 'package:app_1helo/service/app_localizations%20.dart';
 import 'package:app_1helo/service/authservice.dart';
-import 'package:app_1helo/service/document_service.dart';
 import 'package:flutter/material.dart';
+import 'package:app_1helo/service/statistics_service.dart';
+import 'package:app_1helo/model/statistics.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Tableemployeedpage extends StatefulWidget {
-  const Tableemployeedpage({super.key});
+class TableEmployeedPage extends StatefulWidget {
+  final String employeeId;
+
+  const TableEmployeedPage({
+    required this.employeeId,
+    required GlobalKey<TableEmployeedPageState> key,
+  }) : super(key: key);
 
   @override
-  State<Tableemployeedpage> createState() => TableemployeedpageState();
+  TableEmployeedPageState createState() => TableEmployeedPageState();
 }
 
-class TableemployeedpageState extends State<Tableemployeedpage> {
-  EmployeeCustomer? _selectedDropdownCustomer;
-  List<EmployeeCustomer> _filtereddropdownCustomer = [];
-
-  bool isLoading = false;
-  bool hasMoreData = true;
-  final List<Data> _documentLits = [];
-  int pageSize = 10;
-  int currentPage = 1;
-  int itemsPerPage = 10;
-  String? _employeedId;
-  String? _customerId;
-  final List<int> itemsPerPageOptions = [10, 20, 30];
+class TableEmployeedPageState extends State<TableEmployeedPage> {
+  List<Statuses>? statuses;
+  bool isLoading = true;
   DropdownEmployee? selectedDropdownEmployee;
   List<DropdownEmployee> _filtereddropdownEmployee = [];
-
-  DocumentService documentService = DocumentService();
+  String? _employeedId;
   final _authService = AuthService();
-
   @override
   void initState() {
     super.initState();
+    _fetchStatistics();
     _fetchData();
   }
 
-  Future<void> _fetchData({
-    String? customerId,
-    String? employeedId,
-  }) async {
-    if (mounted) {
+//Refres
+  Future<void> refreshTabletData() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    {
       setState(() {
-        isLoading = true;
-        _documentLits.clear();
-        currentPage = 1;
-        hasMoreData = true;
+        _fetchStatistics();
       });
     }
+  }
 
-    List<EmployeeCustomer>? customers =
-        await _authService.getEmployeeCustomerInfo();
+  Future<void> _fetchStatistics() async {
+    final fetchedStatuses = await StatisticsService().fetchStatistics();
     if (mounted) {
       setState(() {
-        _filtereddropdownCustomer = customers ?? [];
+        statuses = fetchedStatuses;
+        isLoading = false;
       });
     }
+  }
 
+  Future<void> _fetchData({String? employeedId}) async {
     List<DropdownEmployee>? employees = await _authService.getEmployeeInfo();
     if (mounted) {
       setState(() {
         _filtereddropdownEmployee = employees ?? [];
+      });
+    }
+
+    if (mounted) {
+      setState(() {
+        isLoading = false; // Dừng trạng thái tải
       });
     }
   }
@@ -118,325 +120,183 @@ class TableemployeedpageState extends State<Tableemployeedpage> {
   Widget renderEmployeed(BuildContext context) {
     final localization = AppLocalizations.of(context);
 
-    List<String> customerNames =
-        _filtereddropdownEmployee.map((c) => c.label ?? '').toSet().toList();
-    String allEmployeedLabel =
-        localization?.translate('all_employeed') ?? 'Tất cả nhân viên';
-    customerNames.insert(0, allEmployeedLabel);
-
-    return buildDropdown(
-      items: customerNames,
-      selectedItem: selectedDropdownEmployee?.label,
-      hint: allEmployeedLabel,
-      width: 180,
-      onChanged: (String? newValue) {
-        setState(() {
-          selectedDropdownEmployee = newValue == allEmployeedLabel
-              ? null
-              : _filtereddropdownEmployee.firstWhere(
-                  (c) => c.value == newValue,
-                  orElse: () => _filtereddropdownEmployee[0],
-                );
-          _employeedId = selectedDropdownEmployee?.label;
-        });
-        _fetchData(customerId: _customerId, employeedId: _employeedId);
-      },
-    );
-  }
-
-  Widget renderCustomer(BuildContext context) {
-    final localization = AppLocalizations.of(context);
-    List<String> customerNames = _filtereddropdownCustomer
-        .map((c) => c.customerName ?? '')
+    // Lấy danh sách tên nhân viên từ _filtereddropdownEmployee
+    List<String> employeeNames = _filtereddropdownEmployee
+        .map((employee) => employee.label ?? '')
         .toSet()
         .toList();
-    String allCustomersLabel =
-        localization?.translate('all_customers') ?? 'Tất cả khách hàng';
-    customerNames.insert(0, allCustomersLabel);
+
+    // Thêm mục "Tất cả nhân viên" vào danh sách
+    String allEmployeesLabel =
+        localization?.translate('all_employeed') ?? 'Tất cả nhân viên';
+    employeeNames.insert(0, allEmployeesLabel);
 
     return buildDropdown(
-      items: customerNames,
-      selectedItem: _selectedDropdownCustomer?.customerName,
-      hint: allCustomersLabel,
-      width: 180,
+      items: employeeNames, // Danh sách tên nhân viên
+      selectedItem: selectedDropdownEmployee?.label ??
+          allEmployeesLabel, // Tùy chọn hiện tại
+      hint: allEmployeesLabel, // Gợi ý mặc định
+      width: 180, // Độ rộng của dropdown
       onChanged: (String? newValue) {
         setState(() {
-          _selectedDropdownCustomer = newValue == allCustomersLabel
-              ? null
-              : _filtereddropdownCustomer.firstWhere(
-                  (c) => c.customerName == newValue,
-                  orElse: () => _filtereddropdownCustomer[0],
-                );
-          _customerId = _selectedDropdownCustomer?.customerId;
+          if (newValue == allEmployeesLabel) {
+            // Nếu chọn "Tất cả nhân viên"
+            selectedDropdownEmployee = null;
+            _employeedId = null;
+          } else {
+            // Tìm nhân viên tương ứng theo nhãn được chọn
+            selectedDropdownEmployee = _filtereddropdownEmployee.firstWhere(
+              (employee) => employee.label == newValue,
+              orElse: () => _filtereddropdownEmployee[0],
+            );
+            _employeedId = selectedDropdownEmployee?.value;
+          }
         });
-        _fetchData(customerId: _customerId, employeedId: _employeedId);
+
+        // Gọi lại _fetchData để cập nhật dữ liệu
+        _fetchData(employeedId: _employeedId);
       },
     );
   }
 
-  final List<Data> sampleData = [
-    Data(
-      stt: 1,
-      employeeName: "Nguyễn Văn A",
-      completed: 5,
-      inProgress: 3,
-      underRepair: 1,
-      waitingForRepair: 2,
-      waitingForApproval: 1,
-      rejected: 0,
-      waitingForCancellation: 1,
-      cancelled: 0,
-      totalQuantity: 13,
-    ),
-    Data(
-      stt: 2,
-      employeeName: "Trần Thị B",
-      completed: 7,
-      inProgress: 4,
-      underRepair: 2,
-      waitingForRepair: 3,
-      waitingForApproval: 2,
-      rejected: 1,
-      waitingForCancellation: 0,
-      cancelled: 1,
-      totalQuantity: 20,
-    ),
-    Data(
-      stt: 3,
-      employeeName: "Lê Văn C",
-      completed: 10,
-      inProgress: 2,
-      underRepair: 0,
-      waitingForRepair: 1,
-      waitingForApproval: 0,
-      rejected: 1,
-      waitingForCancellation: 1,
-      cancelled: 1,
-      totalQuantity: 15,
-    ),
-    Data(
-      stt: 4,
-      employeeName: "Lê Văn D",
-      completed: 10,
-      inProgress: 2,
-      underRepair: 0,
-      waitingForRepair: 1,
-      waitingForApproval: 0,
-      rejected: 1,
-      waitingForCancellation: 1,
-      cancelled: 1,
-      totalQuantity: 15,
-    ),
-    Data(
-      stt: 5,
-      employeeName: "Lê Văn E",
-      completed: 10,
-      inProgress: 2,
-      underRepair: 0,
-      waitingForRepair: 1,
-      waitingForApproval: 0,
-      rejected: 1,
-      waitingForCancellation: 1,
-      cancelled: 1,
-      totalQuantity: 15,
-    ),
-    Data(
-      stt: 6,
-      employeeName: "Lê Văn F",
-      completed: 10,
-      inProgress: 2,
-      underRepair: 0,
-      waitingForRepair: 1,
-      waitingForApproval: 0,
-      rejected: 1,
-      waitingForCancellation: 1,
-      cancelled: 1,
-      totalQuantity: 15,
-    ),
-  ];
   @override
   Widget build(BuildContext context) {
     final localization = AppLocalizations.of(context);
+    final textStyle = GoogleFonts.robotoCondensed(
+      fontSize: 16,
+      color: Colors.black,
+      fontWeight: FontWeight.w600,
+    );
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6.0),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              FittedBox(
-                  child: SizedBox(width: 200, child: renderCustomer(context))),
-              const SizedBox(
-                width: 6,
-              ),
-              FittedBox(
-                  child: SizedBox(width: 140, child: renderEmployeed(context))),
-            ],
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columns: [
-                DataColumn(
-                    label: Text(
-                        localization?.translate('numerical_order') ?? "STT",
-                        style: GoogleFonts.robotoCondensed(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black))),
-                DataColumn(
-                    label: Text(
-                        localization?.translate("full_name") ?? "Họ và tên",
-                        style: GoogleFonts.robotoCondensed(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black))),
-                DataColumn(
-                    label: Text(
-                  localization?.translate('completed') ?? "Hoàn thành",
-                  style: GoogleFonts.robotoCondensed(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green),
-                )),
-                DataColumn(
-                    label: Text(
-                        localization?.translate('processing') ??
-                            "Đang thực hiện",
-                        style: GoogleFonts.robotoCondensed(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue))),
-                DataColumn(
-                    label: Text(
-                        localization?.translate('editing') ?? "Đang sửa",
-                        style: GoogleFonts.robotoCondensed(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black))),
-                DataColumn(
-                    label: Text(
-                        localization?.translate('waiting_repair') ?? "Chờ sửa",
-                        style: GoogleFonts.robotoCondensed(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.orange))),
-                DataColumn(
-                    label: Text(
-                        localization?.translate('waiting_approval') ??
-                            "Chờ duyệt",
-                        style: GoogleFonts.robotoCondensed(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.orange))),
-                DataColumn(
-                    label: Text(
-                        localization?.translate('refused_consideration') ??
-                            "Từ chối xét duyệt",
-                        style: GoogleFonts.robotoCondensed(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.red))),
-                DataColumn(
-                    label: Text(
-                        localization?.translate('waiting_cancel') ?? "Chờ hủy",
-                        style: GoogleFonts.robotoCondensed(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.orange))),
-                DataColumn(
-                    label: Text(localization?.translate('canceled') ?? "Đã hủy",
-                        style: GoogleFonts.robotoCondensed(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.red))),
-                DataColumn(
-                    label: Text(
-                        localization?.translate('total_quantity') ??
-                            "Tổng số lượng",
-                        style: GoogleFonts.robotoCondensed(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black))),
-              ],
-              rows: sampleData.map((data) {
-                return DataRow(cells: [
-                  DataCell(Center(
-                      child: Text(data.stt.toString(),
-                          style: GoogleFonts.robotoCondensed(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black)))),
-                  DataCell(Center(
-                      child: Text(data.employeeName ?? "",
-                          style: GoogleFonts.robotoCondensed(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black)))),
-                  DataCell(Center(
-                    child: Text(
-                      data.completed.toString(),
-                      style: GoogleFonts.robotoCondensed(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.green),
+    final Map<String, Color> statusColors = {
+      "Từ chối xét duyệt": Colors.red,
+      "Đã được duyệt hủy": Colors.red,
+      "Đang chờ duyệt hủy": Colors.orange,
+      "Chờ duyệt": Colors.orange,
+      "Hoàn thành": Colors.green,
+      "Đang thực hiện": Colors.black,
+      "Đang chờ duyệt sửa": Colors.black,
+      "Đã được duyệt sửa": Colors.black,
+      "Tổng số lượng": Colors.black,
+    };
+    final Map<String, String> statusTranslations = {
+      "Từ chối xét duyệt": localization?.translate('rejected') ?? "Rejected",
+      "Đã được duyệt hủy":
+          localization?.translate('approved_cancel') ?? "Approved Cancel",
+      "Đang chờ duyệt hủy":
+          localization?.translate('pending_cancel') ?? "Pending Cancel",
+      "Chờ duyệt": localization?.translate('pending') ?? "Pending",
+      "Hoàn thành": localization?.translate('completed') ?? "Completed",
+      "Đang thực hiện": localization?.translate('in_progress') ?? "In Progress",
+      "Đang chờ duyệt sửa":
+          localization?.translate('pending_edit') ?? "Pending Edit",
+      "Đã được duyệt sửa":
+          localization?.translate('approved_edit') ?? "Approved Edit",
+      "Tổng số lượng":
+          localization?.translate('total_quantity') ?? "Total Quantity",
+    };
+
+    final Map<String, Color> statusColorsDarker =
+        statusColors.map((key, color) {
+      // Translate Vietnamese key to English
+      final translatedKey = statusTranslations[key] ?? key;
+      final hsl = HSLColor.fromColor(color);
+      final darkerColor =
+          hsl.withLightness((hsl.lightness - 0.1).clamp(0.0, 1.0)).toColor();
+      return MapEntry(translatedKey, darkerColor);
+    });
+
+    return Column(
+      children: [
+        FittedBox(child: SizedBox(width: 140, child: renderEmployeed(context))),
+        SizedBox(
+          width: double.infinity,
+          height: 380,
+          child: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : statuses == null || statuses!.isEmpty
+                  ? Center(
+                      child: Text(localization?.translate("no_data") ??
+                          'No data found'))
+                  : ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.8,
+                      ),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            DataTable(
+                              columns: [
+                                DataColumn(
+                                  label: Text(
+                                    localization?.translate('status_name') ??
+                                        'Status Name',
+                                    style: textStyle,
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    localization?.translate('quantity') ??
+                                        'Quantity',
+                                    style: textStyle,
+                                  ),
+                                ),
+                              ],
+                              // Xử lý các hàng trong DataTable
+                              rows: statuses!.map((status) {
+                                // Lấy tên trạng thái gốc
+                                final originalStatusName =
+                                    status.statusName ?? "";
+
+                                // Dịch tên trạng thái sang tiếng Anh
+                                final translatedStatusName =
+                                    statusTranslations[originalStatusName] ??
+                                        originalStatusName;
+
+                                // Lấy màu từ statusColorsDarker dựa trên tên đã dịch
+                                final statusColor =
+                                    statusColorsDarker[translatedStatusName] ??
+                                        Colors.black;
+
+                                // Tạo DataRow cho DataTable
+                                return DataRow(
+                                  cells: [
+                                    DataCell(
+                                      Center(
+                                        child: Text(
+                                          translatedStatusName, // Hiển thị tên trạng thái đã dịch
+                                          style: GoogleFonts.robotoCondensed(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 15,
+                                            color: statusColor, // Màu tương ứng
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Center(
+                                        child: Text(
+                                          "${status.quantity ?? 0}", // Hiển thị số lượng (nếu null thì mặc định là 0)
+                                          style: GoogleFonts.robotoCondensed(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 15,
+                                            color: statusColor, // Màu tương ứng
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }).toList(),
+                            )
+                          ],
+                        ),
+                      ),
                     ),
-                  )),
-                  DataCell(Center(
-                      child: Text(data.inProgress.toString(),
-                          style: GoogleFonts.robotoCondensed(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.blue)))),
-                  DataCell(Center(
-                      child: Text(data.underRepair.toString(),
-                          style: GoogleFonts.robotoCondensed(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black)))),
-                  DataCell(Center(
-                      child: Text(data.waitingForRepair.toString(),
-                          style: GoogleFonts.robotoCondensed(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.orange)))),
-                  DataCell(Center(
-                      child: Text(data.waitingForApproval.toString(),
-                          style: GoogleFonts.robotoCondensed(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.orange)))),
-                  DataCell(Center(
-                      child: Text(data.rejected.toString(),
-                          style: GoogleFonts.robotoCondensed(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.red)))),
-                  DataCell(Center(
-                      child: Text(data.waitingForCancellation.toString(),
-                          style: GoogleFonts.robotoCondensed(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.orange)))),
-                  DataCell(Center(
-                      child: Text(data.cancelled.toString(),
-                          style: GoogleFonts.robotoCondensed(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.red)))),
-                  DataCell(Center(
-                      child: Text(data.totalQuantity.toString(),
-                          style: GoogleFonts.robotoCondensed(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black)))),
-                ]);
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

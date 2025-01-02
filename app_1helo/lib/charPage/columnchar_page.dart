@@ -13,7 +13,7 @@ class Columncharpage extends StatefulWidget {
 
 class _ColumncharpageState extends State<Columncharpage> {
   late Future<List<ColumnChar>> futureData;
-  int selectedYear = 2024;
+  int selectedYear = DateTime.now().year;
 
   @override
   void initState() {

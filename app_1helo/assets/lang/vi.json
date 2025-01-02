@@ -137,6 +137,15 @@
     "new_password":"Mật khẩu mới",
     "confirm_new_password":"Xác nhận mật khẩu mới",
     "save":"Lưu",
-    "total_quantity":"Tổng số lượng"
+    "total_quantity":"Tổng số lượng",
+    "status_name":"Tên trạng thái",
+    "quantity":"Số lượng",
+    "rejected":"Từ chối xét duyệt",
+    "approved_cancel":"Đã được duyệt hủy",
+    "pending_cancel":"Đang chờ duyệt hủy",
+    "pending":"Chờ duyệt",
+    "in_progress":"Đang thực hiện",
+    "pending_edit":"Đang chờ duyệt sửa",
+    "approved_edit":"Đã được duyệt sửa"
   }
   
