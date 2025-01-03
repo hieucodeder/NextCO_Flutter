@@ -549,95 +549,95 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               const SizedBox(
                 height: 20,
               ),
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: const Color(0xffFAFAFA),
-                        border: Border.all(
-                            width: 1,
-                            color: const Color(0xffC4C9CA),
-                            style: BorderStyle.solid),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xff2C2E30).withOpacity(0.2),
-                            blurRadius: 8,
-                          )
-                        ],
-                      ),
-                      width: MediaQuery.of(context).size.width,
-                      height: 450,
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: 40,
-                              padding: const EdgeInsets.all(8),
-                              child: Text(
-                                  localization?.translate('number_employee') ??
-                                      'Số lượng hồ sơ C/O theo nhân viên',
-                                  style: GoogleFonts.robotoCondensed(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold)),
-                            ),
-                            const Divider(color: Color(0xffC4C9CA)),
-                            TableEmployeedPage(
-                              key: _tableEmployeedPageKey,
-                              employeeId: '',
-                            ),
-                          ],
-                        ),
-                      ),
+              Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: const Color(0xffFAFAFA),
+                      border: Border.all(
+                          width: 1,
+                          color: const Color(0xffC4C9CA),
+                          style: BorderStyle.solid),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xff2C2E30).withOpacity(0.2),
+                          blurRadius: 8,
+                        )
+                      ],
                     ),
-                  ],
-                ),
+                    width: MediaQuery.of(context).size.width,
+                    height: 450,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 40,
+                          padding: const EdgeInsets.all(8),
+                          child: Text(
+                            localization?.translate('number_employee') ??
+                                'Số lượng hồ sơ C/O theo nhân viên',
+                            style: GoogleFonts.robotoCondensed(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const Divider(color: Color(0xffC4C9CA)),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child:
+                                TableEmployeedPage(key: _tableEmployeedPageKey),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 15),
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: const Color(0xffFAFAFA),
-                        border: Border.all(
-                            width: 1,
-                            color: const Color(0xffC4C9CA),
-                            style: BorderStyle.solid),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xff2C2E30).withOpacity(0.2),
-                            blurRadius: 8,
-                          )
-                        ],
-                      ),
-                      width: MediaQuery.of(context).size.width,
-                      height: 450,
-                      child: Column(
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 40,
-                            padding: const EdgeInsets.all(8),
-                            child: Text(
-                                localization?.translate('number_status') ??
-                                    'Số lượng hồ sơ C/O theo trạng thái',
-                                style: GoogleFonts.robotoCondensed(
-                                    fontSize: 17, fontWeight: FontWeight.bold)),
-                          ),
-                          const Divider(color: Color(0xffC4C9CA)),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Linecharpage(key: _lineChartKey),
-                        ],
-                      ),
+              Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: const Color(0xffFAFAFA),
+                      border: Border.all(
+                          width: 1,
+                          color: const Color(0xffC4C9CA),
+                          style: BorderStyle.solid),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xff2C2E30).withOpacity(0.2),
+                          blurRadius: 8,
+                        )
+                      ],
                     ),
-                  ],
-                ),
+                    width: MediaQuery.of(context).size.width,
+                    height: 450,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 40,
+                          padding: const EdgeInsets.all(8),
+                          child: Text(
+                              localization?.translate('number_status') ??
+                                  'Số lượng hồ sơ C/O theo trạng thái',
+                              style: GoogleFonts.robotoCondensed(
+                                  fontSize: 17, fontWeight: FontWeight.bold)),
+                        ),
+                        const Divider(color: Color(0xffC4C9CA)),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        Expanded(
+                            child: SingleChildScrollView(
+                                child: Linecharpage(key: _lineChartKey))),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(
                 height: 15,
@@ -675,8 +675,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   fontSize: 17, fontWeight: FontWeight.bold)),
                         ),
                         const Divider(color: Color(0xffC4C9CA)),
-                        Piechartpage(
-                          key: _pieChartKey,
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Piechartpage(
+                              key: _pieChartKey,
+                            ),
+                          ),
                         ),
                       ],
                     ),

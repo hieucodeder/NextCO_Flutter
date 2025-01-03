@@ -72,93 +72,96 @@ class _AcountPageState extends State<AcountPage> {
       height: double.infinity,
       padding: const EdgeInsets.all(20),
       color: Colors.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.account_box,
-                size: 24,
-              ),
-              const SizedBox(width: 10),
-              TextButton(
-                onPressed: () {
-                  navigationProvider.setCurrentIndex(4);
-                },
-                child: Text(
-                    localization?.translate('personal_infoac') ??
-                        'Thông tin cá nhân',
-                    style: styleText),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              const Icon(
-                Icons.search,
-                size: 24,
-              ),
-              const SizedBox(width: 10),
-              TextButton(
-                onPressed: () {
-                  navigationProvider.setCurrentIndex(5);
-                },
-                child: Text(
-                    localization?.translate('change_passwordac') ??
-                        'Đổi mật khẩu',
-                    style: styleText),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              const Icon(
-                Icons.language,
-                size: 24,
-              ),
-              const SizedBox(width: 10),
-              TextButton(
-                onPressed: _showLanguageDialog,
-                child: Row(
-                  children: [
-                    Text(
-                      localization?.translate('languege') ?? "Ngôn ngữ: ",
-                      style: styleText,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      languages.firstWhere(
-                        (language) => language['locale'] == currentLocale,
-                        orElse: () => languages.first,
-                      )['name'],
-                      style: styleText,
-                    ),
-                  ],
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.account_box,
+                  size: 24,
                 ),
-              ),
-            ],
-          ),
-          const Divider(color: Colors.black),
-          Row(
-            children: [
-              const Icon(Icons.logout_outlined, size: 24),
-              const SizedBox(
-                width: 10,
-              ),
-              TextButton(
+                const SizedBox(width: 10),
+                TextButton(
                   onPressed: () {
-                    _showAlertDialog(context);
+                    navigationProvider.setCurrentIndex(4);
                   },
-                  child: Text(localization?.translate('log_out') ?? 'Đăng xuất',
-                      style: styleText))
-            ],
-          )
-        ],
+                  child: Text(
+                      localization?.translate('personal_infoac') ??
+                          'Thông tin cá nhân',
+                      style: styleText),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Icon(
+                  Icons.search,
+                  size: 24,
+                ),
+                const SizedBox(width: 10),
+                TextButton(
+                  onPressed: () {
+                    navigationProvider.setCurrentIndex(5);
+                  },
+                  child: Text(
+                      localization?.translate('change_passwordac') ??
+                          'Đổi mật khẩu',
+                      style: styleText),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Icon(
+                  Icons.language,
+                  size: 24,
+                ),
+                const SizedBox(width: 10),
+                TextButton(
+                  onPressed: _showLanguageDialog,
+                  child: Row(
+                    children: [
+                      Text(
+                        localization?.translate('languege') ?? "Ngôn ngữ: ",
+                        style: styleText,
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        languages.firstWhere(
+                          (language) => language['locale'] == currentLocale,
+                          orElse: () => languages.first,
+                        )['name'],
+                        style: styleText,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const Divider(color: Colors.black),
+            Row(
+              children: [
+                const Icon(Icons.logout_outlined, size: 24),
+                const SizedBox(
+                  width: 10,
+                ),
+                TextButton(
+                    onPressed: () {
+                      _showAlertDialog(context);
+                    },
+                    child: Text(
+                        localization?.translate('log_out') ?? 'Đăng xuất',
+                        style: styleText))
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

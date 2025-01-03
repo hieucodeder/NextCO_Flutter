@@ -1,10 +1,11 @@
+import 'package:flutter/src/material/data_table.dart';
+
 class Statuses {
   String? statusName;
   int? quantity;
 
   Statuses({this.statusName, this.quantity});
 
-  // Constructor to create Statuses from JSON
   Statuses.fromJson(Map<String, dynamic> json) {
     statusName = json['status_name'];
     quantity = json['quantity'];
@@ -25,7 +26,6 @@ class Statistics {
 
   Statistics({this.employeeId, this.fullName, this.statuses});
 
-  // Modify fromJson to handle a single Statistic object from a map
   Statistics.fromJson(Map<String, dynamic> json) {
     employeeId = json['employee_id'];
     fullName = json['full_name'];

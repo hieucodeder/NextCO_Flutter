@@ -1,3 +1,4 @@
+import 'package:app_1helo/model/dropdown_customer.dart';
 import 'package:app_1helo/model/dropdown_employee.dart';
 import 'package:app_1helo/service/app_localizations%20.dart';
 import 'package:app_1helo/service/authservice.dart';
@@ -7,10 +8,7 @@ import 'package:app_1helo/model/statistics.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class TableEmployeedPage extends StatefulWidget {
-  final String employeeId;
-
   const TableEmployeedPage({
-    required this.employeeId,
     required GlobalKey<TableEmployeedPageState> key,
   }) : super(key: key);
 
@@ -19,20 +17,23 @@ class TableEmployeedPage extends StatefulWidget {
 }
 
 class TableEmployeedPageState extends State<TableEmployeedPage> {
-  List<Statuses>? statuses;
+  List<Statistics>? statisticsList;
   bool isLoading = true;
+
   DropdownEmployee? selectedDropdownEmployee;
   List<DropdownEmployee> _filtereddropdownEmployee = [];
+  EmployeeCustomer? selectedemployeeCustomer;
+  List<EmployeeCustomer> _filteredEmployeeCustomer = [];
   String? _employeedId;
+  String? _customerId;
+
   final _authService = AuthService();
   @override
   void initState() {
     super.initState();
-    _fetchStatistics();
     _fetchData();
   }
 
-//Refres
   Future<void> refreshTabletData() async {
     setState(() {
       isLoading = true;
@@ -45,28 +46,63 @@ class TableEmployeedPageState extends State<TableEmployeedPage> {
     }
   }
 
-  Future<void> _fetchStatistics() async {
-    final fetchedStatuses = await StatisticsService().fetchStatistics();
+  Future<void> _fetchStatistics(
+      {String? customerId, String? employeeId}) async {
     if (mounted) {
       setState(() {
-        statuses = fetchedStatuses;
-        isLoading = false;
+        isLoading = true;
       });
+    }
+
+    try {
+      final fetchedStatistics = await StatisticsService().fetchStatistics(
+        customerId: customerId,
+        employeeId: employeeId,
+      );
+
+      if (mounted) {
+        setState(() {
+          statisticsList = fetchedStatistics ?? [];
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
-  Future<void> _fetchData({String? employeedId}) async {
-    List<DropdownEmployee>? employees = await _authService.getEmployeeInfo();
-    if (mounted) {
-      setState(() {
-        _filtereddropdownEmployee = employees ?? [];
-      });
-    }
+  Future<void> _fetchData({String? customerId, String? employeeId}) async {
+    setState(() {
+      isLoading = true;
+    });
 
-    if (mounted) {
-      setState(() {
-        isLoading = false; // Dừng trạng thái tải
-      });
+    try {
+      List<EmployeeCustomer>? customer =
+          await _authService.getEmployeeCustomerInfo();
+      if (mounted) {
+        setState(() {
+          _filteredEmployeeCustomer = customer ?? [];
+        });
+      }
+
+      List<DropdownEmployee>? employees = await _authService.getEmployeeInfo();
+      if (mounted) {
+        setState(() {
+          _filtereddropdownEmployee = employees ?? [];
+        });
+      }
+
+      await _fetchStatistics(customerId: customerId, employeeId: employeeId);
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -117,44 +153,76 @@ class TableEmployeedPageState extends State<TableEmployeedPage> {
     );
   }
 
+  Widget renderCustomer(BuildContext context) {
+    final localization = AppLocalizations.of(context);
+
+    List<String> customersNames = _filteredEmployeeCustomer
+        .map((c) => c.customerName ?? '')
+        .toSet()
+        .toList();
+
+    String allCustomersName =
+        localization?.translate('all_customers') ?? 'Tất cả khách hàng';
+    customersNames.insert(0, allCustomersName);
+
+    return buildDropdown(
+      items: customersNames,
+      selectedItem: selectedemployeeCustomer?.customerName ?? allCustomersName,
+      hint: allCustomersName,
+      width: 180,
+      onChanged: (String? newValue) {
+        setState(() {
+          if (newValue == allCustomersName) {
+            selectedemployeeCustomer = null;
+            _employeedId = null;
+          } else {
+            selectedemployeeCustomer = _filteredEmployeeCustomer.firstWhere(
+              (employee) => employee.customerName == newValue,
+              orElse: () => _filteredEmployeeCustomer[0],
+            );
+            _customerId = selectedemployeeCustomer?.customerId;
+            _employeedId = selectedDropdownEmployee?.value;
+          }
+        });
+
+        _fetchData(customerId: _customerId, employeeId: _employeedId);
+      },
+    );
+  }
+
   Widget renderEmployeed(BuildContext context) {
     final localization = AppLocalizations.of(context);
 
-    // Lấy danh sách tên nhân viên từ _filtereddropdownEmployee
     List<String> employeeNames = _filtereddropdownEmployee
         .map((employee) => employee.label ?? '')
         .toSet()
         .toList();
 
-    // Thêm mục "Tất cả nhân viên" vào danh sách
     String allEmployeesLabel =
         localization?.translate('all_employeed') ?? 'Tất cả nhân viên';
     employeeNames.insert(0, allEmployeesLabel);
 
     return buildDropdown(
-      items: employeeNames, // Danh sách tên nhân viên
-      selectedItem: selectedDropdownEmployee?.label ??
-          allEmployeesLabel, // Tùy chọn hiện tại
-      hint: allEmployeesLabel, // Gợi ý mặc định
-      width: 180, // Độ rộng của dropdown
+      items: employeeNames,
+      selectedItem: selectedDropdownEmployee?.label ?? allEmployeesLabel,
+      hint: allEmployeesLabel,
+      width: 180,
       onChanged: (String? newValue) {
         setState(() {
           if (newValue == allEmployeesLabel) {
-            // Nếu chọn "Tất cả nhân viên"
             selectedDropdownEmployee = null;
             _employeedId = null;
           } else {
-            // Tìm nhân viên tương ứng theo nhãn được chọn
             selectedDropdownEmployee = _filtereddropdownEmployee.firstWhere(
               (employee) => employee.label == newValue,
               orElse: () => _filtereddropdownEmployee[0],
             );
+            _customerId = selectedemployeeCustomer?.customerId;
             _employeedId = selectedDropdownEmployee?.value;
           }
         });
 
-        // Gọi lại _fetchData để cập nhật dữ liệu
-        _fetchData(employeedId: _employeedId);
+        _fetchData(customerId: _customerId, employeeId: _employeedId);
       },
     );
   }
@@ -162,16 +230,22 @@ class TableEmployeedPageState extends State<TableEmployeedPage> {
   @override
   Widget build(BuildContext context) {
     final localization = AppLocalizations.of(context);
+
     final textStyle = GoogleFonts.robotoCondensed(
       fontSize: 16,
       color: Colors.black,
       fontWeight: FontWeight.w600,
     );
+    final textStyleQuantity = GoogleFonts.robotoCondensed(
+      fontSize: 15,
+      color: Colors.black,
+      fontWeight: FontWeight.w500,
+    );
 
     final Map<String, Color> statusColors = {
+      "Đang chờ duyệt hủy": Colors.orange,
       "Từ chối xét duyệt": Colors.red,
       "Đã được duyệt hủy": Colors.red,
-      "Đang chờ duyệt hủy": Colors.orange,
       "Chờ duyệt": Colors.orange,
       "Hoàn thành": Colors.green,
       "Đang thực hiện": Colors.black,
@@ -179,6 +253,7 @@ class TableEmployeedPageState extends State<TableEmployeedPage> {
       "Đã được duyệt sửa": Colors.black,
       "Tổng số lượng": Colors.black,
     };
+
     final Map<String, String> statusTranslations = {
       "Từ chối xét duyệt": localization?.translate('rejected') ?? "Rejected",
       "Đã được duyệt hủy":
@@ -196,27 +271,67 @@ class TableEmployeedPageState extends State<TableEmployeedPage> {
           localization?.translate('total_quantity') ?? "Total Quantity",
     };
 
-    final Map<String, Color> statusColorsDarker =
-        statusColors.map((key, color) {
-      // Translate Vietnamese key to English
-      final translatedKey = statusTranslations[key] ?? key;
-      final hsl = HSLColor.fromColor(color);
-      final darkerColor =
-          hsl.withLightness((hsl.lightness - 0.1).clamp(0.0, 1.0)).toColor();
-      return MapEntry(translatedKey, darkerColor);
-    });
+    final allStatusNames = {
+      "Hoàn thành",
+      "Đã được duyệt sửa",
+      "Đang chờ duyệt sửa",
+      "Đang thực hiện",
+      "Chờ duyệt",
+      "Đang chờ duyệt hủy",
+      "Từ chối xét duyệt",
+      "Đã được duyệt hủy",
+      "Tổng số lượng"
+    };
+
+    final statusColumns = allStatusNames.map((statusName) {
+      final translatedName = statusTranslations[statusName] ?? statusName;
+      final statusColor = statusColors[statusName] ?? Colors.black;
+
+      return DataColumn(
+        label: Center(
+          child: Text(
+            translatedName,
+            style: textStyle.copyWith(color: statusColor),
+          ),
+        ),
+      );
+    }).toList();
+
+    final columns = [
+      DataColumn(
+        label: Text(
+          'STT',
+          style: textStyle,
+        ),
+      ),
+      DataColumn(
+        label: Text(
+          localization?.translate('full_name') ?? 'Full Name',
+          style: textStyle,
+        ),
+      ),
+      ...statusColumns,
+    ];
 
     return Column(
       children: [
-        FittedBox(child: SizedBox(width: 140, child: renderEmployeed(context))),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            FittedBox(
+                child: SizedBox(width: 200, child: renderCustomer(context))),
+            FittedBox(
+                child: SizedBox(width: 140, child: renderEmployeed(context))),
+          ],
+        ),
         SizedBox(
           width: double.infinity,
           height: 380,
           child: isLoading
               ? const Center(child: CircularProgressIndicator())
-              : statuses == null || statuses!.isEmpty
+              : statisticsList == null || statisticsList!.isEmpty
                   ? Center(
-                      child: Text(localization?.translate("no_data") ??
+                      child: Text(localization?.translate('no_data') ??
                           'No data found'))
                   : ConstrainedBox(
                       constraints: BoxConstraints(
@@ -224,74 +339,52 @@ class TableEmployeedPageState extends State<TableEmployeedPage> {
                       ),
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            DataTable(
-                              columns: [
-                                DataColumn(
-                                  label: Text(
-                                    localization?.translate('status_name') ??
-                                        'Status Name',
-                                    style: textStyle,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: DataTable(
+                            columns: columns,
+                            rows: statisticsList!.map((stat) {
+                              List<DataCell> cells = [
+                                DataCell(
+                                  Center(
+                                    child: Text(
+                                      (statisticsList!.indexOf(stat) + 1)
+                                          .toString(),
+                                      style: textStyleQuantity,
+                                    ),
                                   ),
                                 ),
-                                DataColumn(
-                                  label: Text(
-                                    localization?.translate('quantity') ??
-                                        'Quantity',
-                                    style: textStyle,
+                                DataCell(
+                                  Center(
+                                    child: Text(
+                                      stat.fullName ?? 'N/A',
+                                      style: textStyleQuantity,
+                                    ),
                                   ),
                                 ),
-                              ],
-                              // Xử lý các hàng trong DataTable
-                              rows: statuses!.map((status) {
-                                // Lấy tên trạng thái gốc
-                                final originalStatusName =
-                                    status.statusName ?? "";
+                                ...allStatusNames.map((statusName) {
+                                  final status = stat.statuses?.firstWhere(
+                                    (s) => s.statusName == statusName,
+                                    orElse: () => Statuses(quantity: 0),
+                                  );
 
-                                // Dịch tên trạng thái sang tiếng Anh
-                                final translatedStatusName =
-                                    statusTranslations[originalStatusName] ??
-                                        originalStatusName;
+                                  final statusColor =
+                                      statusColors[statusName] ?? Colors.black;
 
-                                // Lấy màu từ statusColorsDarker dựa trên tên đã dịch
-                                final statusColor =
-                                    statusColorsDarker[translatedStatusName] ??
-                                        Colors.black;
-
-                                // Tạo DataRow cho DataTable
-                                return DataRow(
-                                  cells: [
-                                    DataCell(
-                                      Center(
-                                        child: Text(
-                                          translatedStatusName, // Hiển thị tên trạng thái đã dịch
-                                          style: GoogleFonts.robotoCondensed(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 15,
-                                            color: statusColor, // Màu tương ứng
-                                          ),
-                                        ),
+                                  return DataCell(
+                                    Center(
+                                      child: Text(
+                                        status?.quantity.toString() ?? '0',
+                                        style: textStyleQuantity.copyWith(
+                                            color: statusColor),
                                       ),
                                     ),
-                                    DataCell(
-                                      Center(
-                                        child: Text(
-                                          "${status.quantity ?? 0}", // Hiển thị số lượng (nếu null thì mặc định là 0)
-                                          style: GoogleFonts.robotoCondensed(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 15,
-                                            color: statusColor, // Màu tương ứng
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              }).toList(),
-                            )
-                          ],
+                                  );
+                                }),
+                              ];
+                              return DataRow(cells: cells);
+                            }).toList(),
+                          ),
                         ),
                       ),
                     ),
