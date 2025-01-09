@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:app_1helo/model/body_search_piechar.dart';
 import 'package:app_1helo/model/dropdown_employee.dart';
 import 'package:app_1helo/model/piechar_model.dart';
@@ -47,7 +48,7 @@ class PiecharService {
           } else {}
         } else {}
       } else {}
-    // ignore: empty_catches
+      // ignore: empty_catches
     } catch (error) {}
 
     return [];
@@ -103,8 +104,12 @@ class PiecharService {
     return '';
   }
 
-  Future<List<PieCharModel>> searchByDateRange(DateTime? startDate,
-      DateTime? endDate, String? employeeId, String? customerId) async {
+  Future<List<PieCharModel>> searchByDateRange(
+    DateTime? startDate,
+    DateTime? endDate,
+    String? employeeId,
+    String? customerId,
+  ) async {
     final url = Uri.parse(apiUrl);
 
     try {
@@ -119,7 +124,8 @@ class PiecharService {
         toCreatedDate: endDate,
       );
 
-      // Log input parameters
+      // Logging request details
+      print('Sending POST request to $url with body: ${requestBody.toJson()}');
 
       // Make the POST request
       final response = await http.post(
@@ -129,36 +135,38 @@ class PiecharService {
       );
 
       // Log response details
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
-      // Handle response
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
 
-        // Validate response format
-        if (jsonResponse is! Map) {
-          throw Exception('Invalid response format. Expected a JSON object.');
+        if (jsonResponse is Map && jsonResponse.containsKey('message')) {
+          if (jsonResponse['message'] == 'Không có kết quả!') {
+            print('No results found: ${jsonResponse['message']}');
+            return [];
+          }
         }
 
-        // Handle message field
-        if (jsonResponse['message'] == 'Không có kết quả!') {
-          return [];
-        }
-
-        // Parse data if available
-        if (jsonResponse.containsKey('data') && jsonResponse['data'] is List) {
-          return (jsonResponse['data'] as List)
-              .map((item) => PieCharModel.fromJson(item))
-              .toList();
+        if (jsonResponse is Map && jsonResponse.containsKey('data')) {
+          final data = jsonResponse['data'];
+          if (data is List) {
+            return data.map((item) => PieCharModel.fromJson(item)).toList();
+          } else {
+            throw FormatException('Unexpected data format in response.');
+          }
         } else {
-          throw Exception('No data found or unexpected data format.');
+          throw FormatException(
+              'Response does not contain expected "data" field.');
         }
       } else {
-        // Handle non-200 responses
-        throw Exception(
-            'Failed to load data. Status Code: ${response.statusCode}, Response: ${response.body}');
+        throw HttpException(
+          'Failed to load data. Status Code: ${response.statusCode}, Response: ${response.body}',
+        );
       }
-    } catch (error) {
-      // Log and handle errors
+    } catch (error, stackTrace) {
+      print('Error occurred: $error');
+      print('Stack Trace: $stackTrace');
       return [];
     }
   }

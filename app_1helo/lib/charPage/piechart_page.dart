@@ -202,23 +202,68 @@ class PiechartpageState extends State<Piechartpage> {
     }
   }
 
+  final Map<int, Color> statusColorMap = {
+    1: Colors.green,
+    2: Colors.black,
+    3: Colors.pink,
+    4: Colors.orange,
+    5: Colors.pink,
+    6: Colors.red,
+    7: Colors.blue,
+    8: Colors.black45,
+  };
+
   List<Color> _getPieChartColors(BuildContext context) {
     final localization = AppLocalizations.of(context);
-    if (dataMap.containsKey(
-        localization?.translate('no_data') ?? 'Không có dữ liệu')) {
+    final noDataText = localization?.translate('no_data') ?? 'Không có dữ liệu';
+
+    if (dataMap.containsKey(noDataText)) {
       return [Colors.grey];
     }
+    final completedStatus =
+        localization?.translate('completed') ?? 'Hoàn thành';
+    final inProgressStatus =
+        localization?.translate('processing') ?? 'Đang thực hiện';
+    final awaitingCancelStatus =
+        localization?.translate('waiting_cancel') ?? 'Chờ hủy';
+    final awaitingApprovalStatus =
+        localization?.translate('waiting_approval') ?? 'Chờ duyệt';
+    final rejectedStatus =
+        localization?.translate('refused_consideration') ?? 'Từ chối xét duyệt';
+    final cancelledStatus = localization?.translate('canceled') ?? 'Đã hủy';
+    final editingStatus = localization?.translate('editing') ?? 'Đang sửa';
+    final awaitingEditStatus =
+        localization?.translate('waiting_repair') ?? 'Chờ sửa';
 
-    return [
-      Colors.green,
-      Colors.black,
-      Colors.orange,
-      Colors.orange,
-      Colors.red,
-      Colors.red,
-      Colors.black,
-      Colors.black,
-    ];
+    // Lấy trạng thái từ dataMap keys và ánh xạ màu từ statusColorMap
+    return dataMap.keys.map((key) {
+      // Tách trạng thái từ chuỗi key (nếu cần).
+      final statusText = key.split(":").first.trim();
+
+      if (statusText == completedStatus || statusText == 'Hoàn thành') {
+        return statusColorMap[1] ?? Colors.grey;
+      } else if (statusText == inProgressStatus ||
+          statusText == 'Đang thực hiện') {
+        return statusColorMap[2] ?? Colors.grey;
+      } else if (statusText == awaitingCancelStatus ||
+          statusText == 'Chờ hủy') {
+        return statusColorMap[3] ?? Colors.grey;
+      } else if (statusText == awaitingApprovalStatus ||
+          statusText == 'Chờ duyệt') {
+        return statusColorMap[4] ?? Colors.grey;
+      } else if (statusText == rejectedStatus ||
+          statusText == 'Từ chối xét duyệt') {
+        return statusColorMap[5] ?? Colors.grey;
+      } else if (statusText == cancelledStatus || statusText == 'Đã hủy') {
+        return statusColorMap[6] ?? Colors.grey;
+      } else if (statusText == editingStatus || statusText == 'Đang sửa') {
+        return statusColorMap[7] ?? Colors.grey;
+      } else if (statusText == awaitingEditStatus || statusText == 'Chờ sửa') {
+        return statusColorMap[8] ?? Colors.grey;
+      } else {
+        return Colors.grey;
+      }
+    }).toList();
   }
 
   Future<void> _fetchEmployeeOrCustomerData(bool isUserFetch) async {
@@ -358,70 +403,117 @@ class PiechartpageState extends State<Piechartpage> {
     );
   }
 
+  Widget buildCustomLegend() {
+    return Wrap(
+      spacing: 16,
+      runSpacing: 8,
+      children: dataMap.entries.map((entry) {
+        final colorIndex = dataMap.keys.toList().indexOf(entry.key);
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _getPieChartColors(context)[colorIndex],
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              entry.key,
+              style: GoogleFonts.robotoCondensed(
+                fontSize: 13,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        );
+      }).toList(),
+    );
+  }
+
   String? startDate;
   String? endDate;
   final TextEditingController _controller = TextEditingController();
-  late Future<List<PieCharModel>> searchPieChar;
   final PiecharService piecharService = PiecharService();
 
   void _selectDateRange() async {
-    final DateTime? startPicked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-
-    if (startPicked != null) {
-      final DateTime? endPicked = await showDatePicker(
+    try {
+      // Select start date
+      final DateTime? startPicked = await showDatePicker(
         context: context,
-        initialDate: startPicked.add(const Duration(days: 1)),
-        firstDate: startPicked,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2000),
         lastDate: DateTime(2101),
       );
 
-      if (endPicked != null) {
-        setState(() {
-          startDate = DateFormat('yyyy-MM-dd').format(startPicked);
-          endDate = DateFormat('yyyy-MM-dd').format(endPicked);
-          _controller.text = '$startDate - $endDate';
-        });
+      if (startPicked != null) {
+        // Select end date
+        final DateTime? endPicked = await showDatePicker(
+          context: context,
+          initialDate: startPicked.add(const Duration(days: 1)),
+          firstDate: startPicked,
+          lastDate: DateTime(2101),
+        );
 
-        await _updateDocumentsByDateRange();
+        if (endPicked != null) {
+          // Update state with selected dates
+          setState(() {
+            startDate = DateFormat('yyyy-MM-dd').format(startPicked);
+            endDate = DateFormat('yyyy-MM-dd').format(endPicked);
+            _controller.text = '$startDate - $endDate';
+          });
+
+          // Fetch data for the selected date range
+          await _updateDocumentsByDateRange();
+        }
       }
+    } catch (e) {
     }
   }
 
   Future<void> _updateDocumentsByDateRange() async {
     if (startDate != null && endDate != null) {
+      // Parse and format dates
       final DateTime parsedStartDate =
           DateFormat('yyyy-MM-dd').parse(startDate!);
       final DateTime parsedEndDate = DateFormat('yyyy-MM-dd').parse(endDate!);
 
+      final String formattedStartDate =
+          DateFormat('yyyy-MM-dd').format(parsedStartDate);
+      final String formattedEndDate =
+          DateFormat('yyyy-MM-dd').format(parsedEndDate);
+
+
+      // Fetch selected filters
       final selectedEmployeeId = selectedDropdownEmployee?.value;
-      final selectedCustomer = selectedDropdownCustomer?.customerId;
+      final selectedCustomerId = selectedDropdownCustomer?.customerId;
 
       setState(() {
         _isFetchingData = true;
       });
 
       try {
-        final pieCharService = PiecharService();
-
+        // Fetch data using the PiecharService
         final List<PieCharModel> pieCharData =
-            await pieCharService.searchByDateRange(
+            await piecharService.searchByDateRange(
           parsedStartDate,
           parsedEndDate,
           selectedEmployeeId,
-          selectedCustomer,
+          selectedCustomerId,
         );
 
+        // Update state with fetched data
         setState(() {
-          pieCharChartData = pieCharData.isNotEmpty ? pieCharData : [];
+          pieCharChartData = pieCharData;
           _processPieChartData(pieCharData);
         });
 
-        if (pieCharData.isEmpty) {}
+        if (pieCharData.isEmpty) {
+        } else {
+        }
       } catch (e) {
         setState(() {
           pieCharChartData = [];
@@ -431,7 +523,8 @@ class PiechartpageState extends State<Piechartpage> {
           _isFetchingData = false;
         });
       }
-    } else {}
+    } else {
+    }
   }
 
   void _clearDateRange() {
@@ -531,39 +624,45 @@ class PiechartpageState extends State<Piechartpage> {
             const SizedBox(height: 15),
             SizedBox(
               width: double.infinity,
-              height: 250,
+              height: 300,
               child: _isFetchingData
                   ? const Center(child: CircularProgressIndicator())
-                  : Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: PieChart(
-                        dataMap: dataMap,
-                        chartType: ChartType.disc,
-                        colorList: _getPieChartColors(context),
-                        animationDuration: const Duration(milliseconds: 800),
-                        chartRadius: MediaQuery.of(context).size.width / 1.5,
-                        legendOptions: LegendOptions(
-                          legendPosition: LegendPosition.right,
-                          showLegendsInRow: false,
-                          legendTextStyle: GoogleFonts.robotoCondensed(
-                            fontSize: 13,
-                            color: Colors.black,
+                  : Column(
+                      children: [
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: PieChart(
+                              dataMap: dataMap,
+                              chartType: ChartType.disc,
+                              colorList: _getPieChartColors(context),
+                              animationDuration:
+                                  const Duration(milliseconds: 800),
+                              chartRadius:
+                                  MediaQuery.of(context).size.width / 1.5,
+                              legendOptions: const LegendOptions(
+                                  showLegends: false), 
+                              chartValuesOptions: ChartValuesOptions(
+                                showChartValueBackground: false,
+                                showChartValues: true,
+                                showChartValuesInPercentage: true,
+                                showChartValuesOutside: false,
+                                decimalPlaces: 0,
+                                chartValueStyle: GoogleFonts.robotoCondensed(
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                        chartValuesOptions: ChartValuesOptions(
-                          showChartValueBackground: false,
-                          showChartValues: true,
-                          showChartValuesInPercentage: true,
-                          showChartValuesOutside: false,
-                          decimalPlaces: 1,
-                          chartValueStyle: GoogleFonts.robotoCondensed(
-                            fontSize: 14,
-                            color: Colors.white,
-                          ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: buildCustomLegend(),
                         ),
-                      ),
+                      ],
                     ),
-            ),
+            )
           ],
         ),
       ),

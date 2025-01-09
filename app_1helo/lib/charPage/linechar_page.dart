@@ -43,7 +43,7 @@ class LinecharpageState extends State<Linecharpage> {
   List<FlSpot> _canceledCoSpots = [];
 
   List<Widget> _legendItems = [];
-  List<String> monthLabels = [];
+  List<String> _monthLabels = [];
 
   bool _isLoading = true;
   double _minX = 0, _maxX = 0, _minY = 0, _maxY = 0;
@@ -162,33 +162,37 @@ class LinecharpageState extends State<Linecharpage> {
         }
       }
 
-      // Update chart data
       if (mounted) {
         _clearChartData();
 
-        if (lineChartResponse?.data?.completeCo != null &&
-            lineChartResponse!.data!.completeCo!.isNotEmpty) {
-          _completeCoSpots =
-              _mapDataToFlSpot(lineChartResponse.data!.completeCo);
+        // Get the separate FlSpot lists
+        Map<String, List<FlSpot>> flSpotMap = _mapDataToFlSpot(
+          lineChartResponse!.data!.completeCo,
+          lineChartResponse.data!.processingCo,
+          lineChartResponse.data!.canceledCo,
+        );
+
+        // Update chart data for each status
+        if (flSpotMap.containsKey('complete') &&
+            flSpotMap['complete']!.isNotEmpty) {
+          _completeCoSpots = flSpotMap['complete']!;
         }
 
-        if (lineChartResponse?.data?.processingCo != null &&
-            lineChartResponse!.data!.processingCo!.isNotEmpty) {
-          _processingCoSpots =
-              _mapDataToFlSpot(lineChartResponse.data!.processingCo);
+        if (flSpotMap.containsKey('processing') &&
+            flSpotMap['processing']!.isNotEmpty) {
+          _processingCoSpots = flSpotMap['processing']!;
         }
 
-        if (lineChartResponse?.data?.canceledCo != null &&
-            lineChartResponse!.data!.canceledCo!.isNotEmpty) {
-          _canceledCoSpots =
-              _mapDataToFlSpot(lineChartResponse.data!.canceledCo);
+        if (flSpotMap.containsKey('canceled') &&
+            flSpotMap['canceled']!.isNotEmpty) {
+          _canceledCoSpots = flSpotMap['canceled']!;
         }
 
         _calculateAxisRanges();
         _updateLegendItems();
       }
     } catch (e) {
-      // Handle errors, optionally log them
+      print("Error fetching line chart data: $e");
     } finally {
       if (mounted) {
         setState(() {
@@ -202,20 +206,6 @@ class LinecharpageState extends State<Linecharpage> {
     _completeCoSpots.clear();
     _processingCoSpots.clear();
     _canceledCoSpots.clear();
-  }
-
-  void _addNoSelectionLegend() {
-    final localization = AppLocalizations.of(context);
-    setState(() {
-      _legendItems = [
-        LegendItem(
-          color: Colors.grey,
-          text: localization?.translate('please_select_employee') ??
-              'Vui lòng chọn nhân viên!!!',
-        ),
-      ];
-      _isLoading = false;
-    });
   }
 
   void _updateLegendItems() {
@@ -266,63 +256,129 @@ class LinecharpageState extends State<Linecharpage> {
     });
   }
 
-  List<FlSpot> _mapDataToFlSpot(List<dynamic>? dataList) {
-    if (dataList == null || dataList.isEmpty) return [];
+  Map<String, List<FlSpot>> _mapDataToFlSpot(
+    List<dynamic>? completeData,
+    List<dynamic>? processingData,
+    List<dynamic>? canceledData,
+  ) {
+    if ((completeData == null || completeData.isEmpty) &&
+        (processingData == null || processingData.isEmpty) &&
+        (canceledData == null || canceledData.isEmpty)) {
+      return {};
+    }
 
-    final Map<String, double> monthQuantityMap = {};
+    final Map<String, Map<String, double?>> monthQuantityMap = {
+      'complete': {},
+      'processing': {},
+      'canceled': {},
+    };
+
     DateTime? minDate;
     DateTime? maxDate;
 
-    for (var entry in dataList) {
-      Map<String, dynamic> value = entry.toJson();
+    void processData(List<dynamic>? data, String status) {
+      if (data == null) return;
+      for (var entry in data) {
+        Map<String, dynamic> value = entry.toJson();
+        try {
+          String createdDateStr = value["created_date"] ?? '';
+          DateTime createdDate = DateTime.parse(createdDateStr);
+          String monthKey =
+              "${createdDate.year}-${createdDate.month.toString().padLeft(2, '0')}";
 
-      try {
-        String createdDateStr = value["created_date"] ?? '';
-        DateTime createdDate = DateTime.parse(createdDateStr);
-        String monthKey =
-            "${createdDate.year}-${createdDate.month.toString().padLeft(2, '0')}";
+          double quantity =
+              double.tryParse(value['quantity']?.toString() ?? '0') ?? 0;
 
-        double quantity =
-            double.tryParse(value['quantity']?.toString() ?? '0') ?? 0;
-        monthQuantityMap.update(
-            monthKey, (existingQty) => existingQty + quantity,
-            ifAbsent: () => quantity);
+          monthQuantityMap[status]!.update(
+            monthKey,
+            (existingQty) => (existingQty ?? 0) + quantity,
+            ifAbsent: () => quantity,
+          );
 
-        if (minDate == null || createdDate.isBefore(minDate)) {
-          minDate = createdDate;
+          minDate ??= createdDate;
+          maxDate ??= createdDate;
+
+          if (createdDate.isBefore(minDate!)) {
+            minDate = createdDate;
+          }
+          if (createdDate.isAfter(maxDate!)) {
+            maxDate = createdDate;
+          }
+        } catch (e) {
+          continue;
         }
-        if (maxDate == null || createdDate.isAfter(maxDate)) {
-          maxDate = createdDate;
-        }
-      } catch (e) {}
+      }
     }
 
-    if (monthQuantityMap.isEmpty) return [];
+    processData(completeData, 'complete');
+    processData(processingData, 'processing');
+    processData(canceledData, 'canceled');
 
-    List<String> allMonths = [];
+    if (minDate == null || maxDate == null) return {};
+
+    List<String> monthLabels = [];
     DateTime currentDate = minDate!;
-    while (currentDate.isBefore(maxDate!)) {
-      allMonths.add(
-          "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}");
+    while (currentDate.isBefore(maxDate!) ||
+        currentDate.isAtSameMomentAs(maxDate!)) {
+      String monthKey =
+          "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}";
+      monthLabels.add(monthKey);
       currentDate = DateTime(currentDate.year, currentDate.month + 1);
     }
-    allMonths
-        .add("${maxDate.year}-${maxDate.month.toString().padLeft(2, '0')}");
 
-    for (var month in allMonths) {
-      monthQuantityMap.putIfAbsent(month, () => 0);
+    // In ra kiểm tra trước khi áp dụng lọc
+    print("Before filtering, Month Labels: $monthLabels");
+
+    // Giữ lại 10 tháng mới nhất
+    if (monthLabels.length > 6) {
+      monthLabels = monthLabels.sublist(monthLabels.length - 6);
     }
 
-    monthLabels = monthQuantityMap.keys.toList()..sort();
+    // In ra sau khi lọc
+    print("After filtering, Month Labels: $monthLabels");
 
-    List<FlSpot> flSpotList = [];
+    // Đảm bảo mọi trạng thái có dữ liệu cho các tháng này
+    for (var month in monthLabels) {
+      for (var status in monthQuantityMap.keys) {
+        if (!monthQuantityMap[status]!.containsKey(month)) {
+          monthQuantityMap[status]![month] = null;
+        }
+      }
+    }
+
+    // Tạo danh sách FlSpot cho biểu đồ
+    Map<String, List<FlSpot>> flSpotMap = {
+      'complete': [],
+      'processing': [],
+      'canceled': [],
+    };
+
     for (int xIndex = 0; xIndex < monthLabels.length; xIndex++) {
       final month = monthLabels[xIndex];
-      final quantity = monthQuantityMap[month]!;
-      flSpotList.add(FlSpot(xIndex.toDouble(), quantity));
+      double? completeQty = monthQuantityMap['complete']![month];
+      double? processingQty = monthQuantityMap['processing']![month];
+      double? canceledQty = monthQuantityMap['canceled']![month];
+
+      if (completeQty != null) {
+        flSpotMap['complete']!.add(FlSpot(xIndex.toDouble(), completeQty));
+      }
+      if (processingQty != null) {
+        flSpotMap['processing']!.add(FlSpot(xIndex.toDouble(), processingQty));
+      }
+      if (canceledQty != null) {
+        flSpotMap['canceled']!.add(FlSpot(xIndex.toDouble(), canceledQty));
+      }
     }
 
-    return flSpotList;
+    // Cập nhật _monthLabels cho getTitlesWidget
+    _monthLabels = monthLabels.map((month) {
+      final parts = month.split('-');
+      final year = parts[0];
+      final monthNum = int.parse(parts[1]);
+      return "${monthNum.toString().padLeft(2, '0')}/$year";
+    }).toList();
+
+    return flSpotMap;
   }
 
   void _calculateAxisRanges() {
@@ -471,156 +527,142 @@ class LinecharpageState extends State<Linecharpage> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                FittedBox(
-                    child: SizedBox(
-                        width: 200, child: renderCustomerDropdown(context))),
-                const SizedBox(width: 6),
-                FittedBox(
-                    child: SizedBox(
-                        width: 140, child: renderUserDropdown(context))),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: _legendItems,
+        child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: Column(children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  FittedBox(
+                      child: SizedBox(
+                          width: 200, child: renderCustomerDropdown(context))),
+                  const SizedBox(width: 6),
+                  FittedBox(
+                      child: SizedBox(
+                          width: 140, child: renderUserDropdown(context))),
+                ],
               ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.9,
-              height: MediaQuery.of(context).size.height * 0.33,
-              child: AspectRatio(
-                aspectRatio: 1.4,
-                child: _isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                        child: LineChart(
-                          LineChartData(
-                            gridData: FlGridData(
-                              show: true,
-                              drawVerticalLine: true,
-                              horizontalInterval: 4,
-                              getDrawingHorizontalLine: (value) => FlLine(
-                                color: Colors.grey.withOpacity(0.2),
-                                strokeWidth: 1,
-                              ),
-                              getDrawingVerticalLine: (value) => FlLine(
-                                color: Colors.grey.withOpacity(0.2),
-                                strokeWidth: 1,
-                              ),
-                            ),
-                            titlesData: FlTitlesData(
-                              topTitles: const AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: false,
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: _legendItems,
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: MediaQuery.of(context).size.height * 0.33,
+                child: AspectRatio(
+                  aspectRatio: 1.4,
+                  child: _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
+                          child: LineChart(
+                            LineChartData(
+                              gridData: FlGridData(
+                                show: true,
+                                drawVerticalLine: true,
+                                horizontalInterval: 4,
+                                getDrawingHorizontalLine: (value) => FlLine(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  strokeWidth: 1,
+                                ),
+                                getDrawingVerticalLine: (value) => FlLine(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  strokeWidth: 1,
                                 ),
                               ),
-                              rightTitles: const AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: false,
+                              titlesData: FlTitlesData(
+                                topTitles: const AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false),
                                 ),
-                              ),
-                              leftTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  reservedSize: 40,
-                                  interval: 4,
-                                  getTitlesWidget: (value, meta) {
-                                    return Text(
-                                      value.toInt().toString(),
-                                      style: GoogleFonts.robotoCondensed(
+                                rightTitles: const AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false),
+                                ),
+                                leftTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    reservedSize: 40,
+                                    interval: 4,
+                                    getTitlesWidget: (value, meta) {
+                                      return Text(
+                                        value.toInt().toString(),
+                                        style: GoogleFonts.robotoCondensed(
+                                            color: Colors.black,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                bottomTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    reservedSize: 30,
+                                    interval: 1,
+                                    getTitlesWidget: (value, meta) {
+                                      int index = value.toInt();
+                                      if (index < 0 ||
+                                          index >= _monthLabels.length) {
+                                        return const SizedBox.shrink();
+                                      }
+                                      return Text(
+                                        _monthLabels[index],
+                                        style: GoogleFonts.robotoCondensed(
                                           color: Colors.black,
                                           fontSize: 13,
-                                          fontWeight: FontWeight.w500),
-                                    );
-                                  },
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
-                              bottomTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  reservedSize: 30,
-                                  interval: 1,
-                                  getTitlesWidget: (value, meta) {
-                                    int index = value.toInt();
-
-                                    if (index < 0 ||
-                                        index >= monthLabels.length) {
-                                      return const SizedBox.shrink();
-                                    }
-
-                                    final selectedMonth = monthLabels[index];
-                                    final parts = selectedMonth.split('-');
-                                    final year = parts[0];
-                                    final month = parts[1];
-
-                                    return Text(
-                                      '$month/$year',
-                                      style: GoogleFonts.robotoCondensed(
-                                          color: Colors.black,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w500),
-                                    );
-                                  },
+                              lineBarsData: [
+                                LineChartBarData(
+                                  spots: _completeCoSpots,
+                                  isCurved: true,
+                                  color: Colors.green,
+                                  barWidth: 3,
+                                  dotData: const FlDotData(show: true),
+                                  belowBarData: BarAreaData(show: false),
+                                ),
+                                LineChartBarData(
+                                  spots: _processingCoSpots,
+                                  isCurved: true,
+                                  color: Colors.orange,
+                                  barWidth: 3,
+                                  dotData: const FlDotData(show: true),
+                                  belowBarData: BarAreaData(show: false),
+                                ),
+                                LineChartBarData(
+                                  spots: _canceledCoSpots,
+                                  isCurved: true,
+                                  color: Colors.red,
+                                  barWidth: 3,
+                                  dotData: const FlDotData(show: true),
+                                  belowBarData: BarAreaData(show: false),
+                                ),
+                              ],
+                              borderData: FlBorderData(
+                                show: true,
+                                border: Border.all(
+                                  color: const Color(0xff37434d),
+                                  width: 1,
                                 ),
                               ),
+                              minX: _minX,
+                              maxX: _maxX,
+                              minY: _minY,
+                              maxY: _maxY,
                             ),
-                            lineBarsData: [
-                              LineChartBarData(
-                                spots: _completeCoSpots,
-                                isCurved: true,
-                                color: Colors.green,
-                                barWidth: 3,
-                                dotData: const FlDotData(show: true),
-                                belowBarData: BarAreaData(show: false),
-                              ),
-                              LineChartBarData(
-                                spots: _processingCoSpots,
-                                isCurved: true,
-                                color: Colors.orange,
-                                barWidth: 3,
-                                dotData: const FlDotData(show: true),
-                                belowBarData: BarAreaData(show: false),
-                              ),
-                              LineChartBarData(
-                                spots: _canceledCoSpots,
-                                isCurved: true,
-                                color: Colors.red,
-                                barWidth: 3,
-                                dotData: const FlDotData(show: true),
-                                belowBarData: BarAreaData(show: false),
-                              ),
-                            ],
-                            borderData: FlBorderData(
-                              show: true,
-                              border: Border.all(
-                                color: const Color(0xff37434d),
-                                width: 1,
-                              ),
-                            ),
-                            minX: _minX,
-                            maxX: _maxX,
-                            minY: _minY,
-                            maxY: _maxY,
                           ),
                         ),
-                      ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+                ),
+              )
+            ])));
   }
 }

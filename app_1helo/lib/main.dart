@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize the LocaleProvider and load the saved language preference
   final localeProvider = LocaleProvider();
   await localeProvider.loadLocaleFromSharedPreferences();
 
@@ -19,8 +18,7 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => Providercolor()),
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
-        ChangeNotifierProvider(
-            create: (_) => LocaleProvider()), // Thêm LocaleProvider tại đây
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
       ],
       child: const MyApp(),
     ),
@@ -32,17 +30,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider =
-        Provider.of<LocaleProvider>(context); // Lấy LocaleProvider từ context
-    final colorProvider =
-        Provider.of<Providercolor>(context); // Lấy màu từ Providercolor
-
+    final provider = Provider.of<LocaleProvider>(context);
+    final colorProvider = Provider.of<Providercolor>(context);
     return MaterialApp(
       title: 'App Next CO',
       locale: provider.locale,
       supportedLocales: const [
-        Locale('en'), // Tiếng Anh
-        Locale('vi'), // Tiếng Việt
+        Locale('en'),
+        Locale('vi'),
       ],
       localizationsDelegates: const [
         AppLocalizationsDelegate(),

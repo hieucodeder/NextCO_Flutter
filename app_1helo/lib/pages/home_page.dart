@@ -659,7 +659,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               blurRadius: 8)
                         ]),
                     width: MediaQuery.of(context).size.width,
-                    height: 450,
+                    height: 500,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

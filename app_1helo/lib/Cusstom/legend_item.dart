@@ -19,12 +19,12 @@ class LegendItem extends StatelessWidget {
             color: color,
           ),
         ),
-        const SizedBox(width: 5),
+        const SizedBox(width: 6),
         Text(
           text,
           style: GoogleFonts.robotoCondensed(
-            fontSize: 14,
-            color: Colors.black87,
+            fontSize: 13,
+            color: Colors.black,
             fontWeight: FontWeight.w500,
           ),
         ),

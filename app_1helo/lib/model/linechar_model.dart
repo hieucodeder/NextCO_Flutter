@@ -4,18 +4,20 @@ class LinecharModel {
 
   LinecharModel({this.success, this.data});
 
-  LinecharModel.fromJson(Map<String, dynamic> json) {
-    success = json['success'];
-    data = json['data'] != null ? Data.fromJson(json['data']) : null;
+  // Factory constructor for JSON parsing
+  factory LinecharModel.fromJson(Map<String, dynamic> json) {
+    return LinecharModel(
+      success: json['success'],
+      data: json['data'] != null ? Data.fromJson(json['data']) : null,
+    );
   }
 
+  // Method to convert LinecharModel to JSON
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['success'] = success;
-    if (this.data != null) {
-      data['data'] = this.data!.toJson();
-    }
-    return data;
+    return {
+      'success': success,
+      'data': data?.toJson(),
+    };
   }
 }
 
@@ -26,39 +28,34 @@ class Data {
 
   Data({this.completeCo, this.processingCo, this.canceledCo});
 
-  Data.fromJson(Map<String, dynamic> json) {
-    if (json['complete_co'] != null) {
-      completeCo = <CompleteCo>[];
-      json['complete_co'].forEach((v) {
-        completeCo!.add(CompleteCo.fromJson(v));
-      });
-    }
-    if (json['processing_co'] != null) {
-      processingCo = <ProcessingCo>[];
-      json['processing_co'].forEach((v) {
-        processingCo!.add(ProcessingCo.fromJson(v));
-      });
-    }
-    if (json['canceled_co'] != null) {
-      canceledCo = <CanceledCo>[];
-      json['canceled_co'].forEach((v) {
-        canceledCo!.add(CanceledCo.fromJson(v));
-      });
-    }
+  // Factory constructor for JSON parsing
+  factory Data.fromJson(Map<String, dynamic> json) {
+    return Data(
+      completeCo: json['complete_co'] != null
+          ? (json['complete_co'] as List)
+              .map((v) => CompleteCo.fromJson(v))
+              .toList()
+          : null,
+      processingCo: json['processing_co'] != null
+          ? (json['processing_co'] as List)
+              .map((v) => ProcessingCo.fromJson(v))
+              .toList()
+          : null,
+      canceledCo: json['canceled_co'] != null
+          ? (json['canceled_co'] as List)
+              .map((v) => CanceledCo.fromJson(v))
+              .toList()
+          : null,
+    );
   }
 
+  // Method to convert Data to JSON
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    if (completeCo != null) {
-      data['complete_co'] = completeCo!.map((v) => v.toJson()).toList();
-    }
-    if (processingCo != null) {
-      data['processing_co'] = processingCo!.map((v) => v.toJson()).toList();
-    }
-    if (canceledCo != null) {
-      data['canceled_co'] = canceledCo!.map((v) => v.toJson()).toList();
-    }
-    return data;
+    return {
+      'complete_co': completeCo?.map((v) => v.toJson()).toList(),
+      'processing_co': processingCo?.map((v) => v.toJson()).toList(),
+      'canceled_co': canceledCo?.map((v) => v.toJson()).toList(),
+    };
   }
 }
 
@@ -68,83 +65,34 @@ class CompleteCo {
   String? modifiedDate;
   int? modificationCount;
 
-  CompleteCo(
-      {this.quantity,
-      this.createdDate,
-      this.modifiedDate,
-      this.modificationCount});
+  CompleteCo({
+    this.quantity,
+    this.createdDate,
+    this.modifiedDate,
+    this.modificationCount,
+  });
 
-  CompleteCo.fromJson(Map<String, dynamic> json) {
-    quantity = json['quantity'];
-    createdDate = json['created_date'];
-    modifiedDate = json['modified_date'];
-    modificationCount = json['modification_count'] ?? 0;
+  // Factory constructor for JSON parsing
+  factory CompleteCo.fromJson(Map<String, dynamic> json) {
+    return CompleteCo(
+      quantity: json['quantity'],
+      createdDate: json['created_date'],
+      modifiedDate: json['modified_date'],
+      modificationCount: json['modification_count'] ?? 0,
+    );
   }
 
+  // Method to convert CompleteCo to JSON
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['quantity'] = quantity;
-    data['created_date'] = createdDate;
-    data['modified_date'] = modifiedDate;
-    data['modification_count'] = modificationCount;
-    return data;
+    return {
+      'quantity': quantity,
+      'created_date': createdDate,
+      'modified_date': modifiedDate,
+      'modification_count': modificationCount,
+    };
   }
 }
 
-class ProcessingCo {
-  String? quantity;
-  String? createdDate;
-  String? modifiedDate;
-  int? modificationCount;
-
-  ProcessingCo(
-      {this.quantity,
-      this.createdDate,
-      this.modifiedDate,
-      this.modificationCount});
-
-  ProcessingCo.fromJson(Map<String, dynamic> json) {
-    quantity = json['quantity'];
-    createdDate = json['created_date'];
-    modifiedDate = json['modified_date'];
-    modificationCount = json['modification_count'] ?? 0;
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['quantity'] = quantity;
-    data['created_date'] = createdDate;
-    data['modified_date'] = modifiedDate;
-    data['modification_count'] = modificationCount;
-    return data;
-  }
-}
-
-class CanceledCo {
-  String? quantity;
-  String? createdDate;
-  String? modifiedDate;
-  int? modificationCount;
-
-  CanceledCo(
-      {this.quantity,
-      this.createdDate,
-      this.modifiedDate,
-      this.modificationCount});
-
-  CanceledCo.fromJson(Map<String, dynamic> json) {
-    quantity = json['quantity'];
-    createdDate = json['created_date'];
-    modifiedDate = json['modified_date'];
-    modificationCount = json['modification_count'] ?? 0;
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['quantity'] = quantity;
-    data['created_date'] = createdDate;
-    data['modified_date'] = modifiedDate;
-    data['modification_count'] = modificationCount;
-    return data;
-  }
-}
+// ProcessingCo and CanceledCo classes are the same as CompleteCo. Use typedefs for simplicity.
+typedef ProcessingCo = CompleteCo;
+typedef CanceledCo = CompleteCo;

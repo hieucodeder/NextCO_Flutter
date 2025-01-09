@@ -14,9 +14,14 @@ class Bodysearchpiechar {
   })  : frCreatedDate = _formatDate(frCreatedDate),
         toCreatedDate = _formatDate(toCreatedDate);
 
-  /// Convert DateTime to 'yyyy-MM-dd' format or return null if input is null
+  /// Format DateTime to 'yyyy-MM-dd' or return null if input is null
   static String? _formatDate(DateTime? date) {
-    return date != null ? DateFormat('yyyy-MM-dd').format(date) : null;
+    try {
+      return date != null ? DateFormat('yyyy-MM-dd').format(date) : null;
+    } catch (e) {
+      print('Date formatting error: $e');
+      return null;
+    }
   }
 
   /// Convert the object to JSON

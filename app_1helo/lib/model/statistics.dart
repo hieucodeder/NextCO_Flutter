@@ -1,5 +1,3 @@
-import 'package:flutter/src/material/data_table.dart';
-
 class Statuses {
   String? statusName;
   int? quantity;
@@ -51,12 +49,22 @@ class Statistics {
 class StatisticsList {
   List<Statistics>? statistics;
 
-  // Constructor to handle list of Statistics
   StatisticsList({this.statistics});
 
-  // Handle list of Statistics from the response
-  StatisticsList.fromJson(List<dynamic> jsonList) {
-    statistics = jsonList.map((item) => Statistics.fromJson(item)).toList();
+  StatisticsList.fromJson(dynamic json) {
+    if (json is Map<String, dynamic> &&
+        json['data'] != null &&
+        json['data'] is List) {
+      // Handle Map with 'data' key
+      statistics = (json['data'] as List)
+          .map((item) => Statistics.fromJson(item))
+          .toList();
+    } else if (json is List<dynamic>) {
+      // Handle List directly
+      statistics = json.map((item) => Statistics.fromJson(item)).toList();
+    } else {
+      throw ArgumentError("Invalid JSON structure for StatisticsList");
+    }
   }
 
   List<Map<String, dynamic>> toJson() {
