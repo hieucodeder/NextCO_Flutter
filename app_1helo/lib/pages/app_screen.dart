@@ -3,6 +3,7 @@ import 'package:app_1helo/navigation/bottom_navigation.dart';
 import 'package:app_1helo/pages/accout_page.dart';
 import 'package:app_1helo/pages/change_password.dart';
 import 'package:app_1helo/pages/chat_box.dart';
+import 'package:app_1helo/pages/notification_page.dart';
 import 'package:app_1helo/pages/pay_page.dart';
 import 'package:app_1helo/pages/customer_page.dart';
 import 'package:app_1helo/pages/file_co_page.dart';
@@ -19,9 +20,14 @@ import 'package:app_1helo/pages/staff_page.dart';
 import 'package:app_1helo/provider/navigationProvider.dart';
 import 'package:app_1helo/provider/providerColor.dart';
 import 'package:app_1helo/service/app_localizations%20.dart';
+import 'package:app_1helo/service/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
+import '../model/notification_model.dart';
+import 'package:flutter/material.dart'; // Import Flutter's Material package
+import 'package:badges/badges.dart' hide Badge;
 
 class AppScreen extends StatefulWidget {
   const AppScreen({super.key});
@@ -35,6 +41,51 @@ class _AppScreenState extends State<AppScreen> {
   //   {'locale': const Locale('vi'), 'name': 'Tiếng Việt', 'flag': '🇻🇳'},
   //   {'locale': const Locale('en'), 'name': 'English', 'flag': '🇺🇸'},
   // ];
+  late NotificationService _notificationService;
+  List<Data> _notifications = [];
+  bool _isLoading = true;
+  int unreadCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    print("initState called"); // Log to ensure initState is running
+    _notificationService = NotificationService();
+    _fetchNotifications();
+  }
+
+// Hàm gọi API để lấy thông báo
+  Future<void> _fetchNotifications() async {
+    try {
+      print('Fetching notifications...'); // Log before fetching notifications
+
+      List<Data> notifications =
+          await _notificationService.fetchNotification(1, 10);
+
+      // Log fetched data
+      print('Notifications fetched: $notifications');
+
+      if (notifications.isEmpty) {
+        print('No notifications found');
+      }
+
+      setState(() {
+        _notifications = notifications;
+
+        // Calculate unread notifications and log it
+        unreadCount = _notifications.where((notif) => notif.isRead == 0).length;
+        print('Unread notifications count: $unreadCount');
+
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Lỗi khi lấy dữ liệu: $e'); // Log error if fetching fails
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   Widget _getPage(int index) {
     switch (index) {
       case 0:
@@ -74,7 +125,7 @@ class _AppScreenState extends State<AppScreen> {
     final localization = AppLocalizations.of(context);
 
     if (localization == null) {
-      return "Default Title"; // Fallback title in case localization is null
+      return "Default Title";
     }
 
     switch (index) {
@@ -117,6 +168,16 @@ class _AppScreenState extends State<AppScreen> {
     setState(() {
       isExpanded = !isExpanded;
     });
+  }
+
+  int getBottomNavigationIndex(int currentIndex) {
+    if ([2, 4, 5].contains(currentIndex)) {
+      return 2;
+    } else if (currentIndex == 0) {
+      return 0;
+    } else {
+      return 1;
+    }
   }
 
   @override
@@ -166,39 +227,29 @@ class _AppScreenState extends State<AppScreen> {
           //     );
           //   }).toList(),
           // ),
-          IconButton(
-            onPressed: () {
-              showMenu(
-                context: context,
-                position: const RelativeRect.fromLTRB(100, 100, 0, 0),
-                items: [
-                  PopupMenuItem(
-                    value: 'unread',
-                    child: Text(
-                      localization?.translate('un_read') ?? 'Chưa đọc',
-                      style: GoogleFonts.robotoCondensed(
-                          fontSize: 16,
-                          color: Colors.red,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'all',
-                    child: Text(
-                      localization?.translate('all') ?? 'Tất cả',
-                      style: GoogleFonts.robotoCondensed(
-                          fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ],
-              ).then((value) {
-                if (value == 'all') {
-                } else if (value == 'unread') {}
-              });
-            },
-            icon: const Icon(Icons.notifications_none_outlined, size: 24),
-            color: Colors.white,
-          ),
+          Badge(
+            label: Text(
+              '$unreadCount', // The number of notifications
+              style: GoogleFonts.robotoCondensed(
+                  color: Colors.white, fontSize: 12),
+            ),
+            backgroundColor: Colors.red, // Badge color
+            isLabelVisible: true, // Show the badge
+            alignment:
+                Alignment.topRight, // Align the badge to the top-right corner
+            offset: const Offset(
+                -8, 6), // Offset the badge position (move it over the icon)
+            child: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NotificationsPage()),
+                );
+              },
+              icon: const Icon(Icons.notifications_none_outlined, size: 28),
+              color: Colors.white,
+            ),
+          )
         ],
         iconTheme: const IconThemeData(
           color: Colors.white,
@@ -208,10 +259,11 @@ class _AppScreenState extends State<AppScreen> {
       ),
       body: _getPage(currentIndex),
       bottomNavigationBar: BottomNavigation(
-          currentIndex: currentIndex.clamp(0, 2),
-          onTap: (index) {
-            navigationProvider.setCurrentIndex(index);
-          }),
+        currentIndex: getBottomNavigationIndex(currentIndex),
+        onTap: (index) {
+          navigationProvider.setCurrentIndex(index);
+        },
+      ),
       floatingActionButton: Stack(
         alignment: Alignment.bottomRight,
         children: [

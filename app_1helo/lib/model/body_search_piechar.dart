@@ -27,10 +27,10 @@ class Bodysearchpiechar {
   /// Convert the object to JSON
   Map<String, dynamic> toJson() {
     return {
-      'customerId': customerId,
-      'employeeId': employeeId,
-      'frCreatedDate': frCreatedDate,
-      'toCreatedDate': toCreatedDate,
+      'customer_id': customerId,
+      'employee_id': employeeId,
+      'fr_created_date': frCreatedDate,
+      'to_created_date': toCreatedDate,
     };
   }
 }

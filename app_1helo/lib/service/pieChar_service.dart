@@ -113,10 +113,10 @@ class PiecharService {
     final url = Uri.parse(apiUrl);
 
     try {
-      // Prepare headers
+      // Chuẩn bị headers
       final headers = await ApiConfig.getHeaders();
 
-      // Create request body
+      // Tạo body cho request
       final requestBody = Bodysearchpiechar(
         customerId: customerId,
         employeeId: employeeId,
@@ -124,47 +124,37 @@ class PiecharService {
         toCreatedDate: endDate,
       );
 
-      // Logging request details
+      // Ghi log thông tin request
       print('Sending POST request to $url with body: ${requestBody.toJson()}');
 
-      // Make the POST request
+      // Gửi request POST
       final response = await http.post(
         url,
         headers: headers,
         body: jsonEncode(requestBody.toJson()),
       );
 
-      // Log response details
+      // Ghi log thông tin phản hồi
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
+        // Parse JSON response
+        final List<dynamic> jsonData = jsonDecode(response.body);
 
-        if (jsonResponse is Map && jsonResponse.containsKey('message')) {
-          if (jsonResponse['message'] == 'Không có kết quả!') {
-            print('No results found: ${jsonResponse['message']}');
-            return [];
-          }
-        }
+        // Chuyển đổi từng phần tử thành PieCharModel
+        List<PieCharModel> listPieCharModel =
+            jsonData.map((item) => PieCharModel.fromJson(item)).toList();
 
-        if (jsonResponse is Map && jsonResponse.containsKey('data')) {
-          final data = jsonResponse['data'];
-          if (data is List) {
-            return data.map((item) => PieCharModel.fromJson(item)).toList();
-          } else {
-            throw FormatException('Unexpected data format in response.');
-          }
-        } else {
-          throw FormatException(
-              'Response does not contain expected "data" field.');
-        }
+        return listPieCharModel;
       } else {
+        // Ném lỗi nếu không thành công
         throw HttpException(
           'Failed to load data. Status Code: ${response.statusCode}, Response: ${response.body}',
         );
       }
     } catch (error, stackTrace) {
+      // Xử lý lỗi và ghi log
       print('Error occurred: $error');
       print('Stack Trace: $stackTrace');
       return [];

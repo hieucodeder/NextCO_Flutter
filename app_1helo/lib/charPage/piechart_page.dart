@@ -470,24 +470,15 @@ class PiechartpageState extends State<Piechartpage> {
           await _updateDocumentsByDateRange();
         }
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   Future<void> _updateDocumentsByDateRange() async {
     if (startDate != null && endDate != null) {
-      // Parse and format dates
       final DateTime parsedStartDate =
           DateFormat('yyyy-MM-dd').parse(startDate!);
       final DateTime parsedEndDate = DateFormat('yyyy-MM-dd').parse(endDate!);
 
-      final String formattedStartDate =
-          DateFormat('yyyy-MM-dd').format(parsedStartDate);
-      final String formattedEndDate =
-          DateFormat('yyyy-MM-dd').format(parsedEndDate);
-
-
-      // Fetch selected filters
       final selectedEmployeeId = selectedDropdownEmployee?.value;
       final selectedCustomerId = selectedDropdownCustomer?.customerId;
 
@@ -496,7 +487,7 @@ class PiechartpageState extends State<Piechartpage> {
       });
 
       try {
-        // Fetch data using the PiecharService
+        // Gọi API để lấy dữ liệu
         final List<PieCharModel> pieCharData =
             await piecharService.searchByDateRange(
           parsedStartDate,
@@ -505,18 +496,33 @@ class PiechartpageState extends State<Piechartpage> {
           selectedCustomerId,
         );
 
-        // Update state with fetched data
-        setState(() {
-          pieCharChartData = pieCharData;
-          _processPieChartData(pieCharData);
-        });
+        print('API call successful, received ${pieCharData.length} items.');
+        print('Fetched data: ${pieCharData.map((e) => e.toJson()).toList()}');
 
         if (pieCharData.isEmpty) {
-        } else {
+          print('No data available for the selected range and filters.');
+          setState(() {
+            pieCharChartData = [];
+            final localization = AppLocalizations.of(context);
+            dataMap = {
+              localization?.translate('no_data') ?? 'Không có dữ liệu': 0,
+            };
+          });
+          return;
         }
-      } catch (e) {
+
+        // Xử lý dữ liệu cho biểu đồ sử dụng _processPieChartData
+        _processPieChartData(pieCharData);
+        print('Data successfully processed for pie chart.');
+      } catch (e, stackTrace) {
+        print('Error while fetching data: $e');
+        print('Stack trace: $stackTrace');
         setState(() {
           pieCharChartData = [];
+          final localization = AppLocalizations.of(context);
+          dataMap = {
+            localization?.translate('no_data') ?? 'Không có dữ liệu': 0,
+          };
         });
       } finally {
         setState(() {
@@ -524,6 +530,7 @@ class PiechartpageState extends State<Piechartpage> {
         });
       }
     } else {
+      print('Start date or end date is null. Please select valid dates.');
     }
   }
 
@@ -640,8 +647,8 @@ class PiechartpageState extends State<Piechartpage> {
                                   const Duration(milliseconds: 800),
                               chartRadius:
                                   MediaQuery.of(context).size.width / 1.5,
-                              legendOptions: const LegendOptions(
-                                  showLegends: false), 
+                              legendOptions:
+                                  const LegendOptions(showLegends: false),
                               chartValuesOptions: ChartValuesOptions(
                                 showChartValueBackground: false,
                                 showChartValues: true,

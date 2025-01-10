@@ -22,6 +22,10 @@ class ApiConfig {
     return '${domain ?? _defaultDomain}/api/api-core';
   }
 
+  static String get baseUrlChat {
+    return '${domain ?? _defaultDomain}/api-chat';
+  }
+
   static Future<String?> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('token');
