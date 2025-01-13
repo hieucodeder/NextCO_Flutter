@@ -1,7 +1,7 @@
 import 'package:app_1helo/pages/login_page.dart';
 import 'package:app_1helo/provider/locale_provider.dart';
-import 'package:app_1helo/provider/navigationProvider.dart';
-import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/provider/navigation_provider.dart';
+import 'package:app_1helo/provider/provider_color.dart';
 import 'package:app_1helo/service/app_localizations%20.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

@@ -1,11 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/provider/provider_color.dart';
 import 'package:app_1helo/service/app_localizations%20.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:screenshot/screenshot.dart';

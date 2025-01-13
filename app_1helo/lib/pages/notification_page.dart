@@ -1,7 +1,11 @@
+import 'dart:math';
 import 'package:app_1helo/model/notification_model.dart';
+import 'package:app_1helo/provider/provider_color.dart';
 import 'package:app_1helo/service/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class NotificationsPage extends StatefulWidget {
   @override
@@ -18,6 +22,20 @@ class _NotificationsPageState extends State<NotificationsPage> {
   int currentPage = 1;
   final int pageSize = 10;
   bool hasMoreData = true;
+
+  String getRandomImage(int rowNumber) {
+    List<String> images = [
+      'resources/7.jpg',
+      'resources/50.jpg',
+      'resources/43.jpg',
+      'resources/45.jpg',
+      'resources/11.jpg',
+      'resources/47.jpg',
+      'resources/34.jpg',
+      'resources/51.jpg',
+    ];
+    return images[rowNumber % images.length];
+  }
 
   @override
   void initState() {
@@ -82,10 +100,161 @@ class _NotificationsPageState extends State<NotificationsPage> {
     }
   }
 
+  String _formatDateTime(String dateTimeString) {
+    try {
+      DateTime dateTime = DateTime.parse(dateTimeString);
+      // Định dạng ngày tháng theo kiểu dd/MM/yyyy HH:mm
+      return DateFormat('dd/MM/yyyy, HH:mm').format(dateTime);
+    } catch (e) {
+      return 'Không xác định';
+    }
+  }
+
+  void showNotificationDetailsDialog(
+      BuildContext context, dynamic notification) {
+    String title = '';
+    final stylesText = GoogleFonts.robotoCondensed(
+        color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600);
+
+    if (notification.requestType == 1) {
+      title = 'Yêu cầu hủy hồ sơ C/O';
+    } else if (notification.requestType == 2) {
+      title = 'Yêu cầu sửa hồ sơ C/O';
+    } else {
+      title = 'Chi tiết thông báo'; // Tiêu đề mặc định
+    }
+    showDialog(
+      context: context,
+      builder: (context) {
+        final textStyle = GoogleFonts.robotoCondensed(
+            fontWeight: FontWeight.bold, color: Colors.black, fontSize: 14);
+        final stylesTextData =
+            GoogleFonts.robotoCondensed(color: Colors.black, fontSize: 14);
+        return AlertDialog(
+          title: Text(
+            title,
+            style: stylesText,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text.rich(
+                TextSpan(children: [
+                  TextSpan(text: 'Nhân viên: ', style: textStyle),
+                  TextSpan(
+                      text: '${notification.sender ?? 'Không rõ'}',
+                      style: stylesTextData)
+                ]),
+              ),
+              const SizedBox(height: 8),
+              Text.rich(
+                TextSpan(children: [
+                  TextSpan(text: 'Nội dung: ', style: textStyle),
+                  TextSpan(
+                      text: '${notification.content ?? 'Không có nội dung'}',
+                      style: stylesTextData)
+                ]),
+              ),
+              const SizedBox(height: 8),
+              Text.rich(
+                TextSpan(children: [
+                  TextSpan(text: 'Thời gian: ', style: textStyle),
+                  TextSpan(
+                      text:
+                          (_formatDateTime(notification.createdDateTime ?? '')),
+                      style: stylesTextData)
+                ]),
+              ),
+              const SizedBox(height: 8),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(text: 'Khách hàng: ', style: textStyle),
+                    TextSpan(
+                        text: ' ${notification.customerName ?? 'Không rõ'}',
+                        style: stylesTextData)
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(text: 'Mã hồ sơ CO: ', style: textStyle),
+                    TextSpan(
+                        text: '${notification.target ?? 'Không rõ'}',
+                        style: GoogleFonts.robotoCondensed(
+                            color: Colors.blue, fontSize: 14)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(text: 'Lý do: ', style: textStyle),
+                    TextSpan(
+                        text: '${notification.reason ?? 'Không rõ'}',
+                        style: stylesTextData)
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white,
+                    border: Border.all(
+                        width: 2,
+                        color:
+                            Provider.of<Providercolor>(context).selectedColor),
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'Không',
+                      style: GoogleFonts.robotoCondensed(
+                          color: Provider.of<Providercolor>(context)
+                              .selectedColor),
+                    ),
+                  ),
+                ),
+                Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Provider.of<Providercolor>(context).selectedColor),
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'Đồng ý',
+                      style: GoogleFonts.robotoCondensed(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final testStyles = GoogleFonts.robotoCondensed(
-        fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black);
+        fontSize: 15, fontWeight: FontWeight.w700, color: Colors.black);
     final testStyle = GoogleFonts.robotoCondensed(
         fontSize: 16, fontWeight: FontWeight.w500, color: Colors.grey);
     return Scaffold(
@@ -113,7 +282,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 child: ListView(
                   controller: _scrollController,
                   children: [
-                    // Danh sách chưa đọc
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
@@ -137,8 +305,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(width: 1, color: Colors.grey)),
                           child: ListTile(
-                            leading: Image.asset(
-                              'resources/avatarcute.jpg',
+                            leading: SizedBox(
+                              width: 45,
+                              height: 45,
+                              child: Image.asset(
+                                getRandomImage(notification.rowNumber ?? 0),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                             title: Text(
                               notification.content ?? 'Không có nội dung',
@@ -152,15 +325,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                               style: testStyle,
                             ),
                             onTap: () {
-                              // Xử lý khi nhấp vào thông báo
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => NotificationDetailPage(
-                              //       notification: notification,
-                              //     ),
-                              //   ),
-                              // );
+                              showNotificationDetailsDialog(
+                                  context, notification);
                             },
                           ),
                         );
@@ -185,33 +351,31 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         final notification = readNotifications[index];
                         return Container(
                           decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(width: 1, color: Colors.grey)),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(width: 1, color: Colors.grey),
+                          ),
                           child: ListTile(
-                            leading: Image.asset(
-                              'resources/avatarcute.jpg',
+                            leading: SizedBox(
+                              width: 45,
+                              height: 45,
+                              child: Image.asset(
+                                getRandomImage(notification.rowNumber ?? 0),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                             title: Text(
                               notification.content ?? 'Không có nội dung',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: testStyles,
                             ),
                             subtitle: Text(
-                                formatNotificationTime(
-                                    notification.createdDateTime ?? ''),
-                                style: testStyle),
+                              formatNotificationTime(
+                                  notification.createdDateTime ?? ''),
+                            ),
                             onTap: () {
-                              // Xử lý khi nhấp vào thông báo
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => NotificationDetailPage(
-                              //       notification: notification,
-                              //     ),
-                              //   ),
-                              // );
+                              showNotificationDetailsDialog(
+                                  context, notification);
                             },
                           ),
                         );

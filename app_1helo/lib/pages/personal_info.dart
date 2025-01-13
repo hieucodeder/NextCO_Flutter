@@ -1,6 +1,6 @@
 import 'package:app_1helo/model/account.dart';
-import 'package:app_1helo/provider/navigationProvider.dart';
-import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/provider/navigation_provider.dart';
+import 'package:app_1helo/provider/provider_color.dart';
 import 'package:app_1helo/service/app_localizations%20.dart';
 import 'package:app_1helo/service/authservice.dart';
 import 'package:flutter/material.dart';

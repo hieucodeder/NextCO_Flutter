@@ -1,3 +1,4 @@
+import 'package:app_1helo/Cusstom/notification_badge.dart';
 import 'package:app_1helo/charPage/columnchar_page.dart';
 import 'package:app_1helo/navigation/bottom_navigation.dart';
 import 'package:app_1helo/pages/accout_page.dart';
@@ -17,8 +18,8 @@ import 'package:app_1helo/pages/materials_page.dart';
 import 'package:app_1helo/pages/product_page.dart';
 import 'package:app_1helo/pages/productreport_page.dart';
 import 'package:app_1helo/pages/staff_page.dart';
-import 'package:app_1helo/provider/navigationProvider.dart';
-import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/provider/navigation_provider.dart';
+import 'package:app_1helo/provider/provider_color.dart';
 import 'package:app_1helo/service/app_localizations%20.dart';
 import 'package:app_1helo/service/notification_service.dart';
 import 'package:flutter/material.dart';
@@ -205,51 +206,31 @@ class _AppScreenState extends State<AppScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          // DropdownButton<Locale>(
-          //   value: currentLocale,
-          //   onChanged: (Locale? newLocale) {
-          //     if (newLocale != null) {
-          //       context.read<LocaleProvider>().setLocale(newLocale);
-          //     }
-          //   },
-          //   items: languages.map((language) {
-          //     return DropdownMenuItem<Locale>(
-          //       value: language['locale'],
-          //       child: Row(
-          //         children: [
-          //           Text(
-          //             language['flag'],
-          //             style: const TextStyle(fontSize: 24),
-          //           ),
-          //         ],
-          //       ),
-          //     );
-          //   }).toList(),
-          // ),
-          Badge(
-            label: Text(
-              '$unreadCount', // The number of notifications
-              style: GoogleFonts.robotoCondensed(
-                  color: Colors.white, fontSize: 12),
-            ),
-            backgroundColor: Colors.red, // Badge color
-            isLabelVisible: true, // Show the badge
-            alignment:
-                Alignment.topRight, // Align the badge to the top-right corner
-            offset: const Offset(
-                -8, 6), // Offset the badge position (move it over the icon)
-            child: IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NotificationsPage()),
-                );
-              },
-              icon: const Icon(Icons.notifications_none_outlined, size: 28),
-              color: Colors.white,
-            ),
-          )
+        actions: const [
+          NotificationBadge(),
+            // Badge(
+          //   label: Text(
+          //     '$unreadCount',
+          //     style: GoogleFonts.robotoCondensed(
+          //         color: Colors.white, fontSize: 12),
+          //   ),
+          //   backgroundColor: Colors.red,
+          //   isLabelVisible: true,
+          //   alignment:
+          //       Alignment.topRight,
+          //   offset: const Offset(
+          //       -8, 6),
+          //   child: IconButton(
+          //     onPressed: () {
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(builder: (context) => NotificationsPage()),
+          //       );
+          //     },
+          //     icon: const Icon(Icons.notifications_none_outlined, size: 28),
+          //     color: Colors.white,
+          //   ),
+          // )
         ],
         iconTheme: const IconThemeData(
           color: Colors.white,

@@ -2,7 +2,7 @@
 
 import 'package:app_1helo/model/dropdown_customer.dart';
 import 'package:app_1helo/model/user.dart';
-import 'package:app_1helo/provider/providerColor.dart';
+import 'package:app_1helo/provider/provider_color.dart';
 import 'package:app_1helo/service/app_localizations%20.dart';
 import 'package:app_1helo/service/authservice.dart';
 import 'package:app_1helo/service/user_service.dart';
@@ -167,8 +167,7 @@ class _StaffpageState extends State<Staffpage> {
           _filteredUsersRoom = staff;
         });
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   Future<void> _fetchBranchData() async {
@@ -181,8 +180,7 @@ class _StaffpageState extends State<Staffpage> {
           _filteredUsersBranch = staff;
         });
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   void toggleDropDownVisibility() {

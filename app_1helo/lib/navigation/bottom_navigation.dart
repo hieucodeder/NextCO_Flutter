@@ -2,8 +2,7 @@ import 'package:app_1helo/service/app_localizations%20.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:app_1helo/provider/providerColor.dart';
-
+import 'package:app_1helo/provider/provider_color.dart';
 class BottomNavigation extends StatefulWidget {
   final int currentIndex;
   final Function(int) onTap;
