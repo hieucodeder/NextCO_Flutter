@@ -167,28 +167,28 @@ class PiechartpageState extends State<Piechartpage> {
         dataMap = total > 0
             ? {
                 if (completedTotal > 0)
-                  "${localization?.translate('completed') ?? 'Hoàn thành'}: ($completedTotal)":
+                  "${localization?.translate('completed') ?? 'Hoàn thành'} ($completedTotal)":
                       (completedTotal / total) * 100,
                 if (processingTotal > 0)
-                  "${localization?.translate('processing') ?? 'Đang thực hiện'}: ($processingTotal)":
+                  "${localization?.translate('processing') ?? 'Đang thực hiện'} ($processingTotal)":
                       (processingTotal / total) * 100,
                 if (waitingcancelTotal > 0)
-                  "${localization?.translate('waiting_cancel') ?? 'Chờ hủy'}: ($waitingcancelTotal)":
+                  "${localization?.translate('waiting_cancel') ?? 'Chờ hủy'} ($waitingcancelTotal)":
                       (waitingcancelTotal / total) * 100,
                 if (waitingTotal > 0)
-                  "${localization?.translate('waiting_approval') ?? 'Chờ duyệt'}: ($waitingTotal)":
+                  "${localization?.translate('waiting_approval') ?? 'Chờ duyệt'} ($waitingTotal)":
                       (waitingTotal / total) * 100,
                 if (refusedconsider > 0)
-                  "${localization?.translate('refused_consideration') ?? 'Từ chối xét duyệt'}: ($refusedconsider)":
+                  "${localization?.translate('refused_consideration') ?? 'Từ chối xét duyệt'} ($refusedconsider)":
                       (refusedconsider / total) * 100,
                 if (cancel > 0)
-                  "${localization?.translate('canceled') ?? 'Đã hủy'}: ($cancel)":
+                  "${localization?.translate('canceled') ?? 'Đã hủy'} ($cancel)":
                       (cancel / total) * 100,
                 if (editor > 0)
-                  "${localization?.translate('editing') ?? 'Đang sửa'}: ($editor)":
+                  "${localization?.translate('editing') ?? 'Đang sửa'} ($editor)":
                       (editor / total) * 100,
                 if (waitingrepair > 0)
-                  "${localization?.translate('waiting_repair') ?? 'Chờ sửa'}: ($waitingrepair)":
+                  "${localization?.translate('waiting_repair') ?? 'Chờ sửa'} ($waitingrepair)":
                       (waitingrepair / total) * 100,
               }
             : {localization?.translate('no_data') ?? 'Không có dữ liệu': 0};
@@ -238,7 +238,7 @@ class PiechartpageState extends State<Piechartpage> {
     // Lấy trạng thái từ dataMap keys và ánh xạ màu từ statusColorMap
     return dataMap.keys.map((key) {
       // Tách trạng thái từ chuỗi key (nếu cần).
-      final statusText = key.split(":").first.trim();
+      final statusText = key.split(" (").first.trim();
 
       if (statusText == completedStatus || statusText == 'Hoàn thành') {
         return statusColorMap[1] ?? Colors.grey;
