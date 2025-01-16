@@ -1,12 +1,15 @@
 import 'dart:math';
 import 'package:app_1helo/model/notification_model.dart';
 import 'package:app_1helo/provider/provider_color.dart';
+import 'package:app_1helo/service/notification_delete_service.dart';
 import 'package:app_1helo/service/notification_service.dart';
+import 'package:app_1helo/service/request_notification_service.dart';
 import 'package:app_1helo/service/update_notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationsPage extends StatefulWidget {
   @override
@@ -23,6 +26,20 @@ class _NotificationsPageState extends State<NotificationsPage> {
   int currentPage = 1;
   final int pageSize = 10;
   bool hasMoreData = true;
+  List<String> deletedNotificationIds = [];
+
+  void removeNotification(Data notification) {
+    setState(() {
+      // Add deleted notification's ID to the list
+      deletedNotificationIds.add(notification.historyNotificationsId ?? '');
+
+      // Remove from both unread and read lists
+      unreadNotifications
+          .removeWhere((notif) => notif.notifyId == notification.notifyId);
+      readNotifications
+          .removeWhere((notif) => notif.notifyId == notification.notifyId);
+    });
+  }
 
   String getRandomImage(int rowNumber) {
     List<String> images = [
@@ -73,7 +90,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
       });
     } catch (e) {
       // Xử lý lỗi tải thông báo
-      print('Error fetching notifications: $e');
     } finally {
       setState(() {
         isLoading = false;
@@ -111,194 +127,46 @@ class _NotificationsPageState extends State<NotificationsPage> {
     }
   }
 
-  // void showNotificationDetailsDialog(
-  //     BuildContext context, dynamic notification) {
-  //   String title = '';
-  //   final stylesText = GoogleFonts.robotoCondensed(
-  //       color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600);
-
-  //   if (notification.requestType == 1) {
-  //     title = 'Yêu cầu hủy hồ sơ C/O';
-  //   } else if (notification.requestType == 2) {
-  //     title = 'Yêu cầu sửa hồ sơ C/O';
-  //   } else {
-  //     title = 'Chi tiết thông báo'; // Tiêu đề mặc định
-  //   }
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) {
-  //       final textStyle = GoogleFonts.robotoCondensed(
-  //           fontWeight: FontWeight.bold, color: Colors.black, fontSize: 14);
-  //       final stylesTextData =
-  //           GoogleFonts.robotoCondensed(color: Colors.black, fontSize: 14);
-  //       return AlertDialog(
-  //         title: Text(
-  //           title,
-  //           style: stylesText,
-  //         ),
-  //         content: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: [
-  //             Text.rich(
-  //               TextSpan(children: [
-  //                 TextSpan(text: 'Nhân viên: ', style: textStyle),
-  //                 TextSpan(
-  //                     text: '${notification.sender ?? 'Không rõ'}',
-  //                     style: stylesTextData)
-  //               ]),
-  //             ),
-  //             const SizedBox(height: 8),
-  //             Text.rich(
-  //               TextSpan(children: [
-  //                 TextSpan(text: 'Nội dung: ', style: textStyle),
-  //                 TextSpan(
-  //                     text: '${notification.content ?? 'Không có nội dung'}',
-  //                     style: stylesTextData)
-  //               ]),
-  //             ),
-  //             const SizedBox(height: 8),
-  //             Text.rich(
-  //               TextSpan(children: [
-  //                 TextSpan(text: 'Thời gian: ', style: textStyle),
-  //                 TextSpan(
-  //                     text:
-  //                         (_formatDateTime(notification.createdDateTime ?? '')),
-  //                     style: stylesTextData)
-  //               ]),
-  //             ),
-  //             const SizedBox(height: 8),
-  //             Text.rich(
-  //               TextSpan(
-  //                 children: [
-  //                   TextSpan(text: 'Khách hàng: ', style: textStyle),
-  //                   TextSpan(
-  //                       text: ' ${notification.customerName ?? 'Không rõ'}',
-  //                       style: stylesTextData)
-  //                 ],
-  //               ),
-  //             ),
-  //             const SizedBox(height: 8),
-  //             Text.rich(
-  //               TextSpan(
-  //                 children: [
-  //                   TextSpan(text: 'Mã hồ sơ CO: ', style: textStyle),
-  //                   TextSpan(
-  //                       text: '${notification.target ?? 'Không rõ'}',
-  //                       style: GoogleFonts.robotoCondensed(
-  //                           color: Colors.blue, fontSize: 14)),
-  //                 ],
-  //               ),
-  //             ),
-  //             const SizedBox(height: 8),
-  //             Text.rich(
-  //               TextSpan(
-  //                 children: [
-  //                   TextSpan(text: 'Lý do: ', style: textStyle),
-  //                   TextSpan(
-  //                       text: '${notification.reason ?? 'Không rõ'}',
-  //                       style: stylesTextData)
-  //                 ],
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //         actions: [
-  //           Row(
-  //             mainAxisAlignment: MainAxisAlignment.spaceAround,
-  //             children: [
-  //               Container(
-  //                 height: 40,
-  //                 decoration: BoxDecoration(
-  //                   borderRadius: BorderRadius.circular(10),
-  //                   color: Colors.white,
-  //                   border: Border.all(
-  //                       width: 2,
-  //                       color:
-  //                           Provider.of<Providercolor>(context).selectedColor),
-  //                 ),
-  //                 child: TextButton(
-  //                   onPressed: () {
-  //                     Navigator.of(context).pop();
-  //                   },
-  //                   child: Text(
-  //                     'Không',
-  //                     style: GoogleFonts.robotoCondensed(
-  //                         color: Provider.of<Providercolor>(context)
-  //                             .selectedColor),
-  //                   ),
-  //                 ),
-  //               ),
-  //               Container(
-  //                 height: 40,
-  //                 decoration: BoxDecoration(
-  //                     borderRadius: BorderRadius.circular(10),
-  //                     color: Provider.of<Providercolor>(context).selectedColor),
-  //                 child: TextButton(
-  //                   onPressed: () {
-  //                     Navigator.of(context).pop();
-  //                   },
-  //                   child: Text(
-  //                     'Đồng ý',
-  //                     style: GoogleFonts.robotoCondensed(color: Colors.white),
-  //                   ),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-  void showNotificationDetailsDialog(
-      BuildContext context, dynamic notification) async {
-// Chuyển đổi `isRead` từ `int` sang `bool` để so sánh
+  Future<String?> showNotificationDetailsDialog(
+    BuildContext context,
+    dynamic notification,
+    Function(Data) removeNotification, // Callback to remove notification
+  ) async {
     bool isReadBool = notification.isRead == 1;
-    print(
-        "Current isRead (int): ${notification.isRead}, Converted isRead (bool): $isReadBool");
+    final selectedColor =
+        Provider.of<Providercolor>(context, listen: false).selectedColor;
 
-// Nếu thông báo chưa được đọc (isReadBool == false), gọi API để cập nhật trạng thái
     if (!isReadBool) {
-      print("Notification is not read. Sending update API request...");
-
       final updateNotification = await fetchNotificationUpdate(
-        notifyId: notification.notifyId ?? '', // ID của thông báo
-        isRead: true, // Đánh dấu là đã đọc
-        senderId: notification.senderId ?? '', // ID người gửi
-        recordCount: notification.recordCount, // Số lượng bản ghi
-        rowNumber: notification.rowNumber, // Số thứ tự dòng
-        accessCoDetail: notification.accessCoDetail, // Chi tiết quyền truy cập
-        activeFlag: notification.activeFlag, // Cờ hoạt động
-        content: notification.content, // Nội dung thông báo
-        createdDateTime: notification.createdDateTime, // Thời gian tạo
-        customerName: notification.customerName, // Tên khách hàng
-        historyNotificationsId:
-            notification.historyNotificationsId, // ID thông báo lịch sử
-        isReceived: 1, // Trạng thái đã nhận
-        reason: notification.reason, // Lý do
-        requestType: notification.requestType, // Loại yêu cầu
-        sender: notification.sender, // Người gửi
-        target: notification.target, // Mục tiêu
+        notifyId: notification.notifyId ?? '',
+        isRead: true,
+        senderId: notification.senderId ?? '',
+        recordCount: notification.recordCount,
+        rowNumber: notification.rowNumber,
+        accessCoDetail: notification.accessCoDetail,
+        activeFlag: notification.activeFlag,
+        content: notification.content,
+        createdDateTime: notification.createdDateTime,
+        customerName: notification.customerName,
+        historyNotificationsId: notification.historyNotificationsId,
+        isReceived: 1,
+        reason: notification.reason,
+        requestType: notification.requestType,
+        sender: notification.sender,
+        target: notification.target,
       );
 
       if (updateNotification == null) {
-        // Xử lý lỗi khi không lấy được chi tiết thông báo
-        print("Failed to update notification status. API returned null.");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Không thể tải thông báo, vui lòng thử lại!")),
+          const SnackBar(
+              content: Text("Không thể tải thông báo, vui lòng thử lại!")),
         );
-        return;
+        return null;
       }
 
-      // Cập nhật trạng thái isRead trong đối tượng notification
-      print("API call successful. Updating isRead to 1.");
-      notification.isRead = 1; // Đánh dấu là đã đọc
-    } else {
-      print("Notification is already read. No API call needed.");
+      notification.isRead = 1;
     }
 
-    // Hiển thị dialog
     String title = '';
     final stylesText = GoogleFonts.robotoCondensed(
         color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600);
@@ -308,7 +176,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
     } else if (notification.requestType == 2) {
       title = 'Yêu cầu sửa hồ sơ C/O';
     } else {
-      title = 'Chi tiết thông báo'; // Tiêu đề mặc định
+      title = 'Chi tiết thông báo';
     }
 
     showDialog(
@@ -356,37 +224,31 @@ class _NotificationsPageState extends State<NotificationsPage> {
               ),
               const SizedBox(height: 8),
               Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(text: 'Khách hàng: ', style: textStyle),
-                    TextSpan(
-                        text: ' ${notification.customerName ?? 'Không rõ'}',
-                        style: stylesTextData)
-                  ],
-                ),
+                TextSpan(children: [
+                  TextSpan(text: 'Khách hàng: ', style: textStyle),
+                  TextSpan(
+                      text: ' ${notification.customerName ?? 'Không rõ'}',
+                      style: stylesTextData)
+                ]),
               ),
               const SizedBox(height: 8),
               Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(text: 'Mã hồ sơ CO: ', style: textStyle),
-                    TextSpan(
-                        text: '${notification.target ?? 'Không rõ'}',
-                        style: GoogleFonts.robotoCondensed(
-                            color: Colors.blue, fontSize: 14)),
-                  ],
-                ),
+                TextSpan(children: [
+                  TextSpan(text: 'Mã hồ sơ CO: ', style: textStyle),
+                  TextSpan(
+                      text: '${notification.target ?? 'Không rõ'}',
+                      style: GoogleFonts.robotoCondensed(
+                          color: Colors.blue, fontSize: 14)),
+                ]),
               ),
               const SizedBox(height: 8),
               Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(text: 'Lý do: ', style: textStyle),
-                    TextSpan(
-                        text: '${notification.reason ?? 'Không rõ'}',
-                        style: stylesTextData)
-                  ],
-                ),
+                TextSpan(children: [
+                  TextSpan(text: 'Lý do: ', style: textStyle),
+                  TextSpan(
+                      text: '${notification.reason ?? 'Không rõ'}',
+                      style: stylesTextData)
+                ]),
               ),
             ],
           ),
@@ -397,13 +259,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 Container(
                   height: 40,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white,
-                    border: Border.all(
-                        width: 2,
-                        color:
-                            Provider.of<Providercolor>(context).selectedColor),
-                  ),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                      border: Border.all(width: 2, color: selectedColor)),
                   child: TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
@@ -419,11 +277,79 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 Container(
                   height: 40,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Provider.of<Providercolor>(context).selectedColor),
+                    borderRadius: BorderRadius.circular(10),
+                    color: selectedColor,
+                  ),
                   child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
+                    onPressed: () async {
+                      final bool isReadValue = notification.isRead == 1;
+                      final bool isReceivedValue = notification.isReceived == 1;
+
+                      final prefs = await SharedPreferences.getInstance();
+                      final userId = prefs.getString('userId');
+
+                      if (userId != null) {
+                        DateTime now = DateTime.now();
+                        String formattedDateTime =
+                            "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}";
+                        // First API Call: Send Notification Request
+                        final response = await fetchNotificationResquest(
+                          activeFlag: notification.activeFlag,
+                          content: "Demo đã đồng ý yêu cầu chấp thuận hồ sơ",
+                          createdDateTime: formattedDateTime,
+                          historyNotificationsId:
+                              notification.historyNotificationsId,
+                          isRead: false,
+                          isReceived: false,
+                          receiver: notification.senderId,
+                          requestType: 3,
+                          senderId: userId,
+                          target: notification.target,
+                          type: 2,
+                        );
+
+                        if (response == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    "Không thể gửi yêu cầu, vui lòng thử lại!")),
+                          );
+                          return;
+                        }
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text("Yêu cầu đã được gửi thành công!")),
+                        );
+
+                        final deleteResponse = await fetchNotificationRequest(
+                          notificationIds: [notification.notifyId],
+                        );
+
+                        if (deleteResponse == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    "Không thể xóa thông báo, vui lòng thử lại!")),
+                          );
+                        } else {
+                          Navigator.of(context).pop();
+
+                          removeNotification(notification);
+                          _fetchNotifications();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content:
+                                    Text("Thông báo đã được xóa thành công!")),
+                          );
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text(
+                                  "Không thể xác định người dùng, vui lòng thử lại!")),
+                        );
+                      }
                     },
                     child: Text(
                       'Đồng ý',
@@ -437,6 +363,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
         );
       },
     );
+    return null;
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -486,6 +419,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(width: 1, color: Colors.grey),
                         ),
+                        margin: const EdgeInsets.only(bottom: 10),
                         child: ListTile(
                           leading: SizedBox(
                             width: 45,
@@ -508,7 +442,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           ),
                           onTap: () {
                             showNotificationDetailsDialog(
-                                context, notification);
+                                context, notification, removeNotification);
                           },
                         ),
                       );
@@ -558,9 +492,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
                             formatNotificationTime(
                                 notification.createdDateTime ?? ''),
                           ),
-                          onTap: () {
+                          onTap: () async {
                             showNotificationDetailsDialog(
-                                context, notification);
+                                context, notification, removeNotification);
                           },
                         ),
                       );
@@ -576,11 +510,5 @@ class _NotificationsPageState extends State<NotificationsPage> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 }
