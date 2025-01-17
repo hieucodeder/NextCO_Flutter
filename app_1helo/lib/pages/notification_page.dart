@@ -3,6 +3,7 @@ import 'package:app_1helo/model/notification_model.dart';
 import 'package:app_1helo/provider/provider_color.dart';
 import 'package:app_1helo/service/notification_delete_service.dart';
 import 'package:app_1helo/service/notification_service.dart';
+import 'package:app_1helo/service/refuse_notification_service.dart';
 import 'package:app_1helo/service/request_notification_service.dart';
 import 'package:app_1helo/service/update_notification_service.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ class NotificationsPage extends StatefulWidget {
 class _NotificationsPageState extends State<NotificationsPage> {
   final NotificationService notificationService = NotificationService();
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController reasonController = TextEditingController();
 
   List<Data> unreadNotifications = [];
   List<Data> readNotifications = [];
@@ -113,7 +115,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         return '${difference.inDays} ngày trước';
       }
     } catch (e) {
-      return 'Không xác định'; // Trường hợp lỗi
+      return 'Không xác định';
     }
   }
 
@@ -130,7 +132,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
   Future<String?> showNotificationDetailsDialog(
     BuildContext context,
     dynamic notification,
-    Function(Data) removeNotification, // Callback to remove notification
+    Function(Data) removeNotification,
   ) async {
     bool isReadBool = notification.isRead == 1;
     final selectedColor =
@@ -167,17 +169,32 @@ class _NotificationsPageState extends State<NotificationsPage> {
       notification.isRead = 1;
     }
 
-    String title = '';
+    String getTitleByRequestType(int requestType,
+        {String defaultTitle = 'Chi tiết thông báo'}) {
+      switch (requestType) {
+        case 1:
+          return 'Yêu cầu hủy hồ sơ C/O';
+        case 2:
+          return 'Yêu cầu sửa hồ sơ C/O';
+        default:
+          return defaultTitle;
+      }
+    }
+
+    String title = getTitleByRequestType(notification.requestType);
+    String titleNo = getTitleByRequestType(notification.requestType,
+            defaultTitle: 'Chi tiết thông báo')
+        .replaceFirst('Yêu cầu ', '');
+    String titleReson = notification.requestType == 1
+        ? 'Lý do không đồng ý hủy'
+        : notification.requestType == 2
+            ? 'Lý do không đồng ý sửa'
+            : 'Chi tiết thông báo';
+
     final stylesText = GoogleFonts.robotoCondensed(
         color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600);
-
-    if (notification.requestType == 1) {
-      title = 'Yêu cầu hủy hồ sơ C/O';
-    } else if (notification.requestType == 2) {
-      title = 'Yêu cầu sửa hồ sơ C/O';
-    } else {
-      title = 'Chi tiết thông báo';
-    }
+    final stylesTextContent = GoogleFonts.robotoCondensed(
+        color: Colors.black, fontSize: 16, fontWeight: FontWeight.w500);
 
     showDialog(
       context: context,
@@ -265,6 +282,204 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   child: TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          TextEditingController reasonController =
+                              TextEditingController();
+                          return Dialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(titleNo, style: stylesText),
+                                  const SizedBox(height: 8),
+                                  Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        TextSpan(
+                                            text: 'Từ chối $titleNo',
+                                            style: stylesTextContent),
+                                        TextSpan(
+                                            text: ' "${notification.target}"?',
+                                            style: GoogleFonts.robotoCondensed(
+                                                fontSize: 16,
+                                                color: Colors.red))
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  TextField(
+                                    controller: reasonController,
+                                    decoration: InputDecoration(
+                                      labelText: '*$titleReson',
+                                      labelStyle: stylesTextContent,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    maxLines: 3,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Container(
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            border: Border.all(
+                                                width: 2,
+                                                color: selectedColor)),
+                                        child: TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          style: TextButton.styleFrom(
+                                            foregroundColor: Colors.black54,
+                                          ),
+                                          child: Text(
+                                            'Không',
+                                            style: GoogleFonts.robotoCondensed(
+                                                color:
+                                                    Provider.of<Providercolor>(
+                                                            context)
+                                                        .selectedColor),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: selectedColor),
+                                        child: TextButton(
+                                          onPressed: () async {
+                                            final bool isReadValue =
+                                                notification.isRead == 1;
+                                            final bool isReceivedValue =
+                                                notification.isReceived == 1;
+                                            // Lấy giá trị từ TextField
+                                            final reason =
+                                                reasonController.text.trim();
+
+                                            if (reason.isEmpty) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                    content: Text(
+                                                        "Vui lòng nhập lý do!")),
+                                              );
+                                              return;
+                                            }
+                                            final prefs =
+                                                await SharedPreferences
+                                                    .getInstance();
+                                            final userId =
+                                                prefs.getString('userId');
+
+                                            if (userId != null) {
+                                              DateTime now = DateTime.now();
+                                              String formattedDateTime =
+                                                  "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}";
+
+                                              final response =
+                                                  await fetchNotificationRefuse(
+                                                activeFlag:
+                                                    notification.activeFlag,
+                                                content:
+                                                    "Demo đã từ chối yêu cầu hồ sơ số ${notification.target}",
+                                                createdDateTime:
+                                                    formattedDateTime,
+                                                historyNotificationsId:
+                                                    notification
+                                                        .historyNotificationsId,
+                                                reason: reason,
+                                                isRead: false,
+                                                isReceived: false,
+                                                receiver: notification.senderId,
+                                                requestType: 4,
+                                                senderId: userId,
+                                                target: notification.target,
+                                                type: 2,
+                                              );
+
+                                              if (response == null) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                      content: Text(
+                                                          "Không thể gửi yêu cầu, vui lòng thử lại!")),
+                                                );
+                                                return;
+                                              }
+
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                    content: Text(
+                                                        "Yêu cầu đã được gửi thành công!")),
+                                              );
+
+                                              final deleteResponse =
+                                                  await fetchNotificationRequest(
+                                                notificationIds: [
+                                                  notification.notifyId
+                                                ],
+                                              );
+
+                                              if (deleteResponse == null) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                      content: Text(
+                                                          "Không thể xóa thông báo, vui lòng thử lại!")),
+                                                );
+                                              } else {
+                                                Navigator.of(context).pop();
+
+                                                removeNotification(
+                                                    notification);
+                                                _fetchNotifications();
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                      content: Text(
+                                                          "Thông báo đã được xóa thành công!")),
+                                                );
+                                              }
+                                            } else {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                    content: Text(
+                                                        "Không thể xác định người dùng, vui lòng thử lại!")),
+                                              );
+                                            }
+                                          },
+                                          child: Text(
+                                            'Gửi',
+                                            style: GoogleFonts.robotoCondensed(
+                                                color: Colors.white),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      );
                     },
                     child: Text(
                       'Không',
@@ -295,7 +510,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         // First API Call: Send Notification Request
                         final response = await fetchNotificationResquest(
                           activeFlag: notification.activeFlag,
-                          content: "Demo đã đồng ý yêu cầu chấp thuận hồ sơ",
+                          content:
+                              "Demo đã đồng ý yêu cầu chấp thuận hồ sơ ${notification.target}",
                           createdDateTime: formattedDateTime,
                           historyNotificationsId:
                               notification.historyNotificationsId,
@@ -415,7 +631,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       final notification = unreadNotifications[index];
                       return Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Colors.blue.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(width: 1, color: Colors.grey),
                         ),
