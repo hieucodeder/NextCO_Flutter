@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:app_1helo/model/notification_model.dart';
 import 'package:app_1helo/provider/provider_color.dart';
 import 'package:app_1helo/service/notification_delete_service.dart';
@@ -363,10 +362,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                             color: selectedColor),
                                         child: TextButton(
                                           onPressed: () async {
-                                            final bool isReadValue =
-                                                notification.isRead == 1;
-                                            final bool isReceivedValue =
-                                                notification.isReceived == 1;
                                             // Lấy giá trị từ TextField
                                             final reason =
                                                 reasonController.text.trim();
@@ -497,9 +492,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   ),
                   child: TextButton(
                     onPressed: () async {
-                      final bool isReadValue = notification.isRead == 1;
-                      final bool isReceivedValue = notification.isReceived == 1;
-
                       final prefs = await SharedPreferences.getInstance();
                       final userId = prefs.getString('userId');
 
@@ -596,10 +588,17 @@ class _NotificationsPageState extends State<NotificationsPage> {
         fontSize: 16, fontWeight: FontWeight.w500, color: Colors.grey);
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Provider.of<Providercolor>(context).selectedColor,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            color: Colors.white,
+            icon: const Icon(Icons.arrow_back)),
         title: Text(
           'DANH SÁCH THÔNG BÁO',
           style: GoogleFonts.robotoCondensed(
-              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
       ),
@@ -614,7 +613,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 controller: _scrollController,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(6.0),
                     child: Text(
                       'Chưa đọc',
                       style: GoogleFonts.robotoCondensed(
@@ -664,10 +663,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       );
                     },
                   ),
-
-                  // Danh sách đã đọc
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(6.0),
                     child: Text(
                       'Tất cả',
                       style: GoogleFonts.robotoCondensed(

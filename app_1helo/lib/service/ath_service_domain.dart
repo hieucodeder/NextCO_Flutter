@@ -9,31 +9,22 @@ class Athservicedomain {
 
   Future<Map<String, dynamic>?> login(Bodyuser bodyUser) async {
     final url = Uri.parse("$_baseUrl/login");
-    // Log the login URL
+
     try {
-      // Make the POST request
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
         body: json.encode(bodyUser.toJson()),
       );
 
-      // Log the status code and response body
-
       if (response.statusCode == 200) {
-        // Parse the response body
         final jsonResponse = json.decode(response.body);
 
-        // Log the parsed JSON response
-
-        // You can directly return the full JSON response from the API here.
         return jsonResponse;
       } else {
-        // Handle login failure and print the error
         return null;
       }
     } catch (e) {
-      // Log any exceptions
       return null;
     }
   }

@@ -1,15 +1,13 @@
+import 'package:app_1helo/Cusstom/floating_action_button_stack.dart';
 import 'package:app_1helo/Cusstom/notification_badge.dart';
 import 'package:app_1helo/charPage/columnchar_page.dart';
 import 'package:app_1helo/navigation/bottom_navigation.dart';
 import 'package:app_1helo/pages/accout_page.dart';
 import 'package:app_1helo/pages/change_password.dart';
-import 'package:app_1helo/pages/chat_box.dart';
-import 'package:app_1helo/pages/notification_page.dart';
 import 'package:app_1helo/pages/pay_page.dart';
 import 'package:app_1helo/pages/customer_page.dart';
 import 'package:app_1helo/pages/file_co_page.dart';
 import 'package:app_1helo/navigation/drawer.dart';
-import 'package:app_1helo/pages/facebookPage.dart';
 import 'package:app_1helo/pages/funtions_page.dart';
 import 'package:app_1helo/pages/personal_info.dart';
 import 'package:app_1helo/pages/home_page.dart';
@@ -19,6 +17,7 @@ import 'package:app_1helo/pages/product_page.dart';
 import 'package:app_1helo/pages/productreport_page.dart';
 import 'package:app_1helo/pages/staff_page.dart';
 import 'package:app_1helo/provider/navigation_provider.dart';
+import 'package:app_1helo/provider/notification_provider%20.dart';
 import 'package:app_1helo/provider/provider_color.dart';
 import 'package:app_1helo/service/app_localizations%20.dart';
 import 'package:app_1helo/service/notification_service.dart';
@@ -27,8 +26,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../model/notification_model.dart';
-import 'package:flutter/material.dart'; // Import Flutter's Material package
-import 'package:badges/badges.dart' hide Badge;
 
 class AppScreen extends StatefulWidget {
   const AppScreen({super.key});
@@ -43,47 +40,26 @@ class _AppScreenState extends State<AppScreen> {
   //   {'locale': const Locale('en'), 'name': 'English', 'flag': '🇺🇸'},
   // ];
   late NotificationService _notificationService;
-  List<Data> _notifications = [];
-  bool _isLoading = true;
   int unreadCount = 0;
 
   @override
   void initState() {
     super.initState();
-    print("initState called"); // Log to ensure initState is running
     _notificationService = NotificationService();
     _fetchNotifications();
   }
 
-// Hàm gọi API để lấy thông báo
   Future<void> _fetchNotifications() async {
     try {
-      print('Fetching notifications...'); // Log before fetching notifications
-
-      List<Data> notifications =
+      final List<Data> notifications =
           await _notificationService.fetchNotification(1, 10);
 
-      // Log fetched data
-      print('Notifications fetched: $notifications');
-
-      if (notifications.isEmpty) {
-        print('No notifications found');
-      }
-
-      setState(() {
-        _notifications = notifications;
-
-        // Calculate unread notifications and log it
-        unreadCount = _notifications.where((notif) => notif.isRead == 0).length;
-        print('Unread notifications count: $unreadCount');
-
-        _isLoading = false;
-      });
+      // Cập nhật danh sách thông báo vào NotificationProvider
+      final notificationProvider =
+          Provider.of<NotificationProvider>(context, listen: false);
+      notificationProvider.setNotifications(notifications);
     } catch (e) {
-      print('Lỗi khi lấy dữ liệu: $e'); // Log error if fetching fails
-      setState(() {
-        _isLoading = false;
-      });
+      print('Lỗi khi lấy thông báo: $e');
     }
   }
 
@@ -186,7 +162,7 @@ class _AppScreenState extends State<AppScreen> {
     final navigationProvider = Provider.of<NavigationProvider>(context);
     final currentIndex = navigationProvider.currentIndex;
     final selectedColor = Provider.of<Providercolor>(context).selectedColor;
-    final localization = AppLocalizations.of(context);
+    AppLocalizations.of(context);
 
     // final currentLocale = context.watch<LocaleProvider>().locale;
 
@@ -208,29 +184,6 @@ class _AppScreenState extends State<AppScreen> {
         ),
         actions: const [
           NotificationBadge(),
-            // Badge(
-          //   label: Text(
-          //     '$unreadCount',
-          //     style: GoogleFonts.robotoCondensed(
-          //         color: Colors.white, fontSize: 12),
-          //   ),
-          //   backgroundColor: Colors.red,
-          //   isLabelVisible: true,
-          //   alignment:
-          //       Alignment.topRight,
-          //   offset: const Offset(
-          //       -8, 6),
-          //   child: IconButton(
-          //     onPressed: () {
-          //       Navigator.push(
-          //         context,
-          //         MaterialPageRoute(builder: (context) => NotificationsPage()),
-          //       );
-          //     },
-          //     icon: const Icon(Icons.notifications_none_outlined, size: 28),
-          //     color: Colors.white,
-          //   ),
-          // )
         ],
         iconTheme: const IconThemeData(
           color: Colors.white,
@@ -245,93 +198,10 @@ class _AppScreenState extends State<AppScreen> {
           navigationProvider.setCurrentIndex(index);
         },
       ),
-      floatingActionButton: Stack(
-        alignment: Alignment.bottomRight,
-        children: [
-          Visibility(
-            visible: isExpanded,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 150.0),
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: FloatingActionButton(
-                  heroTag: 'uniqueTagForButton3',
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const FacebookPage()));
-                  },
-                  tooltip: 'Button 3',
-                  backgroundColor: selectedColor,
-                  child: const Icon(
-                    Icons.facebook_outlined,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Visibility(
-            visible: isExpanded,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 100.0),
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: FloatingActionButton(
-                  heroTag: 'uniqueTagForButton2',
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const Chatbox()));
-                  },
-                  backgroundColor: selectedColor,
-                  tooltip: 'Button 2',
-                  child: const Icon(
-                    Icons.zoom_out_map_outlined,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Visibility(
-            visible: isExpanded,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 50.0),
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: FloatingActionButton(
-                  heroTag: 'uniqueTagForButton1',
-                  onPressed: () {},
-                  backgroundColor: selectedColor,
-                  tooltip: 'Button 1',
-                  child: const Icon(
-                    Icons.phone_callback_outlined,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 40,
-            height: 40,
-            child: FloatingActionButton(
-              onPressed: _toggleButtons,
-              tooltip: 'Toggle',
-              backgroundColor: selectedColor,
-              child: Icon(
-                isExpanded ? Icons.close : Icons.support_agent_outlined,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
+      floatingActionButton: FloatingActionButtonStack(
+        isExpanded: isExpanded,
+        selectedColor: selectedColor,
+        toggleButtons: _toggleButtons,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
