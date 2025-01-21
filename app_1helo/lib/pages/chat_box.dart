@@ -4,6 +4,7 @@ import 'package:app_1helo/provider/provider_color.dart';
 import 'package:app_1helo/service/chatbot_answer_service.dart';
 import 'package:app_1helo/service/chatbot_getcode_service.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -18,6 +19,7 @@ class _ChatBoxState extends State<ChatBox> {
   final TextEditingController _controller = TextEditingController();
   final List<Map<String, dynamic>> _messages = [];
   String? _initialMessage;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -46,8 +48,9 @@ class _ChatBoxState extends State<ChatBox> {
 
     setState(() {
       _messages.add({'type': 'user', 'text': userQuery});
+      _isLoading = true;
     });
-
+    _controller.clear();
     BodyChatbotAnswer chatbotRequest = BodyChatbotAnswer(
       chatbotCode: "a4db1b36-8e24-4fee-bbef-70ca4413e988",
       chatbotName: "Chatbot 2024/12/05, 16:35:57",
@@ -79,10 +82,14 @@ class _ChatBoxState extends State<ChatBox> {
 
     ChatbotAnswerModel? response = await fetchApiResponse(chatbotRequest);
 
+    setState(() {
+      _isLoading = false;
+    });
     if (response != null) {
       print("API response: ${response.message}");
 
       setState(() {
+        _isLoading = false;
         List<String> images = response.data.images.isNotEmpty
             ? response.data.images
             : ['resources/logo_chatbox.jpg'];
@@ -111,6 +118,8 @@ class _ChatBoxState extends State<ChatBox> {
   @override
   Widget build(BuildContext context) {
     final selectColors = Provider.of<Providercolor>(context).selectedColor;
+    final textChatBot =
+        GoogleFonts.robotoCondensed(fontSize: 15, color: Colors.black);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: selectColors,
@@ -121,6 +130,7 @@ class _ChatBoxState extends State<ChatBox> {
             color: Colors.white,
             icon: const Icon(Icons.arrow_back)),
         title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const CircleAvatar(
               backgroundImage: AssetImage('resources/logo_chatbox.jpg'),
@@ -175,12 +185,13 @@ class _ChatBoxState extends State<ChatBox> {
                         margin: const EdgeInsets.symmetric(vertical: 5),
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: isUser ? Colors.teal[300] : Colors.grey[300],
+                          color: isUser ? selectColors : Colors.grey[300],
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
                           message['text']!,
-                          style: TextStyle(
+                          style: GoogleFonts.robotoCondensed(
+                              fontSize: 14,
                               color: isUser ? Colors.white : Colors.black),
                         ),
                       ),
@@ -190,6 +201,29 @@ class _ChatBoxState extends State<ChatBox> {
               },
             ),
           ),
+          if (_isLoading) ...[
+            Padding(
+              padding: const EdgeInsets.all(6.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  RotationTransition(
+                    turns: const AlwaysStoppedAnimation(45 / 360),
+                    child: Icon(
+                      FontAwesomeIcons.circleNotch,
+                      color: selectColors,
+                      size: 20.0,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Bot đang trả lời...',
+                    style: textChatBot,
+                  ),
+                ],
+              ),
+            ),
+          ],
           Container(
             padding: const EdgeInsets.all(10),
             color: Colors.grey[200],
@@ -200,8 +234,7 @@ class _ChatBoxState extends State<ChatBox> {
                     controller: _controller,
                     decoration: InputDecoration(
                       hintText: 'Nhập tin nhắn...',
-                      hintStyle: GoogleFonts.robotoCondensed(
-                          fontSize: 16, color: Colors.black),
+                      hintStyle: textChatBot,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
@@ -215,12 +248,37 @@ class _ChatBoxState extends State<ChatBox> {
                 ),
                 const SizedBox(width: 10),
                 IconButton(
-                  icon: Icon(Icons.send, color: selectColors),
+                  icon: Icon(
+                      _isLoading ? Icons.hourglass_empty : Icons.send_rounded,
+                      color: selectColors),
                   onPressed: _sendMessage,
                 ),
               ],
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Được hỗ trợ bởi',
+                  style: textChatBot,
+                ),
+                Text(
+                  ' SmartChat |',
+                  style: GoogleFonts.robotoCondensed(
+                      fontSize: 15,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  ' AI Academy',
+                  style: textChatBot,
+                )
+              ],
+            ),
+          )
         ],
       ),
     );
